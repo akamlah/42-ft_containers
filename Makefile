@@ -26,13 +26,15 @@ CLASSES = \
 INTERFACES = \
 
 OTHER_CPPFILES = \
+	
 
 TEMPLATES_HPP = \
 	vector.hpp \
 
 OTHER_HEADERS = \
 	ANSIpalette.h \
-
+	TestClass.hpp
+	
 # ********************************************************************* #
 # internal setup:
 # (Classes must have .cpp/.hpp extension to be compiled)
@@ -78,6 +80,9 @@ dbg: fclean $(SOURCES) $(HEADER_DEPS)
 
 sani: fclean $(SOURCES) $(HEADER_DEPS)
 	$(CC) $(CFLAGS) -o $(EXECUTABLE_NAME) $(SOURCES) -g3 -fsanitize=address
+
+sani_std: $(SOURCES) $(HEADER_DEPS)
+	$(CC) $(CFLAGS) -o $(EXECUTABLE_NAME) $(SOURCES) -DSTD=1 -g3 -fsanitize=address
 
 comp:
 	./std_compare/compare.sh

@@ -1,0 +1,16 @@
+8,9c8,9
+< 0
+< 1
+---
+> 2
+> 2
+40c40
+< 0 9 10 16 1152921504606846975 0 9 
+---
+> 0 -421504480 10 16 1152921504606846975 0 -421504480 
+43,44c43,44
+< Process 61165: 157 nodes malloced for 12 KB
+< Process 61165: 0 leaks for 0 total leaked bytes.
+---
+> Process 61184: 157 nodes malloced for 12 KB
+> Process 61184: 0 leaks for 0 total leaked bytes.

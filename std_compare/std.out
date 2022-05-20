@@ -1,0 +1,45 @@
+[1;36m----	 vector_pushback_int 	----[0m
+size: 4 capacity: 4
+size: 5 capacity: 8
+element[4]: 2
+element[4] + 3: 5
+
+[1;36m----	 vector_pushbackTC 	----[0m
+0
+1
+2
+4
+4
+8
+8
+
+[1;36m----	 vector_popback 	----[0m
+empty
+
+[1;36m----	 vector_iterators 	----[0m
+8
+begin: 0 
+end - 1: 14 
+begin: 0 
+end - 1: 13 
+c it begin: 0 
+begin: 0 
+end - 1: 13 
+0max_size: 1152921504606846975
+front: 0
+
+[1;36m----	 vector_swap_and_copies 	----[0m
+0 14 15 16 1152921504606846975 0 14 
+100 114 15 16 1152921504606846975 100 114 
+100 114 15 16 1152921504606846975 100 114 
+0 14 15 16 1152921504606846975 0 14 
+
+[1;36m----	 vector_resize 	----[0m
+0 14 15 16 1152921504606846975 0 14 
+0 4 5 16 1152921504606846975 0 4 
+0 9 10 16 1152921504606846975 0 9 
+0 77 15 16 1152921504606846975 0 77 
+
+Process 61165: 157 nodes malloced for 12 KB
+Process 61165: 0 leaks for 0 total leaked bytes.
+
