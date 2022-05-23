@@ -10,6 +10,7 @@ public:
 		std::cout << ", sizeof *this: " << sizeof(*this);
 		std::cout << NC << std::endl;
 		#endif
+		_someValue = 1;
 		_someStuffOnHeap = new int(0);
 	}
 	TestClass(const int n) {
@@ -57,6 +58,6 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& o, const TestClass& x) {
-	o << x.getValue();
+	o << x.getValue() << "-" << x.getHeapValue();
 	return (o);
 }

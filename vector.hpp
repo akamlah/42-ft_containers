@@ -20,6 +20,10 @@
 # define _THROWS_OUT_OF_RANGE throw(std::out_of_range)
 #endif
 
+#ifndef _THROWS_LENGTH_ERROR
+# define _THROWS_LENGTH_ERROR throw(std::length_error)
+#endif
+
 #ifndef _NOEXCEPT
 # define _NOEXCEPT throw()
 #endif
@@ -73,6 +77,23 @@ ASSIGNMENTS
 	template< class InputIt >
 		void assign( InputIt first, InputIt last );
 
+MODIFIERS
+ -	deletion
+		void clear();
+		iterator erase( iterator pos );
+		iterator erase( iterator first, iterator last );
+		void pop_back();
+ -	insertion:
+		void push_back( const T& value );
+		iterator insert( iterator pos, const T& value );
+		void insert( iterator pos, size_type count, const T& value );
+		template< class InputIt >
+			void insert( iterator pos, InputIt first, InputIt last );
+ -	resize:
+		void resize( size_type count, T value = T() );
+ - 	swap:
+		void swap( vector& other );
+
 ACCESSORS
  -	allocator:
 		allocator_type get_allocator() const;
@@ -101,24 +122,6 @@ ACCESSORS
 		size_type max_size() const;
 		void reserve( size_type new_cap ); // setter for cpacity
 		size_type capacity() const;
-
-MODIFIERS
- -	deletion
-		void clear();
-		iterator erase( iterator pos );
-		iterator erase( iterator first, iterator last );
-		void pop_back();
- -	insertion:
-		void push_back( const T& value );
-		iterator insert( iterator pos, const T& value );
-		void insert( iterator pos, size_type count, const T& value );
-		template< class InputIt >
-			void insert( iterator pos, InputIt first, InputIt last );
- -	resize:
-		void resize( size_type count, T value = T() );
- - 	swap:
-		void swap( vector& other );
-
 
 - NON MEMBER FUNCTIONS -------------------------------------------------------
 
@@ -152,8 +155,11 @@ std::swap specialization
 *************************************************************************** */
 
 
+// std::cout << RED << "HERE" << NC << std::endl;
+
 
 /*   +  +  +  +  +  +  +  --- IMPLEMENTATION ---  +  +  +  +  +  +  +  +  + */
+
 
 namespace ft { /* NAMESPACE FT -------------------------------------------- */
 
@@ -195,35 +201,15 @@ private: // protected: ?
 	iterator		_end_capacity;
 	pointer			_data;
 
-/* - CONSTRUCTION --------------------------------------------------------- */
-public:
-
-	vector() _NOEXCEPT_(is_nothrow_default_constructible<allocator_type>::value) {
-		_build_empty_vector();
-	}
-
-	// explicit vector( const Allocator& alloc );
-	// explicit vector( size_type count, const T& value = T(), const Allocator& alloc = Allocator());
-	template< class InputIt >
-	vector( InputIt first, InputIt last); //, const Allocator& alloc = Allocator() );
-
-	vector( const vector& other );
-
-/* - DESTRUCTION ---------------------------------------------------------- */
-
-	~vector() {
-		clear();
-		_allocator.deallocate(_data, capacity());
-	}
-
 /* - INTERNAL FUNCTIONALITIES --------------------------------------------- */
+
 private:
 
 	void _build_empty_vector() {
 		_data = _allocator.allocate(0);
-		_begin = _data; // actually segfaults in std if called at beginning
-		_end_size = _begin;
-		_end_capacity = _begin;
+		_begin = NULL;
+		_end_size = NULL;
+		_end_capacity = NULL;
 	}
 
 	void _transfer_content(pointer new_block) {
@@ -238,107 +224,71 @@ private:
 		_end_size = _data + i;
 	}
 
-	void _increase_capacity() {
+	size_type _new_capacity() const {
 		size_type new_cap;
 		size_type current_cap = capacity();
 		if (empty())
-			new_cap = 2;
+			new_cap = 1; // necessary ?
 		else if (current_cap < 128)
 			new_cap = current_cap * 2;
 		else
 			new_cap = current_cap + current_cap / 2;
+		return (new_cap);
+	}
+
+	void _reallocate_capacity(size_type new_cap) {
 		pointer new_block = _allocator.allocate(new_cap);
 		_transfer_content(new_block);
 		_end_capacity = _data + new_cap;
 	}
+	
+/* - CONSTRUCTION --------------------------------------------------------- */
+
+public:
+
+	vector() _NOEXCEPT_(is_nothrow_default_constructible<allocator_type>::value) {
+		_build_empty_vector();
+	}
+
+	explicit vector(size_type count, const T& value = T()) {
+		_build_empty_vector();
+		_reallocate_capacity(count);
+		for (size_type i = 0; i < count; i++) {
+			_allocator.construct(_data + i, value);
+		}
+		_end_size = _data + count;
+	}
+
+	template< class InputIt > vector(InputIt first, InputIt last);
+
+	vector(const vector& other );
+
+/* - DESTRUCTION ---------------------------------------------------------- */
+
+	~vector() {
+		clear();
+		_allocator.deallocate(_data, capacity());
+		_end_capacity = NULL;
+		_end_size = NULL;
+		_begin = NULL;
+	}
 
 /* - MEMBER FUNCTIONS ----------------------------------------------------- */
+
 public:
 
 /* ASSIGNMENTS */
 
 	vector& operator=( const vector& other );
+
 	void assign( size_type count, const T& value );
+
 	template< class InputIt >
 		void assign( InputIt first, InputIt last );
 
-/* ACCESSORS */
-
-//  -	allocator:
-
-	allocator_type get_allocator() const {
-		return (_allocator);
-	}
-
-//  -	elements:
-
-	reference at( size_type pos ) _THROWS_OUT_OF_RANGE {
-		if (pos < 0 || pos >= size())
-			std::__throw_out_of_range("index out of vector range");
-	}
-	reference operator[]( size_type pos ) _NOEXCEPT {
-		return (*(_data + pos));
-	}
-	const_reference operator[]( size_type pos ) const _NOEXCEPT {
-		return (*(_data + pos));
-	}
-	reference front() _NOEXCEPT {
-		return (*begin());
-	}
-	const_reference front() const _NOEXCEPT {
-		return (*begin());
-	}
-	reference back() _NOEXCEPT {
-		return (*(end() - 1));
-	}
-	const_reference back() const _NOEXCEPT {
-		return (*(end() - 1));
-	}
-	T* data() {
-		return (_data);
-	}
-	const T* data() const {
-		return (_data);
-	}
-
-//  -	iterators:
-
-	iterator begin() _NOEXCEPT {
-		return (_begin);
-	}
-	const_iterator begin() const _NOEXCEPT {
-		return (_begin);
-	}
-	iterator end() _NOEXCEPT {
-		return (_end_size);
-	}
-	const_iterator end() const _NOEXCEPT {
-		return (_end_size);
-	}
-	reverse_iterator rbegin();
-	const_reverse_iterator rbegin() const;
-	reverse_iterator rend();
-	const_reverse_iterator rend() const;
-
-//  -	capacity:
-
-	bool empty() const {
-		return (begin() == end());
-	}
-	size_type size() const {
-		return (_end_size - _begin);
-	}
-	size_type max_size() const {
-		return (_allocator.max_size());
-	}
-	void reserve( size_type new_cap );
-	size_type capacity() const {
-		return (_end_capacity - _begin);
-	}
-
 /* MODIFIERS */
 
-//  -	deletion
+/*  -	deletion */
 
 	void clear() {
 		for (size_type i = 0; i < size(); i++) {
@@ -348,29 +298,157 @@ public:
 	}
 
 	iterator erase( iterator pos );
+
 	iterator erase( iterator first, iterator last );
-	void pop_back();
 
-//  -	insertion:
+	void pop_back() {
+		if (empty())
+			return ;
+		_end_size--;
+		_allocator.destroy(_end_size);
+	}
 
+/*  -	insertion: */
+
+	// exception catch from aloc or cpy?
 	void push_back( const T& value ) {
-		if (capacity() <= size())
-			_increase_capacity();
+		if (capacity() <= size()) { // also true if all ptrs null
+			_reallocate_capacity(_new_capacity());
+		}
 		_allocator.construct(_end_size, value);
 		_end_size++;
 	}
+	
 	iterator insert( iterator pos, const T& value );
+
 	void insert( iterator pos, size_type count, const T& value );
+
 	template< class InputIt >
 		void insert( iterator pos, InputIt first, InputIt last );
 
-//  -	resize:
+/*  -	resize: */
 
-	void resize( size_type count, T value = T() );
-
-//  - 	swap:
+	void resize(size_type count, value_type value = value_type()) {
+		if (count == size())
+			return ;
+		if (count > size()) {
+			if (count > capacity())
+				_reallocate_capacity(count);
+			while (size() != capacity()) {
+				_allocator.construct(_end_size, value);
+				_end_size++;
+			}
+			return ;
+		}
+		for (size_type i = size() - 1; i >= count; i--)
+			_allocator.destroy(--_end_size);
+	}
+ 
+/*  - 	swap: */
 
 	void swap( vector& other );
+
+
+/* ACCESSORS */
+
+/*  -	allocator: */
+
+	allocator_type get_allocator() const {
+		return (_allocator);
+	}
+
+/*  -	elements: */
+
+	reference at( size_type pos ) _THROWS_OUT_OF_RANGE {
+		if (pos < 0 || pos >= size())
+			std::__throw_out_of_range("index out of vector range");
+	}
+
+	reference operator[]( size_type pos ) _NOEXCEPT {
+		return (*(_data + pos));
+	}
+
+	const_reference operator[]( size_type pos ) const _NOEXCEPT {
+		return (*(_data + pos));
+	}
+
+	reference front() _NOEXCEPT {
+		return (*begin());
+	}
+
+	const_reference front() const _NOEXCEPT {
+		return (*begin());
+	}
+
+	reference back() _NOEXCEPT {
+		return (*(end() - 1));
+	}
+	
+	const_reference back() const _NOEXCEPT {
+		return (*(end() - 1));
+	}
+
+	T* data() {
+		return (_data);
+	}
+
+	const T* data() const {
+		return (_data);
+	}
+
+/*  -	iterators: */
+
+	iterator begin() _NOEXCEPT {
+		return (_begin);
+	}
+
+	const_iterator begin() const _NOEXCEPT {
+		return (_begin);
+	}
+	
+	iterator end() _NOEXCEPT {
+		return (_end_size);
+	}
+
+	const_iterator end() const _NOEXCEPT {
+		return (_end_size);
+	}
+
+	reverse_iterator rbegin();
+
+	const_reverse_iterator rbegin() const;
+
+	reverse_iterator rend();
+
+	const_reverse_iterator rend() const;
+
+/*  -	capacity: */
+
+	bool empty() const {
+		return (begin() == end());
+	}
+
+	size_type size() const {
+		return (_end_size - _begin);
+	}
+
+	size_type max_size() const {
+		return (_allocator.max_size());
+	}
+
+	void reserve(size_type new_cap) _THROWS_LENGTH_ERROR {
+		if (new_cap > max_size())
+			throw std::length_error("Invalid capacity");
+		if (new_cap > capacity()) {
+			// optimise ? (also constructor then) but sofar = std
+			// exceptions ?
+			_reallocate_capacity(new_cap);
+		}
+	}
+
+	size_type capacity() const {
+		return (_end_capacity - _begin);
+	}
 
 };  /* VECTOR FT end -------------------------------------------------------*/
 
