@@ -13,6 +13,7 @@
 #include "iterator.hpp"
 #include "type_traits.hpp"
 
+// have a __config header for this: ?
 #ifndef _LIBFT_VECTOR_H_
 # define _LIBFT_VECTOR_H_
 
@@ -36,6 +37,12 @@
 // #ifndef vector
 // #define vector vector
 // #endif
+
+/*
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1
+
+*/
 
 /* ***************************************************************************
 
@@ -270,9 +277,9 @@ public:
 	}
 
 	// template< typeneme _InputIter >
+		// + enable if correct iter
 	vector(const_iterator first, const_iterator last, \
 		const Alloc&alloc = allocator_type()): _allocator(alloc) {
-		// + enable if correct iter
 		size_type range = static_cast<size_type>(last - first);
 		__allocate_empty_vector(range);
 		for (const_iterator it = first; it != last; it++) {
@@ -322,6 +329,8 @@ public:
 			_allocator.construct(_end_size++, value);
 	}
 
+	// template< typeneme _InputIter >
+		// + enable if correct iter
 	void assign(const_iterator first, const_iterator last) {
 		clear();
 		size_type range = static_cast<size_type>(last - first);
@@ -343,6 +352,8 @@ public:
 		_end_size = _begin;
 	}
 
+	// template< typeneme _InputIter >
+		// + enable if correct iter
 	iterator erase(iterator pos) {
 		if (!__iterator_is_in_range(pos) || pos == _end_size)
 			return (pos);
@@ -356,6 +367,8 @@ public:
 		return (pos);
 	}
 
+	// template< typeneme _InputIter >
+		// + enable if correct iter
 	iterator erase(iterator first, iterator last) {
 		iterator curr = first;
 		iterator remaining = last;
@@ -395,7 +408,9 @@ public:
 		_allocator.construct(_end_size, value);
 		++_end_size;
 	}
-	
+
+	// template< typeneme _InputIter >
+		// + enable if correct iter
 	iterator insert(iterator pos, const T& value) {
 		if (pos == _end_size) {
 			push_back(value);
@@ -422,6 +437,8 @@ public:
 		return (pos);
 	}
 
+	// template< typeneme _InputIter >
+		// + enable if correct iter
 	void insert(iterator pos, size_type n, const T& value) {
 		size_type new_cap = size() + n;
 		if (new_cap < capacity())
@@ -448,6 +465,8 @@ public:
 		_end_capacity = _begin + new_cap;
 	}
 
+	// template< typeneme _InputIter >
+		// + enable if correct iter
 	void insert(iterator pos, const_iterator first, const_iterator last) {
 		size_type range = static_cast<size_type>(last - first);
 		size_type new_cap = size() + range;
@@ -614,6 +633,8 @@ public:
 /* - NON MEMBER FUNCTIONS ------------------------------------------------- */
 
 /* operator==,!=,<,<=,>,>=,<=> */
+
+// + enable ifs ?
 
 	template< class T, class Alloc >
 	bool operator==(const ft::vector<T, Alloc>& lhs,
