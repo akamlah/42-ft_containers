@@ -1,16 +1,16 @@
-29c29
-< *begin: 1-0, *end - 1: 1-0, size: 50, capacity: 96, front: 1-0, back: 1-0, empty?: 0, 
+47c47
+< *begin: 1, *end - 1: 1, size: 50, capacity: 96, front: 1, back: 1, empty?: 0, 
 ---
-> *begin: 1-0, *end - 1: 1-0, size: 50, capacity: 50, front: 1-0, back: 1-0, empty?: 0, 
-79,81c79,81
-< *begin: 1-0, *end - 1: 1-0, size: 5, capacity: 96, front: 1-0, back: 1-0, empty?: 0, 
-< *begin: 1-0, *end - 1: 38-9, size: 24, capacity: 96, front: 1-0, back: 38-9, empty?: 0, 
-< *begin: 1-0, *end - 1: 38-9, size: 24, capacity: 96, front: 1-0, back: 38-9, empty?: 0, 
+> *begin: 1, *end - 1: 1, size: 50, capacity: 50, front: 1, back: 1, empty?: 0, 
+97,99c97,99
+< *begin: 1, *end - 1: 1, size: 5, capacity: 96, front: 1, back: 1, empty?: 0, 
+< *begin: 1, *end - 1: 38, size: 24, capacity: 96, front: 1, back: 38, empty?: 0, 
+< *begin: 1, *end - 1: 38, size: 24, capacity: 96, front: 1, back: 38, empty?: 0, 
 ---
-> *begin: 1-0, *end - 1: 1-0, size: 5, capacity: 50, front: 1-0, back: 1-0, empty?: 0, 
-> *begin: 1-0, *end - 1: 38-9, size: 24, capacity: 50, front: 1-0, back: 38-9, empty?: 0, 
-> *begin: 1-0, *end - 1: 38-9, size: 24, capacity: 50, front: 1-0, back: 38-9, empty?: 0, 
-83,88c83,88
+> *begin: 1, *end - 1: 1, size: 5, capacity: 50, front: 1, back: 1, empty?: 0, 
+> *begin: 1, *end - 1: 38, size: 24, capacity: 50, front: 1, back: 38, empty?: 0, 
+> *begin: 1, *end - 1: 38, size: 24, capacity: 50, front: 1, back: 38, empty?: 0, 
+102,107c102,107
 < *begin: 20, *end - 1: 42, size: 10, capacity: 14, front: 20, back: 42, empty?: 0, 
 < *begin: 20, *end - 1: 43, size: 18, capacity: 28, front: 20, back: 43, empty?: 0, 
 < *begin: 20, *end - 1: 42, size: 10, capacity: 28, front: 20, back: 42, empty?: 0, 
@@ -24,9 +24,17 @@
 > *begin: 20, *end - 1: 44, size: 23, capacity: 23, front: 20, back: 44, empty?: 0, 
 > *begin: 20, *end - 1: 9, size: 5, capacity: 23, front: 20, back: 9, empty?: 0, 
 > *begin: 20, *end - 1: 9, size: 5, capacity: 23, front: 20, back: 9, empty?: 0, 
-94,95c94,95
-< Process 27206: 156 nodes malloced for 12 KB
-< Process 27206: 0 leaks for 0 total leaked bytes.
+162c162
+< *begin: 2, *end - 1: 40, size: 20, capacity: 20, front: 2, back: 40, empty?: 0, 
 ---
-> Process 27226: 156 nodes malloced for 12 KB
-> Process 27226: 0 leaks for 0 total leaked bytes.
+> *begin: 2, *end - 1: 40, size: 20, capacity: 32, front: 2, back: 40, empty?: 0, 
+521c521
+< *begin: 0, *end - 1: -2, size: 36, capacity: 64, front: 0, back: -2, empty?: 0, 
+---
+> *begin: 0, *end - 1: -2, size: 36, capacity: 36, front: 0, back: -2, empty?: 0, 
+766,767c766,767
+< Process 14082: 159 nodes malloced for 12 KB
+< Process 14082: 0 leaks for 0 total leaked bytes.
+---
+> Process 14103: 159 nodes malloced for 12 KB
+> Process 14103: 0 leaks for 0 total leaked bytes.

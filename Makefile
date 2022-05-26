@@ -30,6 +30,10 @@ OTHER_CPPFILES = \
 
 TEMPLATES_HPP = \
 	vector.hpp \
+	iterator.hpp \
+	type_traits.hpp \
+	algorithm.hpp \
+	utility.hpp
 
 OTHER_HEADERS = \
 	ANSIpalette.h \

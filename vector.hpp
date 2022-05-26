@@ -4,12 +4,17 @@
 /*																			*/
 /* ************************************************************************ */
 
-#include <string>
+// std::
 #include <iostream>
-#include <vector>
 #include <cassert>
 #include <algorithm>
-#include "ANSIpalette.h"
+
+// ft::
+#include "iterator.hpp"
+#include "type_traits.hpp"
+
+#ifndef _LIBFT_VECTOR_H_
+# define _LIBFT_VECTOR_H_
 
 #define PF __PRETTY_FUNCTION__
 #ifndef DBG
@@ -27,6 +32,10 @@
 #ifndef _NOEXCEPT
 # define _NOEXCEPT throw()
 #endif
+
+// #ifndef vector
+// #define vector vector
+// #endif
 
 /* ***************************************************************************
 
@@ -60,11 +69,11 @@ iterator end;
 
 CONSTRUCTION
 	vector();
-		// explicit vector( const Allocator& alloc );
-		// explicit vector( size_type count, const T& value = T(), \
-			const Allocator& alloc = Allocator());
-	template< class InputIt >
-		vector( InputIt first, InputIt last, \
+	explicit vector( const Allocator& alloc );
+	explicit vector( size_type n, const T& value = T(), \
+		const Allocator& alloc = Allocator());
+	template< class const_iterator >
+		vector( const_iterator first, const_iterator last, \
 			const Allocator& alloc = Allocator() );
 	vector( const vector& other );
 
@@ -73,9 +82,9 @@ DESTRUCTION
 
 ASSIGNMENTS
 	vector& operator=( const vector& other );
-	void assign( size_type count, const T& value );
-	template< class InputIt >
-		void assign( InputIt first, InputIt last );
+	void assign( size_type n, const T& value );
+	template< class const_iterator >
+		void assign( const_iterator first, const_iterator last );
 
 MODIFIERS
  -	deletion
@@ -86,11 +95,11 @@ MODIFIERS
  -	insertion:
 		void push_back( const T& value );
 		iterator insert( iterator pos, const T& value );
-		void insert( iterator pos, size_type count, const T& value );
-		template< class InputIt >
-			void insert( iterator pos, InputIt first, InputIt last );
+		void insert( iterator pos, size_type n, const T& value );
+		template< class const_iterator >
+			void insert( iterator pos, const_iterator first, const_iterator last );
  -	resize:
-		void resize( size_type count, T value = T() );
+		void resize( size_type n, T value = T() );
  - 	swap:
 		void swap( vector& other );
 
@@ -99,6 +108,7 @@ ACCESSORS
 		allocator_type get_allocator() const;
  -	elements:
 		reference at( size_type pos );
+		const_reference at( size_type pos ) const;
 		reference operator[]( size_type pos );
 		const_reference operator[]( size_type pos ) const;
 		reference front();
@@ -128,23 +138,17 @@ ACCESSORS
 operator==,!=,<,<=,>,>=,<=>
 
 	template< class T, class Alloc >
-	bool operator==( const std::vector<T,Alloc>& lhs,
-					const std::vector<T,Alloc>& rhs );
+	bool operator==(const ft::vector<T, Alloc>& lhs, const std::vector<T>& rhs);
 	template< class T, class Alloc >
-	bool operator!=( const std::vector<T,Alloc>& lhs,
-					const std::vector<T,Alloc>& rhs );
+	bool operator!=(const ft::vector<T, Alloc>& lhs, const ft::vector<T>& rhs);
 	template< class T, class Alloc >
-	bool operator<( const std::vector<T,Alloc>& lhs,
-					const std::vector<T,Alloc>& rhs );
+	bool operator<(const ft::vector<T, Alloc>& lhs, const ft::vector<T>& rhs);
 	template< class T, class Alloc >
-	bool operator<=( const std::vector<T,Alloc>& lhs,
-					const std::vector<T,Alloc>& rhs );
+	bool operator<=(const ft::vector<T, Alloc>& lhs, const ft::vector<T>& rhs);
 	template< class T, class Alloc >
-	bool operator>( const std::vector<T,Alloc>& lhs,
-					const std::vector<T,Alloc>& rhs );
+	bool operator>(const ft::vector<T, Alloc>& lhs, const ft::vector<T>& rhs);
 	template< class T, class Alloc >
-	bool operator>=( const std::vector<T,Alloc>& lhs,
-					const std::vector<T,Alloc>& rhs );
+	bool operator>=(const ft::vector<T, Alloc>& lhs, const ft::vector<T>& rh );
 
 std::swap specialization
 
@@ -154,28 +158,18 @@ std::swap specialization
 
 *************************************************************************** */
 
-
-// std::cout << RED << "HERE" << NC << std::endl;
-
-
 /*   +  +  +  +  +  +  +  --- IMPLEMENTATION ---  +  +  +  +  +  +  +  +  + */
-
 
 namespace ft { /* NAMESPACE FT -------------------------------------------- */
 
-	template<typename T>
-	class allocator: public std::allocator<T> {
-		public:
-	};
-
-template <typename T>
+template <typename T, class Alloc = std::allocator<T> >
 class vector { /* VECTOR -------------------------------------------------- */
 
 /* - TYPEDEFS ------------------------------------------------------------- */
 
 public:
 
-	typedef ft::allocator<T>							allocator_type;
+	typedef Alloc										allocator_type;
 	typedef typename allocator_type::value_type			value_type;
 	typedef typename allocator_type::size_type			size_type;
 	typedef typename allocator_type::difference_type	difference_type;
@@ -185,11 +179,9 @@ public:
 	typedef typename allocator_type::const_pointer		const_pointer;
 	typedef pointer										iterator;
 	typedef const_pointer								const_iterator;
-
-	// todo (std -> ft):
-	typedef typename std::reverse_iterator<iterator>	reverse_iterator;
-	typedef typename std::reverse_iterator<const_iterator>	const_reverse_iterator;
-
+	typedef typename ft::reverse_iterator<iterator>	reverse_iterator;
+	typedef typename ft::reverse_iterator<const_iterator>
+		const_reverse_iterator;
 
 /* - ATTRIBUTES ----------------------------------------------------------- */
 
@@ -199,36 +191,30 @@ private: // protected: ?
 	iterator		_begin;
 	iterator		_end_size;
 	iterator		_end_capacity;
-	pointer			_data;
 
 /* - INTERNAL FUNCTIONALITIES --------------------------------------------- */
 
 private:
 
-	void _build_empty_vector() {
-		_data = _allocator.allocate(0);
-		_begin = NULL;
-		_end_size = NULL;
-		_end_capacity = NULL;
+	void __resize_empty_vector(size_type new_cap) {
+		pointer new_block = _allocator.allocate(new_cap);
+		_allocator.deallocate(_begin, capacity());
+		_begin = new_block;
+		_end_size = _begin;
+		_end_capacity = _begin + new_cap;
 	}
 
-	void _transfer_content(pointer new_block) {
-		size_type i;
-		for (i = 0; i < size(); i++) {
-			_allocator.construct(new_block + i, _data[i]);
-			_allocator.destroy(_data + i);
-		}
-		_allocator.deallocate(_data, capacity());
-		_data = new_block;
-		_begin = _data;
-		_end_size = _data + i;
+	void __allocate_empty_vector(size_type new_cap) {
+		_begin = _allocator.allocate(new_cap);
+		_end_size = _begin;
+		_end_capacity = _begin + new_cap;
 	}
 
-	size_type _new_capacity() const {
+	size_type __calculate_new_capacity() const {
 		size_type new_cap;
 		size_type current_cap = capacity();
 		if (empty())
-			new_cap = 1; // necessary ?
+			new_cap = 1;
 		else if (current_cap < 128)
 			new_cap = current_cap * 2;
 		else
@@ -236,140 +222,340 @@ private:
 		return (new_cap);
 	}
 
-	void _reallocate_capacity(size_type new_cap) {
+	void __resize_filled_vector(size_type new_cap) {
 		pointer new_block = _allocator.allocate(new_cap);
-		_transfer_content(new_block);
-		_end_capacity = _data + new_cap;
+		size_type i;
+		for (i = 0; i < size(); i++) {
+			_allocator.construct(new_block + i, _begin[i]);
+			_allocator.destroy(_begin + i);
+		}
+		_allocator.deallocate(_begin, capacity());
+		_begin = new_block;
+		_end_size = _begin + i;
+		_end_capacity = _begin + new_cap;
 	}
-	
+
+	bool __iterator_is_in_range(iterator it) const {
+		iterator curr = _begin;
+		while (curr != _end_size) {
+			if (curr == it)
+				return (true);
+			curr++;
+		}
+		if (it == _end_size)
+			return (true);
+		return (false);
+	}
+
+/* ------------------------------------------------------------------------ */
 /* - CONSTRUCTION --------------------------------------------------------- */
 
 public:
 
-	vector() _NOEXCEPT_(is_nothrow_default_constructible<allocator_type>::value) {
-		_build_empty_vector();
+	vector() {
+		__allocate_empty_vector(0);
 	}
 
-	explicit vector(size_type count, const T& value = T()) {
-		_build_empty_vector();
-		_reallocate_capacity(count);
-		for (size_type i = 0; i < count; i++) {
-			_allocator.construct(_data + i, value);
+	explicit vector( const Alloc& alloc): _allocator(alloc) {
+		// assert(is_same< typename allocator_type::value_type, value_type >::value);
+		__allocate_empty_vector(0);
+	}
+	
+	explicit vector(size_type n, const T& value = T(), \
+		const Alloc&alloc = allocator_type()): _allocator(alloc) {
+		__allocate_empty_vector(n);
+		for (size_type i = 0; i < n; i++)
+			_allocator.construct(_begin + i, value);
+		_end_size = _begin + n;
+	}
+
+	// template< typeneme _InputIter >
+	vector(const_iterator first, const_iterator last, \
+		const Alloc&alloc = allocator_type()): _allocator(alloc) {
+		// + enable if correct iter
+		size_type range = static_cast<size_type>(last - first);
+		__allocate_empty_vector(range);
+		for (const_iterator it = first; it != last; it++) {
+			_allocator.construct(_end_size++, *it);
 		}
-		_end_size = _data + count;
 	}
 
-	template< class InputIt > vector(InputIt first, InputIt last);
-
-	vector(const vector& other );
+	vector(const vector& other) {
+		__allocate_empty_vector(other.size());
+		for (const_iterator it = other.begin(); it != other.end(); it++) {
+			_allocator.construct(_end_size++, *it);
+		}
+	}
 
 /* - DESTRUCTION ---------------------------------------------------------- */
 
 	~vector() {
 		clear();
-		_allocator.deallocate(_data, capacity());
+		_allocator.deallocate(_begin, capacity());
 		_end_capacity = NULL;
 		_end_size = NULL;
 		_begin = NULL;
 	}
 
+/* ------------------------------------------------------------------------ */
 /* - MEMBER FUNCTIONS ----------------------------------------------------- */
 
 public:
 
 /* ASSIGNMENTS */
 
-	vector& operator=( const vector& other );
+	vector& operator=(const vector& other) {
+		clear();
+		if (other.capacity() != capacity())
+			__resize_empty_vector(other.capacity());
+		for (const_iterator it = other.begin(); it != other.end(); it++) {
+			_allocator.construct(_end_size++, *it);
+		}
+		return (*this);
+	}
 
-	void assign( size_type count, const T& value );
+	void assign(size_type n, const T& value) {
+		clear();
+		if (n > capacity())
+			__resize_empty_vector(n);
+		for (size_type i = 0; i < n; i++)
+			_allocator.construct(_end_size++, value);
+	}
 
-	template< class InputIt >
-		void assign( InputIt first, InputIt last );
+	void assign(const_iterator first, const_iterator last) {
+		clear();
+		size_type range = static_cast<size_type>(last - first);
+		if (range > capacity())
+			__resize_empty_vector(range);
+		for (const_iterator it = first; it != last; it++) {
+			_allocator.construct(_end_size++, *it);
+		}
+	}
 
 /* MODIFIERS */
 
-/*  -	deletion */
+/* ------------------------ deletion -------------------------------------- */
 
 	void clear() {
 		for (size_type i = 0; i < size(); i++) {
-			_allocator.destroy(_data + i);
+			_allocator.destroy(_begin + i);
 		}
-		_end_size = _data;
+		_end_size = _begin;
 	}
 
-	iterator erase( iterator pos );
+	iterator erase(iterator pos) {
+		if (!__iterator_is_in_range(pos) || pos == _end_size)
+			return (pos);
+		iterator curr = pos;
+		_allocator.destroy(curr);
+		while (curr + 1 != _end_size) {
+			_allocator.construct(curr, *(curr + 1));
+			_allocator.destroy(++curr);
+		}
+		_end_size = curr;
+		return (pos);
+	}
 
-	iterator erase( iterator first, iterator last );
+	iterator erase(iterator first, iterator last) {
+		iterator curr = first;
+		iterator remaining = last;
+		bool destroy_curr = true;
+		if (!__iterator_is_in_range(first) && __iterator_is_in_range(last))
+			curr = _begin;
+		if (curr == last)
+			return (curr);
+		while (remaining != _end_size) {
+			if (destroy_curr == true)
+				_allocator.destroy(curr);
+			_allocator.construct(curr++, *remaining);
+			_allocator.destroy(remaining++);
+			if (curr == last)
+				destroy_curr = false;
+		}
+		_end_size = curr;
+		if (destroy_curr == true) {
+			while (curr != remaining)
+				_allocator.destroy(curr++);
+		}
+		return (first);
+	}
 
 	void pop_back() {
 		if (empty())
 			return ;
-		_end_size--;
-		_allocator.destroy(_end_size);
+		_allocator.destroy(--_end_size);
 	}
 
-/*  -	insertion: */
+/* ------------------------ insertion: ------------------------------------ */
 
-	// exception catch from aloc or cpy?
-	void push_back( const T& value ) {
-		if (capacity() <= size()) { // also true if all ptrs null
-			_reallocate_capacity(_new_capacity());
+	void push_back(const T& value) {
+		if (capacity() <= size()) {
+			__resize_filled_vector(__calculate_new_capacity());
 		}
 		_allocator.construct(_end_size, value);
-		_end_size++;
+		++_end_size;
 	}
 	
-	iterator insert( iterator pos, const T& value );
-
-	void insert( iterator pos, size_type count, const T& value );
-
-	template< class InputIt >
-		void insert( iterator pos, InputIt first, InputIt last );
-
-/*  -	resize: */
-
-	void resize(size_type count, value_type value = value_type()) {
-		if (count == size())
-			return ;
-		if (count > size()) {
-			if (count > capacity())
-				_reallocate_capacity(count);
-			while (size() != capacity()) {
-				_allocator.construct(_end_size, value);
-				_end_size++;
+	iterator insert(iterator pos, const T& value) {
+		if (pos == _end_size) {
+			push_back(value);
+			return (_end_size - 1);
+		}
+		size_type new_cap = capacity();
+		if (size() == new_cap)
+			new_cap = __calculate_new_capacity();
+		pointer new_block = _allocator.allocate(new_cap);
+		iterator new_curr = new_block;
+		iterator curr = _begin;
+		while (curr != _end_size) {
+			if (curr == pos) {
+				pos = new_curr;
+				_allocator.construct(new_curr++, value);
 			}
+			_allocator.construct(new_curr++, *(curr++));
+		}
+		clear();
+		_allocator.deallocate(_begin, capacity());
+		_begin = new_block;
+		_end_size = new_curr;
+		_end_capacity = _begin + new_cap;
+		return (pos);
+	}
+
+	void insert(iterator pos, size_type n, const T& value) {
+		size_type new_cap = size() + n;
+		if (new_cap < capacity())
+			new_cap = capacity();
+		if (pos == _end_size) {
+			reserve(new_cap);
+			for (size_type cpys = 0; cpys < n; cpys++)
+				push_back(value);
 			return ;
 		}
-		for (size_type i = size() - 1; i >= count; i--)
+		pointer new_block = _allocator.allocate(new_cap);
+		iterator new_curr = new_block;
+		iterator curr = _begin;
+		while (curr != _end_size) {
+			if (curr == pos)
+				for (size_type cpys = 0; cpys < n; cpys++)
+						_allocator.construct(new_curr++, value);
+			_allocator.construct(new_curr++, *(curr++));
+		}
+		clear();
+		_allocator.deallocate(_begin, capacity());
+		_begin = new_block;
+		_end_size = new_curr;
+		_end_capacity = _begin + new_cap;
+	}
+
+	void insert(iterator pos, const_iterator first, const_iterator last) {
+		size_type range = static_cast<size_type>(last - first);
+		size_type new_cap = size() + range;
+		if (new_cap < capacity())
+			new_cap = capacity();
+		if (pos == _end_size) {
+			reserve(new_cap);
+			for (const_iterator set = first; set != last; set++)
+				push_back(*set);
+			return ;
+		}
+		pointer new_block = _allocator.allocate(new_cap);
+		iterator new_curr = new_block;
+		iterator curr = _begin;
+		while (curr != _end_size) {
+			if (curr == pos)
+				for (const_iterator set = first; set != last; set++)
+					_allocator.construct(new_curr++, *set);
+			_allocator.construct(new_curr++, *(curr++));
+		}
+		clear();
+		_allocator.deallocate(_begin, capacity());
+		_begin = new_block;
+		_end_size = new_curr;
+		_end_capacity = _begin + new_cap;
+	}
+	// ^^ could have done these with <algorithm> copy & copy_backward
+
+/* ------------------------ resize: --------------------------------------- */
+
+	void resize(size_type n, T value = T()) {
+		if (n == size())
+			return ;
+		if (n > size()) {
+			if (n > capacity())
+				__resize_filled_vector(n);
+			while (size() != capacity())
+				_allocator.construct(_end_size++, value);
+			return ;
+		}
+		for (size_type i = size(); i > n; i--)
 			_allocator.destroy(--_end_size);
 	}
  
-/*  - 	swap: */
+/*  ----------------------- swap: ----------------------------------------- */
 
-	void swap( vector& other );
+	void swap(vector& other) {
+		std::swap(_end_size, other._end_size);
+		std::swap(_end_capacity, other._end_capacity);
+		std::swap(_begin, other._begin);
+		std::swap(_allocator, other._allocator);
+	}
 
 
 /* ACCESSORS */
 
-/*  -	allocator: */
+/* ------------------------ capacity: ------------------------------------- */
+
+	bool empty() const {
+		return (begin() == end());
+	}
+
+	size_type size() const {
+		return (_end_size - _begin);
+	}
+
+	size_type max_size() const {
+		return (_allocator.max_size());
+	}
+
+	void reserve(size_type new_cap) _THROWS_LENGTH_ERROR {
+		if (new_cap > max_size())
+			throw std::length_error("Invalid capacity");
+		if (new_cap > capacity()) {
+			__resize_filled_vector(new_cap);
+		}
+	}
+
+	size_type capacity() const {
+		return (_end_capacity - _begin);
+	}
+
+/* ------------------------ allocator: ------------------------------------ */
 
 	allocator_type get_allocator() const {
 		return (_allocator);
 	}
 
-/*  -	elements: */
+/* ------------------------ elements: ------------------------------------- */
 
 	reference at( size_type pos ) _THROWS_OUT_OF_RANGE {
 		if (pos < 0 || pos >= size())
 			std::__throw_out_of_range("index out of vector range");
+		return (*(_begin + pos));
+	}
+
+	const_reference at( size_type pos ) const _THROWS_OUT_OF_RANGE {
+		if (pos < 0 || pos >= size())
+			std::__throw_out_of_range("index out of vector range");
+		return (*(_begin + pos));
 	}
 
 	reference operator[]( size_type pos ) _NOEXCEPT {
-		return (*(_data + pos));
+		return (*(_begin + pos));
 	}
 
 	const_reference operator[]( size_type pos ) const _NOEXCEPT {
-		return (*(_data + pos));
+		return (*(_begin + pos));
 	}
 
 	reference front() _NOEXCEPT {
@@ -389,14 +575,14 @@ public:
 	}
 
 	T* data() {
-		return (_data);
+		return (_begin);
 	}
 
 	const T* data() const {
-		return (_data);
+		return (_begin);
 	}
 
-/*  -	iterators: */
+/* ------------------------ iterators: ------------------------------------ */
 
 	iterator begin() _NOEXCEPT {
 		return (_begin);
@@ -422,35 +608,56 @@ public:
 
 	const_reverse_iterator rend() const;
 
-/*  -	capacity: */
 
-	bool empty() const {
-		return (begin() == end());
+}; /* class VECTOR FT ------------------------------------------------------*/
+
+/* - NON MEMBER FUNCTIONS ------------------------------------------------- */
+
+/* operator==,!=,<,<=,>,>=,<=> */
+
+	template< class T, class Alloc >
+	bool operator==(const ft::vector<T, Alloc>& lhs,
+		const ft::vector<T, Alloc>& rhs) {
+		return (lhs.size() == rhs.size()
+			&& std::equal(lhs.begin(), lhs.end(), rhs.begin()));
 	}
 
-	size_type size() const {
-		return (_end_size - _begin);
+	template< class T, class Alloc >
+	bool operator!=(const ft::vector<T, Alloc>& lhs,
+		const ft::vector<T, Alloc>& rhs) {
+		return (!(lhs == rhs));
 	}
 
-	size_type max_size() const {
-		return (_allocator.max_size());
+	template< class T, class Alloc >
+	bool operator<(const ft::vector<T, Alloc>& lhs,
+		const ft::vector<T, Alloc>& rhs) {
+		return (std::lexicographical_compare(lhs.begin(), lhs.end(),
+			rhs.begin(), rhs.end()));
 	}
 
-	void reserve(size_type new_cap) _THROWS_LENGTH_ERROR {
-		if (new_cap > max_size())
-			throw std::length_error("Invalid capacity");
-		if (new_cap > capacity()) {
-			// optimise ? (also constructor then) but sofar = std
-			// exceptions ?
-			_reallocate_capacity(new_cap);
-		}
+	template< class T, class Alloc >
+	bool operator<=(const ft::vector<T, Alloc>& lhs,
+		const ft::vector<T, Alloc>& rhs) {
+		return (std::lexicographical_compare(lhs.begin(), lhs.end(),
+			rhs.begin(), rhs.end()) || lhs == rhs);
 	}
 
-	size_type capacity() const {
-		return (_end_capacity - _begin);
+	template< class T, class Alloc >
+	bool operator>(const ft::vector<T, Alloc>& lhs,
+		const ft::vector<T, Alloc>& rhs) {
+		return (std::lexicographical_compare(rhs.begin(), rhs.end(),
+			lhs.begin(), lhs.end()) && rhs != lhs);
 	}
 
-};  /* VECTOR FT end -------------------------------------------------------*/
+	template< class T, class Alloc >
+	bool operator>=(const ft::vector<T, Alloc>& lhs,
+		const ft::vector<T, Alloc>& rhs) {
+		return (std::lexicographical_compare(rhs.begin(), rhs.end(),
+			lhs.begin(), lhs.end()) || rhs == lhs);
+	}
 
-
+// #undef vector
 } /* NAMESPACE FT end ------------------------------------------------------*/
+
+#endif
+/* - end VECTOR ----------------------------------------------------------- */
