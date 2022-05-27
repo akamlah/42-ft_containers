@@ -26,14 +26,15 @@ CLASSES = \
 INTERFACES = \
 
 OTHER_CPPFILES = \
-	
 
 TEMPLATES_HPP = \
-	vector.hpp \
-	iterator.hpp \
-	type_traits.hpp \
-	algorithm.hpp \
-	utility.hpp
+	../type_traits.hpp \
+	../utility.hpp \
+	../iterator.hpp \
+	\
+	../vector.hpp \
+	\
+	../algorithm.hpp \
 
 OTHER_HEADERS = \
 	ANSIpalette.h \

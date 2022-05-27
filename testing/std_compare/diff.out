@@ -1,0 +1,6 @@
+31,32c31,32
+< Process 28344: 157 nodes malloced for 12 KB
+< Process 28344: 0 leaks for 0 total leaked bytes.
+---
+> Process 28363: 157 nodes malloced for 12 KB
+> Process 28363: 0 leaks for 0 total leaked bytes.

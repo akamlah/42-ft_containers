@@ -12,6 +12,7 @@
 // ft::
 #include "iterator.hpp"
 #include "type_traits.hpp"
+#include "utility.hpp"
 
 // have a __config header for this: ?
 #ifndef _LIBFT_VECTOR_H_
@@ -40,7 +41,8 @@
 
 /*
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1
+/Applications/Xcode.app/Contents/Developer/Toolchains
+/XcodeDefault.xctoolchain/usr/include/c++/v1
 
 */
 
@@ -180,15 +182,16 @@ public:
 	typedef typename allocator_type::value_type			value_type;
 	typedef typename allocator_type::size_type			size_type;
 	typedef typename allocator_type::difference_type	difference_type;
+
 	typedef typename allocator_type::reference			reference;
 	typedef typename allocator_type::const_reference	const_reference;
 	typedef typename allocator_type::pointer			pointer;
 	typedef typename allocator_type::const_pointer		const_pointer;
-	typedef pointer										iterator;
-	typedef const_pointer								const_iterator;
-	typedef typename ft::reverse_iterator<iterator>	reverse_iterator;
-	typedef typename ft::reverse_iterator<const_iterator>
-		const_reverse_iterator;
+
+	typedef pointer											iterator;
+	typedef const_pointer									const_iterator;
+	typedef typename ft::reverse_iterator<iterator>			reverse_iterator;
+	typedef typename ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 /* - ATTRIBUTES ----------------------------------------------------------- */
 
@@ -242,6 +245,8 @@ private:
 		_end_capacity = _begin + new_cap;
 	}
 
+	// template< typeneme _InputIter >
+		// + enable if correct iter
 	bool __iterator_is_in_range(iterator it) const {
 		iterator curr = _begin;
 		while (curr != _end_size) {
@@ -263,6 +268,7 @@ public:
 		__allocate_empty_vector(0);
 	}
 
+	// protect ALLOC argument ?
 	explicit vector( const Alloc& alloc): _allocator(alloc) {
 		// assert(is_same< typename allocator_type::value_type, value_type >::value);
 		__allocate_empty_vector(0);
@@ -276,10 +282,22 @@ public:
 		_end_size = _begin + n;
 	}
 
-	// template< typeneme _InputIter >
-		// + enable if correct iter
-	vector(const_iterator first, const_iterator last, \
-		const Alloc&alloc = allocator_type()): _allocator(alloc) {
+	// template< typename InputIter >
+		// vector(_InputIterator __first,
+		// 	typename enable_if<__is_input_iterator <_InputIterator>::value &&
+		// 	!__is_forward_iterator<_InputIterator>::value &&
+		// 	is_constructible<
+		// 	value_type,
+		// 	typename iterator_traits<_InputIterator>::reference>::value,
+		// 	_InputIterator>::type __last);
+	// vector(const_iterator first, const_iterator last, const Alloc&alloc = allocator_type()): _allocator(alloc) {
+	// 	size_type range = static_cast<size_type>(last - first);
+	// 	__allocate_empty_vector(range);
+	// 	for (const_iterator it = first; it != last; it++) {
+	// 		_allocator.construct(_end_size++, *it);
+	// 	}
+	// }
+	vector(const_iterator first, const_iterator last, const Alloc&alloc = allocator_type()): _allocator(alloc) {
 		size_type range = static_cast<size_type>(last - first);
 		__allocate_empty_vector(range);
 		for (const_iterator it = first; it != last; it++) {
@@ -410,7 +428,34 @@ public:
 	}
 
 	// template< typeneme _InputIter >
-		// + enable if correct iter
+	// _InputIter insert(_InputIter pos, const T& value,
+	// ft::enable_if<>
+	// ) {
+	// 	if (pos == _end_size) {
+	// 		push_back(value);
+	// 		return (_end_size - 1);
+	// 	}
+	// 	size_type new_cap = capacity();
+	// 	if (size() == new_cap)
+	// 		new_cap = __calculate_new_capacity();
+	// 	pointer new_block = _allocator.allocate(new_cap);
+	// 	iterator new_curr = new_block;
+	// 	iterator curr = _begin;
+	// 	while (curr != _end_size) {
+	// 		if (curr == pos) {
+	// 			pos = new_curr;
+	// 			_allocator.construct(new_curr++, value);
+	// 		}
+	// 		_allocator.construct(new_curr++, *(curr++));
+	// 	}
+	// 	clear();
+	// 	_allocator.deallocate(_begin, capacity());
+	// 	_begin = new_block;
+	// 	_end_size = new_curr;
+	// 	_end_capacity = _begin + new_cap;
+	// 	return (pos);
+	// }
+
 	iterator insert(iterator pos, const T& value) {
 		if (pos == _end_size) {
 			push_back(value);
@@ -520,22 +565,14 @@ public:
 		std::swap(_allocator, other._allocator);
 	}
 
-
 /* ACCESSORS */
 
 /* ------------------------ capacity: ------------------------------------- */
 
-	bool empty() const {
-		return (begin() == end());
-	}
-
-	size_type size() const {
-		return (_end_size - _begin);
-	}
-
-	size_type max_size() const {
-		return (_allocator.max_size());
-	}
+	size_type size() const { return (_end_size - _begin); }
+	size_type capacity() const { return (_end_capacity - _begin); }
+	size_type max_size() const { return (_allocator.max_size()); }
+	bool empty() const { return (begin() == end()); }
 
 	void reserve(size_type new_cap) _THROWS_LENGTH_ERROR {
 		if (new_cap > max_size())
@@ -545,15 +582,9 @@ public:
 		}
 	}
 
-	size_type capacity() const {
-		return (_end_capacity - _begin);
-	}
-
 /* ------------------------ allocator: ------------------------------------ */
 
-	allocator_type get_allocator() const {
-		return (_allocator);
-	}
+	allocator_type get_allocator() const { return (_allocator); }
 
 /* ------------------------ elements: ------------------------------------- */
 
@@ -569,66 +600,27 @@ public:
 		return (*(_begin + pos));
 	}
 
-	reference operator[]( size_type pos ) _NOEXCEPT {
-		return (*(_begin + pos));
-	}
-
-	const_reference operator[]( size_type pos ) const _NOEXCEPT {
-		return (*(_begin + pos));
-	}
-
-	reference front() _NOEXCEPT {
-		return (*begin());
-	}
-
-	const_reference front() const _NOEXCEPT {
-		return (*begin());
-	}
-
-	reference back() _NOEXCEPT {
-		return (*(end() - 1));
-	}
-	
-	const_reference back() const _NOEXCEPT {
-		return (*(end() - 1));
-	}
-
-	T* data() {
-		return (_begin);
-	}
-
-	const T* data() const {
-		return (_begin);
-	}
+	reference operator[]( size_type pos ) { return (*(_begin + pos)); }
+	const_reference operator[]( size_type pos ) const { return (*(_begin + pos)); }
+	reference front() { return (*begin()); }
+	const_reference front() const { return (*begin()); }
+	reference back() { return (*(end() - 1)); }
+	const_reference back() const { return (*(end() - 1)); }
+	T* data() { return (_begin); }
+	const T* data() const { return (_begin); }
 
 /* ------------------------ iterators: ------------------------------------ */
 
-	iterator begin() _NOEXCEPT {
-		return (_begin);
-	}
+	iterator begin() { return (_begin); }
+	const_iterator begin() const { return (_begin); }
+	iterator end() {return (_end_size); }
+	const_iterator end() const { return (_end_size); }
+	reverse_iterator rbegin() {return (reverse_iterator(end())); }
+	const_reverse_iterator rbegin() const { return (const_reverse_iterator(end())); }
+	reverse_iterator rend() { return (reverse_iterator(begin())); }
+	const_reverse_iterator rend() const { return (const_reverse_iterator(begin())); }
 
-	const_iterator begin() const _NOEXCEPT {
-		return (_begin);
-	}
-	
-	iterator end() _NOEXCEPT {
-		return (_end_size);
-	}
-
-	const_iterator end() const _NOEXCEPT {
-		return (_end_size);
-	}
-
-	reverse_iterator rbegin();
-
-	const_reverse_iterator rbegin() const;
-
-	reverse_iterator rend();
-
-	const_reverse_iterator rend() const;
-
-
-}; /* class VECTOR FT ------------------------------------------------------*/
+}; /* vector */
 
 /* - NON MEMBER FUNCTIONS ------------------------------------------------- */
 
@@ -638,47 +630,47 @@ public:
 
 	template< class T, class Alloc >
 	bool operator==(const ft::vector<T, Alloc>& lhs,
-		const ft::vector<T, Alloc>& rhs) {
+					const ft::vector<T, Alloc>& rhs) {
 		return (lhs.size() == rhs.size()
 			&& std::equal(lhs.begin(), lhs.end(), rhs.begin()));
 	}
 
 	template< class T, class Alloc >
 	bool operator!=(const ft::vector<T, Alloc>& lhs,
-		const ft::vector<T, Alloc>& rhs) {
+					const ft::vector<T, Alloc>& rhs) {
 		return (!(lhs == rhs));
 	}
 
 	template< class T, class Alloc >
 	bool operator<(const ft::vector<T, Alloc>& lhs,
-		const ft::vector<T, Alloc>& rhs) {
+					const ft::vector<T, Alloc>& rhs) {
 		return (std::lexicographical_compare(lhs.begin(), lhs.end(),
 			rhs.begin(), rhs.end()));
 	}
 
 	template< class T, class Alloc >
 	bool operator<=(const ft::vector<T, Alloc>& lhs,
-		const ft::vector<T, Alloc>& rhs) {
+					const ft::vector<T, Alloc>& rhs) {
 		return (std::lexicographical_compare(lhs.begin(), lhs.end(),
 			rhs.begin(), rhs.end()) || lhs == rhs);
 	}
 
 	template< class T, class Alloc >
 	bool operator>(const ft::vector<T, Alloc>& lhs,
-		const ft::vector<T, Alloc>& rhs) {
+					const ft::vector<T, Alloc>& rhs) {
 		return (std::lexicographical_compare(rhs.begin(), rhs.end(),
 			lhs.begin(), lhs.end()) && rhs != lhs);
 	}
 
 	template< class T, class Alloc >
 	bool operator>=(const ft::vector<T, Alloc>& lhs,
-		const ft::vector<T, Alloc>& rhs) {
+					const ft::vector<T, Alloc>& rhs) {
 		return (std::lexicographical_compare(rhs.begin(), rhs.end(),
 			lhs.begin(), lhs.end()) || rhs == lhs);
 	}
 
-// #undef vector
-} /* NAMESPACE FT end ------------------------------------------------------*/
-
-#endif
 /* - end VECTOR ----------------------------------------------------------- */
+// #undef vector
+
+} /* NAMESPACE FT end ------------------------------------------------------*/
+#endif // _LIBFT_VECTOR_H_

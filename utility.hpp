@@ -66,14 +66,14 @@ public:
 
 	pair( const T1& x, const T2& y );
 	template< class U1, class U2 > pair( const pair<U1, U2>& p );
-	pair( const pair& p ) = default;
+	// pair( const pair& p ) = default; c++11 syntax
 
 // member functions
 
 	pair& operator=( const pair& other );
 
-	template< class T1, class T2 >
-	ft::pair<T1,T2> make_pair( T1 t, T2 u );
+	// template< class T1, class T2 >
+	// ft::pair<T1,T2> make_pair( T1 t, T2 u ); wshadow
 	
 }; // FT PAIR
 

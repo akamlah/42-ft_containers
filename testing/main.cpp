@@ -4,13 +4,19 @@
 /*																			*/
 /* ************************************************************************ */
 
+#include <cassert>
 #include <string>
 #include <iostream>
 #include <vector>
-#include "vector.hpp"
+#include <list>
+
+#include "../vector.hpp"
+#include "../iterator.hpp"
+#include "../utility.hpp"
+#include "../algorithm.hpp"
+
 #include "ANSIpalette.h"
 #include "TestClass.hpp"
-#include <cassert>
 
 #if STD
 #define ft std
@@ -39,20 +45,22 @@ void vector_erase_range();
 void vector_erase();
 void vector_at();
 void vector_comp_int();
+void vector_rev_iter();
 
 int main() {
 
-	vector_push_pop(); std::cout << std::endl;
-	vector_resize_reserve(); std::cout << std::endl;
-	vector_copies(); std::cout << std::endl;
-	vector_range_construct(); std::cout << std::endl;
-	vector_swap(); std::cout << std::endl;
-	vector_assign(); std::cout << std::endl;
-	vector_insert(); std::cout << std::endl;
-	vector_erase_range(); std::cout << std::endl;
-	vector_erase(); std::cout << std::endl;
-	vector_at(); std::cout << std::endl;
-	vector_comp_int(); std::cout << std::endl;
+	// vector_push_pop(); std::cout << std::endl;
+	// vector_resize_reserve(); std::cout << std::endl;
+	// vector_copies(); std::cout << std::endl;
+	// vector_range_construct(); std::cout << std::endl;
+	// vector_swap(); std::cout << std::endl;
+	// vector_assign(); std::cout << std::endl;
+	// vector_insert(); std::cout << std::endl;
+	// vector_erase_range(); std::cout << std::endl;
+	// vector_erase(); std::cout << std::endl;
+	// vector_at(); std::cout << std::endl;
+	// vector_comp_int(); std::cout << std::endl;
+	vector_rev_iter(); std::cout << std::endl;
 
 	system("leaks test_ft_containers | tail -3");
 	// system("leaks test_ft_containers");
@@ -656,8 +664,101 @@ void vector_comp_int() {
 	std::cout << "v1 >= v2: " << (v1 >= v2) << std::endl;
 	std::cout << "v1 >= v3: " << (v1 >= v3) << std::endl;
 	std::cout << "v1 >= v1: " << (v1 >= v1) << std::endl;
+}
 
+void vector_rev_iter() {
+	std::cout << CYAN_B"----\t vector_rev_iter \t----" << NC << std::endl;
+	ft::vector<int> v;
+	unsigned int size = 20;
 
+	// for (unsigned int i = 0; i < size; i++) {
+	// 	v.push_back(int(i));
+	// }
+	// info(v);
+	// for (unsigned int i = 0; i < v.size(); i++) {
+	// 	std::cout << "i: " << i \
+	// 	<< " | v: " << v[i] \
+	// 	<< std::endl;
+	// }
+	// std::cout << std::endl;
+	// std::cout << "rend: " << *(v.rend()) << std::endl;
+	// std::cout << "rend - 1: " << *(v.rend() - 1) << std::endl;
+	// std::cout << "rend + 1: " << *(v.rend() + 1) << std::endl;
+	// std::cout << "rbegin: " << *(v.rbegin()) << std::endl;
+	// std::cout << "rbegin - 1: " << *(v.rbegin() - 1) << std::endl;
+	// std::cout << "rbegin + 1: " << *(v.rbegin() + 1) << std::endl;
+
+	size = 5;
+	ft::vector<foo <int> > vct(size);
+	ft::vector<foo <int> >::reverse_iterator it(vct.rbegin());
+	ft::vector<foo <int> >::const_reverse_iterator ite(vct.rend());
+	for (int i = 1; it != ite; ++i)
+		*it++ = (i * 7);
+	info(vct);
+	it = vct.rbegin();
+	ite = vct.rbegin();
+	std::cout << *(++ite) << std::endl;
+	std::cout << *(ite++) << std::endl;
+	std::cout << *ite++ << std::endl;
+	std::cout << *++ite << std::endl;
+	it->m();
+	ite->m();
+	std::cout << *(++it) << std::endl;
+	std::cout << *(it++) << std::endl;
+	std::cout << *it++ << std::endl;
+	std::cout << *++it << std::endl;
+	std::cout << *(--ite) << std::endl;
+	std::cout << *(ite--) << std::endl;
+	std::cout << *--ite << std::endl;
+	std::cout << *ite-- << std::endl;
+	(*it).m();
+	(*ite).m();
+	std::cout << *(--it) << std::endl;
+	std::cout << *(it--) << std::endl;
+	std::cout << *it-- << std::endl;
+	std::cout << *--it << std::endl;
+
+	size = 5;
+	ft::vector< foo <int> > v3(size);
+	it = v3.rbegin();
+	ite = v3.rbegin();
+
+	for (unsigned int i = 0; i < size; ++i)
+		it[i] = (size - i) * 5;
+
+	it = it + 5;
+	it = 1 + it;
+	it = it - 4;
+	std::cout << *(it += 2) << std::endl;
+	std::cout << *(it -= 1) << std::endl;
+
+	*(it -= 2) = 42;
+	*(it += 2) = 21;
+
+	std::cout << "const_ite +=/-=: " << *(ite += 2) << " | " << *(ite -= 2) << std::endl;
+
+	std::cout << "(it == const_it): " << (ite == it) << std::endl;
+	std::cout << "(const_ite - it): " << (ite - it) << std::endl;
+	std::cout << "(ite + 3 == it): " << (ite + 3 == it) << std::endl;
+
+	info(v3);
+
+	// std::list< int > lst;
+	// std::list< int >::iterator lst_it;
+	// for (int i = 1; i < 5; ++i)
+	// 	lst.push_back(i * 3);
+
+	// ft::vector< int > vct(lst.begin(), lst.end());
+	// info(vct);
+
+	// lst_it = lst.begin();
+	// for (int i = 1; lst_it != lst.end(); ++i)
+	// 	*lst_it++ = i * 5;
+	// vct.assign(lst.begin(), lst.end());
+	// info(vct);
+
+	// vct.insert(vct.end(), lst.rbegin(), lst.rend());
+	// info(vct);
 
 }
 /* ------------------------------------------------------------------------ */
