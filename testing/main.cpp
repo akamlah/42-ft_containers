@@ -45,22 +45,28 @@ void vector_erase_range();
 void vector_erase();
 void vector_at();
 void vector_comp_int();
-void vector_rev_iter();
+void vector_rev_iter1();
+void vector_rev_iter2();
+void vector_rev_iter3();
+void vector_bidirect();
 
 int main() {
 
-	// vector_push_pop(); std::cout << std::endl;
-	// vector_resize_reserve(); std::cout << std::endl;
-	// vector_copies(); std::cout << std::endl;
-	// vector_range_construct(); std::cout << std::endl;
-	// vector_swap(); std::cout << std::endl;
-	// vector_assign(); std::cout << std::endl;
-	// vector_insert(); std::cout << std::endl;
-	// vector_erase_range(); std::cout << std::endl;
-	// vector_erase(); std::cout << std::endl;
-	// vector_at(); std::cout << std::endl;
-	// vector_comp_int(); std::cout << std::endl;
-	vector_rev_iter(); std::cout << std::endl;
+	vector_push_pop(); std::cout << std::endl;
+	vector_resize_reserve(); std::cout << std::endl;
+	vector_copies(); std::cout << std::endl;
+	vector_range_construct(); std::cout << std::endl;
+	vector_swap(); std::cout << std::endl;
+	vector_assign(); std::cout << std::endl;
+	vector_insert(); std::cout << std::endl;
+	vector_erase_range(); std::cout << std::endl;
+	vector_erase(); std::cout << std::endl;
+	vector_at(); std::cout << std::endl;
+	vector_comp_int(); std::cout << std::endl;
+	vector_rev_iter1(); std::cout << std::endl;
+	vector_rev_iter2(); std::cout << std::endl;
+	vector_rev_iter3(); std::cout << std::endl;
+	vector_bidirect(); std::cout << std::endl;
 
 	system("leaks test_ft_containers | tail -3");
 	// system("leaks test_ft_containers");
@@ -93,6 +99,8 @@ void info(ft::vector<T>& v) {
 /* ************************************************************************ */
 // TESTS
 /* ************************************************************************ */
+
+// #if 0
 
 void vector_push_pop(){
 	std::cout << CYAN_B"----\t vector_push_pop \t----" << NC << std::endl;
@@ -242,7 +250,6 @@ void vector_copies() {
 	for (unsigned int i = 0; i < v2.size(); i++) {
 		std::cout << v2[i] << std::endl;
 	}
-
 	// bug in std? weird stuff anyways... double free if cpy to bigger
 	// ft::vector<__TestType__> v3; // test cpy to smaller
 	// for (int i = 1; i < 50; i++) {
@@ -666,29 +673,32 @@ void vector_comp_int() {
 	std::cout << "v1 >= v1: " << (v1 >= v1) << std::endl;
 }
 
-void vector_rev_iter() {
-	std::cout << CYAN_B"----\t vector_rev_iter \t----" << NC << std::endl;
+void vector_rev_iter1() {
+	std::cout << CYAN_B"----\t vector_rev_iter1 \t----" << NC << std::endl;
 	ft::vector<int> v;
 	unsigned int size = 20;
 
-	// for (unsigned int i = 0; i < size; i++) {
-	// 	v.push_back(int(i));
-	// }
-	// info(v);
-	// for (unsigned int i = 0; i < v.size(); i++) {
-	// 	std::cout << "i: " << i \
-	// 	<< " | v: " << v[i] \
-	// 	<< std::endl;
-	// }
-	// std::cout << std::endl;
-	// std::cout << "rend: " << *(v.rend()) << std::endl;
-	// std::cout << "rend - 1: " << *(v.rend() - 1) << std::endl;
-	// std::cout << "rend + 1: " << *(v.rend() + 1) << std::endl;
-	// std::cout << "rbegin: " << *(v.rbegin()) << std::endl;
-	// std::cout << "rbegin - 1: " << *(v.rbegin() - 1) << std::endl;
-	// std::cout << "rbegin + 1: " << *(v.rbegin() + 1) << std::endl;
+	for (unsigned int i = 0; i < size; i++) {
+		v.push_back(int(i));
+	}
+	info(v);
+	for (unsigned int i = 0; i < v.size(); i++) {
+		std::cout << "i: " << i \
+		<< " | v: " << v[i] \
+		<< std::endl;
+	}
+	std::cout << std::endl;
+	std::cout << "rend: " << *(v.rend()) << std::endl;
+	std::cout << "rend - 1: " << *(v.rend() - 1) << std::endl;
+	std::cout << "rend + 1: " << *(v.rend() + 1) << std::endl;
+	std::cout << "rbegin: " << *(v.rbegin()) << std::endl;
+	std::cout << "rbegin - 1: " << *(v.rbegin() - 1) << std::endl;
+	std::cout << "rbegin + 1: " << *(v.rbegin() + 1) << std::endl;
+}
 
-	size = 5;
+void vector_rev_iter2() {
+	std::cout << CYAN_B"----\t vector_rev_iter2 \t----" << NC << std::endl;
+	unsigned int size = 5;
 	ft::vector<foo <int> > vct(size);
 	ft::vector<foo <int> >::reverse_iterator it(vct.rbegin());
 	ft::vector<foo <int> >::const_reverse_iterator ite(vct.rend());
@@ -717,11 +727,14 @@ void vector_rev_iter() {
 	std::cout << *(it--) << std::endl;
 	std::cout << *it-- << std::endl;
 	std::cout << *--it << std::endl;
+}
 
-	size = 5;
+void vector_rev_iter3() {
+	std::cout << CYAN_B"----\t vector_rev_iter3 \t----" << NC << std::endl;
+	unsigned int size = 5;
 	ft::vector< foo <int> > v3(size);
-	it = v3.rbegin();
-	ite = v3.rbegin();
+	ft::vector<foo <int> >::reverse_iterator it = v3.rbegin();
+	ft::vector<foo <int> >::const_reverse_iterator ite = v3.rbegin();
 
 	for (unsigned int i = 0; i < size; ++i)
 		it[i] = (size - i) * 5;
@@ -742,24 +755,29 @@ void vector_rev_iter() {
 	std::cout << "(ite + 3 == it): " << (ite + 3 == it) << std::endl;
 
 	info(v3);
-
-	// std::list< int > lst;
-	// std::list< int >::iterator lst_it;
-	// for (int i = 1; i < 5; ++i)
-	// 	lst.push_back(i * 3);
-
-	// ft::vector< int > vct(lst.begin(), lst.end());
-	// info(vct);
-
-	// lst_it = lst.begin();
-	// for (int i = 1; lst_it != lst.end(); ++i)
-	// 	*lst_it++ = i * 5;
-	// vct.assign(lst.begin(), lst.end());
-	// info(vct);
-
-	// vct.insert(vct.end(), lst.rbegin(), lst.rend());
-	// info(vct);
-
 }
+
+// #endif
+
+void vector_bidirect() {
+	std::cout << CYAN_B"----\t vector_bidirect \t----" << NC << std::endl;
+	std::list<int> lst;
+	std::list<int>::iterator lst_it;
+	for (int i = 1; i < 5; ++i)
+		lst.push_back(i * 3);
+
+	ft::vector<int> vct(lst.begin(), lst.end());
+	info(vct);
+
+	lst_it = lst.begin();
+	for (int i = 1; lst_it != lst.end(); ++i)
+		*lst_it++ = i * 5;
+	vct.assign(lst.begin(), lst.end());
+	info(vct);
+
+	vct.insert(vct.end(), lst.rbegin(), lst.rend());
+	info(vct);
+}
+
 /* ------------------------------------------------------------------------ */
 // end of tests
