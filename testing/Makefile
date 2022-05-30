@@ -21,24 +21,26 @@ CFLAGS = \
 
 ENTRY_POINT = main.cpp
 
-CLASSES = \
+FT_LIB_DIR = ../
 
-INTERFACES = \
+CLASSES = \
+	TestClass
 
 OTHER_CPPFILES = \
+	tests_vector.cpp \
+	tests_stack.cpp \
 
-TEMPLATES_HPP = \
-	../type_traits.hpp \
-	../utility.hpp \
-	../iterator.hpp \
-	\
-	../vector.hpp \
-	\
-	../algorithm.hpp \
+FT_LIB_TEMPLATES = \
+	type_traits.hpp \
+	iterator.hpp \
+	algorithm.hpp \
+	utility.hpp \
+	vector.hpp \
+	stack.hpp \
 
 OTHER_HEADERS = \
 	ANSIpalette.h \
-	TestClass.hpp
+	testing.hpp \
 	
 # ********************************************************************* #
 # internal setup:
@@ -47,13 +49,13 @@ OTHER_HEADERS = \
 CLASS_CPP := $(addsuffix .cpp, $(CLASSES))
 CLASS_HPP := $(addsuffix .hpp, $(CLASSES))
 
-INTERFACES_HPP := $(addsuffix .hpp, $(INTERFACES))
+FT_LIB_LOCATED_HPPS = $(addprefix $(FT_LIB_DIR), $(FT_LIB_TEMPLATES))
 
 SOURCES = $(CLASS_CPP) $(ENTRY_POINT) $(OTHER_CPPFILES)
-HEADER_DEPS = $(CLASS_HPP) $(INTERFACES_HPP) $(TEMPLATES_HPP) $(OTHER_HEADERS)
+HEADER_DEPS = $(CLASS_HPP) $(FT_LIB_LOCATED_HPPS) $(OTHER_HEADERS)
 
 # ********************************************************************* #
-# compile:
+# compile all:
 
 all: $(EXECUTABLE_NAME)
 
@@ -68,6 +70,8 @@ clean:
 fclean: clean
 	@ rm -f $(EXECUTABLE_NAME)
 	@ rm -rf *.dSYM
+	@ rm -rf std_container ft_container endboss.std endboss.ft
+
 
 re: fclean all
 
@@ -91,3 +95,10 @@ sani_std: $(SOURCES) $(HEADER_DEPS)
 
 comp:
 	./std_compare/compare.sh
+
+endboss:
+	clang++ ENDBOSS_main.cpp -o ft_container
+	clang++ ENDBOSS_main.cpp -o std_container -DSTD
+	./ft_container > endboss.ft
+	./std_container > endboss.std
+	diff endboss.ft endboss.std

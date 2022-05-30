@@ -260,23 +260,36 @@ private:
 		return (false);
 	}
 
+	void __dbg_funcid(const char * msg) {
+		#if DBG
+			std::cout << "\033[38;5;227m";
+			std::cout << msg;
+			std::cout << "\033[0m";
+			std::cout << std::endl;
+		#endif
+		(void)msg;
+	}
+
 /* ------------------------------------------------------------------------ */
 /* - CONSTRUCTION --------------------------------------------------------- */
 
 public:
 
 	vector() {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		__allocate_empty_vector(0);
 	}
 
 	// protect ALLOC argument ?
 	explicit vector( const Alloc& alloc): _allocator(alloc) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		// assert(is_same< typename allocator_type::value_type, value_type >::value);
 		__allocate_empty_vector(0);
 	}
 	
 	explicit vector(size_type n, const T& value = T(), \
 		const Alloc&alloc = allocator_type()): _allocator(alloc) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		__allocate_empty_vector(n);
 		for (size_type i = 0; i < n; i++)
 			_allocator.construct(_begin + i, value);
@@ -287,6 +300,7 @@ public:
 	vector(const InputIter first, const InputIter last, const Alloc&alloc = allocator_type(),
 		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0)
 		: _allocator(alloc) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		size_type range = std::distance(first, last);
 		__allocate_empty_vector(range);
 		for (InputIter it = first; it != last; it++) {
@@ -295,6 +309,7 @@ public:
 	}
 
 	vector(const vector& other) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		__allocate_empty_vector(other.size());
 		for (const_iterator it = other.begin(); it != other.end(); it++) {
 			_allocator.construct(_end_size++, *it);
@@ -304,6 +319,7 @@ public:
 /* - DESTRUCTION ---------------------------------------------------------- */
 
 	~vector() {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		clear();
 		_allocator.deallocate(_begin, capacity());
 		_end_capacity = NULL;
@@ -319,6 +335,7 @@ public:
 /* ASSIGNMENTS */
 
 	vector& operator=(const vector& other) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		clear();
 		if (other.capacity() != capacity())
 			__resize_empty_vector(other.capacity());
@@ -329,6 +346,7 @@ public:
 	}
 
 	void assign(size_type n, const T& value) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		clear();
 		if (n > capacity())
 			__resize_empty_vector(n);
@@ -339,6 +357,7 @@ public:
 	template< typename InputIter >
 	void assign(const InputIter first, const InputIter last,
 		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		clear();
 		size_type range = std::distance(first, last);
 		if (range > capacity())
@@ -363,6 +382,7 @@ public:
 	template< typename InputIter >
 	InputIter erase(InputIter pos,
 		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		if (!__iterator_is_in_range(pos) || pos == _end_size)
 			return (pos);
 		InputIter curr = pos;
@@ -378,6 +398,7 @@ public:
 	template< typename InputIter >
 	InputIter erase(InputIter first, InputIter last,
 		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		iterator curr = first;
 		iterator remaining = last;
 		bool destroy_curr = true;
@@ -420,6 +441,7 @@ public:
 	template< typename InputIter >
 	InputIter insert(InputIter pos, const T& value,
 		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		if (pos == _end_size) {
 			push_back(value);
 			return (_end_size - 1);
@@ -448,6 +470,7 @@ public:
 	template< typename InputIter >
 	void insert(InputIter pos, size_type n, const T& value,
 		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		size_type new_cap = size() + n;
 		if (new_cap < capacity())
 			new_cap = capacity();
@@ -477,6 +500,7 @@ public:
 	void insert(IterVect pos, const InterCont2 first, const InterCont2 last,
 		typename enable_if<!std::is_integral<IterVect>::value, bool>::type* = 0,
 		typename enable_if<!std::is_integral<InterCont2>::value, bool>::type* = 0) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		size_type range = std::distance(first, last);
 		size_type new_cap = size() + range;
 		if (new_cap < capacity())
@@ -506,12 +530,13 @@ public:
 /* ------------------------ resize: --------------------------------------- */
 
 	void resize(size_type n, T value = T()) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		if (n == size())
 			return ;
 		if (n > size()) {
 			if (n > capacity())
 				__resize_filled_vector(n);
-			while (size() != capacity())
+			while (size() != n)
 				_allocator.construct(_end_size++, value);
 			return ;
 		}
@@ -538,6 +563,7 @@ public:
 	bool empty() const { return (begin() == end()); }
 
 	void reserve(size_type new_cap) _THROWS_LENGTH_ERROR {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		if (new_cap > max_size())
 			throw std::length_error("Invalid capacity");
 		if (new_cap > capacity()) {
@@ -552,12 +578,14 @@ public:
 /* ------------------------ elements: ------------------------------------- */
 
 	reference at( size_type pos ) _THROWS_OUT_OF_RANGE {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		if (pos < 0 || pos >= size())
 			std::__throw_out_of_range("index out of vector range");
 		return (*(_begin + pos));
 	}
 
 	const_reference at( size_type pos ) const _THROWS_OUT_OF_RANGE {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		if (pos < 0 || pos >= size())
 			std::__throw_out_of_range("index out of vector range");
 		return (*(_begin + pos));
@@ -586,51 +614,50 @@ public:
 }; /* vector */
 
 /* - NON MEMBER FUNCTIONS ------------------------------------------------- */
-
 /* operator==,!=,<,<=,>,>=,<=> */
 
 // + enable ifs ?
 
-	template< class T, class Alloc >
-	bool operator==(const ft::vector<T, Alloc>& lhs,
-					const ft::vector<T, Alloc>& rhs) {
-		return (lhs.size() == rhs.size()
-			&& std::equal(lhs.begin(), lhs.end(), rhs.begin()));
-	}
+template< class T, class Alloc >
+bool operator==(const ft::vector<T, Alloc>& lhs,
+				const ft::vector<T, Alloc>& rhs) {
+	return (lhs.size() == rhs.size()
+		&& std::equal(lhs.begin(), lhs.end(), rhs.begin()));
+}
 
-	template< class T, class Alloc >
-	bool operator!=(const ft::vector<T, Alloc>& lhs,
-					const ft::vector<T, Alloc>& rhs) {
-		return (!(lhs == rhs));
-	}
+template< class T, class Alloc >
+bool operator!=(const ft::vector<T, Alloc>& lhs,
+				const ft::vector<T, Alloc>& rhs) {
+	return (!(lhs == rhs));
+}
 
-	template< class T, class Alloc >
-	bool operator<(const ft::vector<T, Alloc>& lhs,
-					const ft::vector<T, Alloc>& rhs) {
-		return (std::lexicographical_compare(lhs.begin(), lhs.end(),
-			rhs.begin(), rhs.end()));
-	}
+template< class T, class Alloc >
+bool operator<(const ft::vector<T, Alloc>& lhs,
+				const ft::vector<T, Alloc>& rhs) {
+	return (std::lexicographical_compare(lhs.begin(), lhs.end(),
+		rhs.begin(), rhs.end()));
+}
 
-	template< class T, class Alloc >
-	bool operator<=(const ft::vector<T, Alloc>& lhs,
-					const ft::vector<T, Alloc>& rhs) {
-		return (std::lexicographical_compare(lhs.begin(), lhs.end(),
-			rhs.begin(), rhs.end()) || lhs == rhs);
-	}
+template< class T, class Alloc >
+bool operator<=(const ft::vector<T, Alloc>& lhs,
+				const ft::vector<T, Alloc>& rhs) {
+	return (std::lexicographical_compare(lhs.begin(), lhs.end(),
+		rhs.begin(), rhs.end()) || lhs == rhs);
+}
 
-	template< class T, class Alloc >
-	bool operator>(const ft::vector<T, Alloc>& lhs,
-					const ft::vector<T, Alloc>& rhs) {
-		return (std::lexicographical_compare(rhs.begin(), rhs.end(),
-			lhs.begin(), lhs.end()) && rhs != lhs);
-	}
+template< class T, class Alloc >
+bool operator>(const ft::vector<T, Alloc>& lhs,
+				const ft::vector<T, Alloc>& rhs) {
+	return (std::lexicographical_compare(rhs.begin(), rhs.end(),
+		lhs.begin(), lhs.end()) && rhs != lhs);
+}
 
-	template< class T, class Alloc >
-	bool operator>=(const ft::vector<T, Alloc>& lhs,
-					const ft::vector<T, Alloc>& rhs) {
-		return (std::lexicographical_compare(rhs.begin(), rhs.end(),
-			lhs.begin(), lhs.end()) || rhs == lhs);
-	}
+template< class T, class Alloc >
+bool operator>=(const ft::vector<T, Alloc>& lhs,
+				const ft::vector<T, Alloc>& rhs) {
+	return (std::lexicographical_compare(rhs.begin(), rhs.end(),
+		lhs.begin(), lhs.end()) || rhs == lhs);
+}
 
 /* - end VECTOR ----------------------------------------------------------- */
 // #undef vector

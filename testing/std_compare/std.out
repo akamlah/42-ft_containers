@@ -1,33 +1,110 @@
-[1;36m----	 vector_rev_iter 	----[0m
-*begin: 35, *end - 1: 7, size: 5, capacity: 5, front: 35, back: 7, empty?: 0, 
-14
-14
-21
-35
-foo::m called [7]
-foo::m const called [35]
-14
-14
-21
-35
-28
-28
-14
-14
-foo::m called [35]
-foo::m const called [7]
-28
-28
-21
-7
-5
-10
-const_ite +=/-=: 15 | 25
-(it == const_it): 0
-(const_ite - it): -3
-(ite + 3 == it): 1
-*begin: 5, *end - 1: 25, size: 5, capacity: 5, front: 5, back: 25, empty?: 0, 
+[1;36m----	 vector_performance 	----[0m
+*begin: 0, *end - 1: 4999, size: 5009, front: 0, back: 4999, empty?: 0, 
+*begin: 0, *end - 1: 2499, size: 2509, front: 0, back: 2499, empty?: 0, 
 
-Process 28344: 157 nodes malloced for 12 KB
-Process 28344: 0 leaks for 0 total leaked bytes.
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+*begin: 0, *end - 1: 0, size: 50, front: 0, back: 0, empty?: 0, 
+[0;33mSTD Vector performance test: 0.006103sec.
+[0m
+
+Process 35335: 160 nodes malloced for 12 KB
+Process 35335: 0 leaks for 0 total leaked bytes.
 

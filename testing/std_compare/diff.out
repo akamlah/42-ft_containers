@@ -1,6 +1,35 @@
-31,32c31,32
-< Process 28344: 157 nodes malloced for 12 KB
-< Process 28344: 0 leaks for 0 total leaked bytes.
+1a2,25
+> SIZE: 10 CAP: 20
+> SIZE: 20 CAP: 40
+> SIZE: 40 CAP: 80
+> SIZE: 80 CAP: 160
+> SIZE: 160 CAP: 240
+> SIZE: 240 CAP: 360
+> SIZE: 360 CAP: 540
+> SIZE: 540 CAP: 810
+> SIZE: 810 CAP: 1215
+> SIZE: 1215 CAP: 1822
+> SIZE: 1822 CAP: 2733
+> SIZE: 2733 CAP: 4099
+> SIZE: 4099 CAP: 6148
+> SIZE: 10 CAP: 20
+> SIZE: 20 CAP: 40
+> SIZE: 40 CAP: 80
+> SIZE: 80 CAP: 160
+> SIZE: 160 CAP: 240
+> SIZE: 240 CAP: 360
+> SIZE: 360 CAP: 540
+> SIZE: 540 CAP: 810
+> SIZE: 810 CAP: 1215
+> SIZE: 1215 CAP: 1822
+> SIZE: 1822 CAP: 2733
+105c129
+< [0;33mSTD Vector performance test: 0.006103sec.
 ---
-> Process 28363: 157 nodes malloced for 12 KB
-> Process 28363: 0 leaks for 0 total leaked bytes.
+> [0;33mFT Vector performance test: 0.002316sec.
+108,109c132,133
+< Process 35335: 160 nodes malloced for 12 KB
+< Process 35335: 0 leaks for 0 total leaked bytes.
+---
+> Process 35361: 160 nodes malloced for 12 KB
+> Process 35361: 0 leaks for 0 total leaked bytes.

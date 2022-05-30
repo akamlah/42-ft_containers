@@ -149,18 +149,33 @@ protected:
 
 	iterator_type	_current;
 
+private:
+
+	void __dbg_funcid(const char * msg) {
+	#if DBG
+		std::cout << "\033[38;5;56m";
+		std::cout << msg;
+		std::cout << "\033[0m";
+		std::cout << std::endl;
+	#endif
+	(void)msg;
+}
+
 public:
 
-	reverse_iterator() {}
-	explicit reverse_iterator( iterator_type x ): _current(x) {}
+	reverse_iterator() { __dbg_funcid(__PRETTY_FUNCTION__); }
+	explicit reverse_iterator( iterator_type x ): _current(x) { __dbg_funcid(__PRETTY_FUNCTION__); }
 	template< class U >
-	reverse_iterator( const reverse_iterator<U>& other ): _current(other.base()) {}
+	reverse_iterator( const reverse_iterator<U>& other ): _current(other.base()) { __dbg_funcid(__PRETTY_FUNCTION__); }
 
 	template< class U >
 	reverse_iterator& operator=( const reverse_iterator < U >& other ) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
 		_current = other.base();
 		return (*this);
 	}
+
+	~reverse_iterator() { __dbg_funcid(__PRETTY_FUNCTION__); } // ?
 
 	iterator_type base() const { return (_current); }
 
