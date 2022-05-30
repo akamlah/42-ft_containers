@@ -246,10 +246,10 @@ private:
 		_end_capacity = _begin + new_cap;
 	}
 
-	// template< typeneme _InputIter >
-		// + enable if correct iter
-	bool __iterator_is_in_range(iterator it) const {
-		iterator curr = _begin;
+	template< typename InputIter >
+	bool __iterator_is_in_range(InputIter it,
+		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) const {
+		InputIter curr = _begin;
 		while (curr != _end_size) {
 			if (curr == it)
 				return (true);
@@ -283,26 +283,16 @@ public:
 		_end_size = _begin + n;
 	}
 
-	// constructor: as template parameter ?
-
 	template< typename InputIter>
-	vector(const InputIter first, const InputIter last, const Alloc&alloc = allocator_type()
-	, typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0
-	): _allocator(alloc) {
-		// size_type range = static_cast<size_type>(last - first);
+	vector(const InputIter first, const InputIter last, const Alloc&alloc = allocator_type(),
+		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0)
+		: _allocator(alloc) {
 		size_type range = std::distance(first, last);
 		__allocate_empty_vector(range);
 		for (InputIter it = first; it != last; it++) {
 			_allocator.construct(_end_size++, *it);
 		}
 	}
-	// vector(const_iterator first, const_iterator last, const Alloc&alloc = allocator_type()): _allocator(alloc) {
-	// 	size_type range = static_cast<size_type>(last - first);
-	// 	__allocate_empty_vector(range);
-	// 	for (const_iterator it = first; it != last; it++) {
-	// 		_allocator.construct(_end_size++, *it);
-	// 	}
-	// }
 
 	vector(const vector& other) {
 		__allocate_empty_vector(other.size());
@@ -347,9 +337,9 @@ public:
 	}
 
 	template< typename InputIter >
-	void assign(const InputIter first, const InputIter last) {
+	void assign(const InputIter first, const InputIter last,
+		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
 		clear();
-		// size_type range = static_cast<size_type>(last - first);
 		size_type range = std::distance(first, last);
 		if (range > capacity())
 			__resize_empty_vector(range);
@@ -357,15 +347,7 @@ public:
 			_allocator.construct(_end_size++, *it);
 		}
 	}
-	// void assign(const_iterator first, const_iterator last) {
-	// 	clear();
-	// 	size_type range = static_cast<size_type>(last - first);
-	// 	if (range > capacity())
-	// 		__resize_empty_vector(range);
-	// 	for (const_iterator it = first; it != last; it++) {
-	// 		_allocator.construct(_end_size++, *it);
-	// 	}
-	// }
+
 
 /* MODIFIERS */
 
@@ -379,7 +361,8 @@ public:
 	}
 
 	template< typename InputIter >
-	InputIter erase(InputIter pos) {
+	InputIter erase(InputIter pos,
+		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
 		if (!__iterator_is_in_range(pos) || pos == _end_size)
 			return (pos);
 		InputIter curr = pos;
@@ -391,21 +374,10 @@ public:
 		_end_size = curr;
 		return (pos);
 	}
-	// iterator erase(iterator pos) {
-	// 	if (!__iterator_is_in_range(pos) || pos == _end_size)
-	// 		return (pos);
-	// 	iterator curr = pos;
-	// 	_allocator.destroy(curr);
-	// 	while (curr + 1 != _end_size) {
-	// 		_allocator.construct(curr, *(curr + 1));
-	// 		_allocator.destroy(++curr);
-	// 	}
-	// 	_end_size = curr;
-	// 	return (pos);
-	// }
 
 	template< typename InputIter >
-	InputIter erase(InputIter first, InputIter last) {
+	InputIter erase(InputIter first, InputIter last,
+		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
 		iterator curr = first;
 		iterator remaining = last;
 		bool destroy_curr = true;
@@ -428,29 +400,6 @@ public:
 		}
 		return (first);
 	}
-	// iterator erase(iterator first, iterator last) {
-	// 	iterator curr = first;
-	// 	iterator remaining = last;
-	// 	bool destroy_curr = true;
-	// 	if (!__iterator_is_in_range(first) && __iterator_is_in_range(last))
-	// 		curr = _begin;
-	// 	if (curr == last)
-	// 		return (curr);
-	// 	while (remaining != _end_size) {
-	// 		if (destroy_curr == true)
-	// 			_allocator.destroy(curr);
-	// 		_allocator.construct(curr++, *remaining);
-	// 		_allocator.destroy(remaining++);
-	// 		if (curr == last)
-	// 			destroy_curr = false;
-	// 	}
-	// 	_end_size = curr;
-	// 	if (destroy_curr == true) {
-	// 		while (curr != remaining)
-	// 			_allocator.destroy(curr++);
-	// 	}
-	// 	return (first);
-	// }
 
 	void pop_back() {
 		if (empty())
@@ -469,9 +418,8 @@ public:
 	}
 
 	template< typename InputIter >
-	InputIter insert(InputIter pos, const T& value
-	// ,ft::enable_if<>
-	) {
+	InputIter insert(InputIter pos, const T& value,
+		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
 		if (pos == _end_size) {
 			push_back(value);
 			return (_end_size - 1);
@@ -496,31 +444,6 @@ public:
 		_end_capacity = _begin + new_cap;
 		return (pos);
 	}
-	// iterator insert(iterator pos, const T& value) {
-	// 	if (pos == _end_size) {
-	// 		push_back(value);
-	// 		return (_end_size - 1);
-	// 	}
-	// 	size_type new_cap = capacity();
-	// 	if (size() == new_cap)
-	// 		new_cap = __calculate_new_capacity();
-	// 	pointer new_block = _allocator.allocate(new_cap);
-	// 	iterator new_curr = new_block;
-	// 	iterator curr = _begin;
-	// 	while (curr != _end_size) {
-	// 		if (curr == pos) {
-	// 			pos = new_curr;
-	// 			_allocator.construct(new_curr++, value);
-	// 		}
-	// 		_allocator.construct(new_curr++, *(curr++));
-	// 	}
-	// 	clear();
-	// 	_allocator.deallocate(_begin, capacity());
-	// 	_begin = new_block;
-	// 	_end_size = new_curr;
-	// 	_end_capacity = _begin + new_cap;
-	// 	return (pos);
-	// }
 
 	template< typename InputIter >
 	void insert(InputIter pos, size_type n, const T& value,
@@ -549,38 +472,11 @@ public:
 		_end_size = new_curr;
 		_end_capacity = _begin + new_cap;
 	}
-	// void insert(iterator pos, size_type n, const T& value) {
-	// 	size_type new_cap = size() + n;
-	// 	if (new_cap < capacity())
-	// 		new_cap = capacity();
-	// 	if (pos == _end_size) {
-	// 		reserve(new_cap);
-	// 		for (size_type cpys = 0; cpys < n; cpys++)
-	// 			push_back(value);
-	// 		return ;
-	// 	}
-	// 	pointer new_block = _allocator.allocate(new_cap);
-	// 	iterator new_curr = new_block;
-	// 	iterator curr = _begin;
-	// 	while (curr != _end_size) {
-	// 		if (curr == pos)
-	// 			for (size_type cpys = 0; cpys < n; cpys++)
-	// 					_allocator.construct(new_curr++, value);
-	// 		_allocator.construct(new_curr++, *(curr++));
-	// 	}
-	// 	clear();
-	// 	_allocator.deallocate(_begin, capacity());
-	// 	_begin = new_block;
-	// 	_end_size = new_curr;
-	// 	_end_capacity = _begin + new_cap;
-	// }
 
 	template< typename IterVect, typename InterCont2 >
-	void insert(IterVect pos, const InterCont2 first, const InterCont2 last
-	,typename enable_if<!std::is_integral<IterVect>::value, bool>::type* = 0
-	,typename enable_if<!std::is_integral<InterCont2>::value, bool>::type* = 0
-	) {
-		// size_type range = static_cast<size_type>(last - first);
+	void insert(IterVect pos, const InterCont2 first, const InterCont2 last,
+		typename enable_if<!std::is_integral<IterVect>::value, bool>::type* = 0,
+		typename enable_if<!std::is_integral<InterCont2>::value, bool>::type* = 0) {
 		size_type range = std::distance(first, last);
 		size_type new_cap = size() + range;
 		if (new_cap < capacity())
@@ -606,33 +502,6 @@ public:
 		_end_size = new_curr;
 		_end_capacity = _begin + new_cap;
 	}
-	// void insert(iterator pos, const_iterator first, const_iterator last) {
-	// 	size_type range = static_cast<size_type>(last - first);
-	// 	size_type new_cap = size() + range;
-	// 	if (new_cap < capacity())
-	// 		new_cap = capacity();
-	// 	if (pos == _end_size) {
-	// 		reserve(new_cap);
-	// 		for (const_iterator set = first; set != last; set++)
-	// 			push_back(*set);
-	// 		return ;
-	// 	}
-	// 	pointer new_block = _allocator.allocate(new_cap);
-	// 	iterator new_curr = new_block;
-	// 	iterator curr = _begin;
-	// 	while (curr != _end_size) {
-	// 		if (curr == pos)
-	// 			for (const_iterator set = first; set != last; set++)
-	// 				_allocator.construct(new_curr++, *set);
-	// 		_allocator.construct(new_curr++, *(curr++));
-	// 	}
-	// 	clear();
-	// 	_allocator.deallocate(_begin, capacity());
-	// 	_begin = new_block;
-	// 	_end_size = new_curr;
-	// 	_end_capacity = _begin + new_cap;
-	// }
-	// ^^ could have done these with <algorithm> copy & copy_backward
 
 /* ------------------------ resize: --------------------------------------- */
 
