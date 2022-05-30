@@ -32,6 +32,21 @@ void vector_performance();
 // UTILS:
 /* ************************************************************************ */
 
+// TO TEST std COMPILE WITH -DSTD as a flag or uncomment:
+// #ifndef STD
+// # define STD 1
+// #endif
+/* this^^ defines substitution as:
+	#if STD
+	#define __NS__ std
+	#endif
+	#if !STD
+	#define __NS__ ft
+	#endif
+in the header "testing.hpp"
+*/
+
+// select data type in container:
 #ifndef __TestType__
 // #define __TestType__ TestClass
 #define __TestType__ int
@@ -79,10 +94,11 @@ void test_vector() {
 	/* ------------------ */
 	// performance tests
 
+	// nb of elements in vector for stress tests. should not be smaller than 22
 	#ifndef _nb_elements__
-	#define _nb_elements__ 5000
+	#define _nb_elements__ 500000
 	#endif
-	
+
 	vector_performance(); std::cout << std::endl;
 
 }
@@ -107,17 +123,26 @@ void performance1() {
 	info(src);
 	std::cout << std::endl;
 
+	// try here a number of combinations of resize, reserve, insert and erase.
+	// in case an iterator gets out of boundary the behavior is undefined also in std
+	// load tests in output files and look up the diff (comment out capacity in info)
 	for (int i = 0; i < 100; i++) {
 		v.resize(5);
-		v.resize(50);
 		info(v);
-		v.insert(v.begin() + 10, src.begin(), src.end()  -1);
-		// for (int i = 1; i < _nb_elements__ / 2; i++) {
-		// 	v.push_back(__TestType__(i));
-		// }
+		v.resize(5 * i, __TestType__(1));
+		info(v);
+		v.insert(v.begin(), src.begin(), src.end());
+		info(v);
+		v.erase((v.begin() + (src.size() / 2)), v.end() - 10);
+		for (int i = 1; i < _nb_elements__ / 2; i++) {
+			v.push_back(__TestType__(i));
+		}
+		info(v);
 		v.erase((v.begin() + (src.size() / 2)));
+		info(v);
+		v.reserve(_nb_elements__ / 3);
+		info(v);
 	}
-	// info(src);
 }
 
 void vector_performance() {
@@ -726,41 +751,41 @@ void vector_rev_iter1() {
 	std::cout << "rbegin + 1: " << *(v.rbegin() + 1) << std::endl;
 }
 
-// --- Class foo
-template <typename T>
-class foo {
-	public:
-		typedef T	value_type;
+// // --- Class foo
+// template <typename T>
+// class foo {
+// 	public:
+// 		typedef T	value_type;
 
-		foo(void) : value(), _verbose(false) { };
-		foo(value_type src, const bool verbose = false) : value(src), _verbose(verbose) { };
-		foo(foo const &src, const bool verbose = false) : value(src.value), _verbose(verbose) { };
-		~foo(void) { if (this->_verbose) std::cout << "~foo::foo()" << std::endl; };
-		void m(void) { std::cout << "foo::m called [" << this->value << "]" << std::endl; };
-		void m(void) const { std::cout << "foo::m const called [" << this->value << "]" << std::endl; };
-		foo &operator=(value_type src) { this->value = src; return *this; };
-		foo &operator=(foo const &src) {
-			if (this->_verbose || src._verbose)
-				std::cout << "foo::operator=(foo) CALLED" << std::endl;
-			this->value = src.value;
-			return *this;
-		};
-		value_type	getValue(void) const { return this->value; };
-		void		switchVerbose(void) { this->_verbose = !(this->_verbose); };
+// 		foo(void) : value(), _verbose(false) { };
+// 		foo(value_type src, const bool verbose = false) : value(src), _verbose(verbose) { };
+// 		foo(foo const &src, const bool verbose = false) : value(src.value), _verbose(verbose) { };
+// 		~foo(void) { if (this->_verbose) std::cout << "~foo::foo()" << std::endl; };
+// 		void m(void) { std::cout << "foo::m called [" << this->value << "]" << std::endl; };
+// 		void m(void) const { std::cout << "foo::m const called [" << this->value << "]" << std::endl; };
+// 		foo &operator=(value_type src) { this->value = src; return *this; };
+// 		foo &operator=(foo const &src) {
+// 			if (this->_verbose || src._verbose)
+// 				std::cout << "foo::operator=(foo) CALLED" << std::endl;
+// 			this->value = src.value;
+// 			return *this;
+// 		};
+// 		value_type	getValue(void) const { return this->value; };
+// 		void		switchVerbose(void) { this->_verbose = !(this->_verbose); };
 
-		operator value_type(void) const {
-			return value_type(this->value);
-		}
-	private:
-		value_type	value;
-		bool		_verbose;
-};
+// 		operator value_type(void) const {
+// 			return value_type(this->value);
+// 		}
+// 	private:
+// 		value_type	value;
+// 		bool		_verbose;
+// };
 
-template <typename T>
-std::ostream	&operator<<(std::ostream &o, foo<T> const &bar) {
-	o << bar.getValue();
-	return o;
-} // ---
+// template <typename T>
+// std::ostream	&operator<<(std::ostream &o, foo<T> const &bar) {
+// 	o << bar.getValue();
+// 	return o;
+// } // ---
 
 void vector_rev_iter2() {
 	std::cout << CYAN_B"----\t vector_rev_iter2 \t----" << NC << std::endl;

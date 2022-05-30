@@ -16,10 +16,11 @@ void stack_construct();
 // __NS__ (tested namespace) defined in testing.hpp
 
 #ifndef __TestType__ // the data type tested
-	#define __TestType__ TestClass
+	// #define __TestType__ TestClass
 	// #define __TestType__ int
 	// #define __TestType__ double
 	// #define __TestType__ std::string
+	#define __TestType__ foo<int>
 #endif
 
 #ifndef __TestCont__ // the container tested
@@ -63,6 +64,19 @@ void stack_construct() {
 		s.pop();
 	}
 	info(s);
+	__NS__::stack<__TestType__> stck;
+
+	std::cout << "empty: " << stck.empty() << std::endl;
+	std::cout << "size: " << stck.size() << std::endl;
+
+	stck.push(41);
+	stck.push(29);
+	stck.push(10);
+	stck.push(42);
+	std::cout << "Added some elements" << std::endl;
+
+	std::cout << "empty: " << stck.empty() << std::endl;
+	info(stck);
 }
 
 #undef __TestType__

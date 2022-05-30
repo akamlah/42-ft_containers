@@ -10,7 +10,7 @@
 int main() {
 
 	test_vector();
-	// test_stack();
+	test_stack();
 
 	system("leaks test_ft_containers | tail -3");
 	// system("leaks test_ft_containers");

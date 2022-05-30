@@ -27,15 +27,15 @@ NON MEMBER FUNCTIONS
 --------------------------------------------------------------------------- */
 
 
-#ifndef STACK_HPP
-# define STACK_HPP
+#ifndef _STACK_HPP__
+# define _STACK_HPP__
 
 #include "vector.hpp"
 #include "iterator.hpp"
 
 namespace ft {
 
-template< typename T, class Container = std::deque<T> >
+template< typename T, class Container = ft::vector<T> >
 class stack {
 
 public:
@@ -60,8 +60,8 @@ public:
 	stack& operator=( const stack& other ) { c = other.c; return (*this); }
 
 
-	reference top() { return (c.front()); }
-	const_reference top() const { return (c.front()); }
+	reference top() { return (c.back()); }
+	const_reference top() const { return (c.back()); }
 	bool empty() const { return (c.empty()); }
 	size_type size() const { return (c.size()); }
 
@@ -83,30 +83,29 @@ private:
 /* operator==,!=,<,<=,>,>=,<=> */
 
 template< class T, class Container >
-bool operator==( const std::stack<T,Container>& lhs,
-	const std::stack<T,Container>& rhs ) { return (lhs.c == rhs.c); }
+bool operator==( const ft::stack<T,Container>& lhs,
+	const ft::stack<T,Container>& rhs ) { return (lhs.c == rhs.c); }
 
 template< class T, class Container >
-bool operator!=( const std::stack<T,Container>& lhs,
-	const std::stack<T,Container>& rhs ) { return (!(lhs == rhs)); }
+bool operator!=( const ft::stack<T,Container>& lhs,
+	const ft::stack<T,Container>& rhs ) { return (!(lhs == rhs)); }
 
 template< class T, class Container >
-bool operator<( const std::stack<T,Container>& lhs,
-	const std::stack<T,Container>& rhs ) { return (lhs.c < rhs.c); }
+bool operator<( const ft::stack<T,Container>& lhs,
+	const ft::stack<T,Container>& rhs ) { return (lhs.c < rhs.c); }
 
 template< class T, class Container >
-bool operator<=( const std::stack<T,Container>& lhs,
-	const std::stack<T,Container>& rhs ) { return (!(lhs > rhs)); }
+bool operator<=( const ft::stack<T,Container>& lhs,
+	const ft::stack<T,Container>& rhs ) { return (!(rhs < lhs)); }
 
 template< class T, class Container >
-bool operator>( const std::stack<T,Container>& lhs,
-	const std::stack<T,Container>& rhs ) { return (rhs < lhs); }
+bool operator>( const ft::stack<T,Container>& lhs,
+	const ft::stack<T,Container>& rhs ) { return (rhs < lhs); }
 
 template< class T, class Container >
-bool operator>=( const std::stack<T,Container>& lhs,
-	const std::stack<T,Container>& rhs ) { return (!(lhs < rhs)); }
-
+bool operator>=( const ft::stack<T,Container>& lhs,
+	const ft::stack<T,Container>& rhs ) { return (!(lhs < rhs)); }
 
 } // NAMESPACE_FT
 
-#endif // STACK_HPP
+#endif // _STACK_HPP__
