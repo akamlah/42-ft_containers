@@ -45,6 +45,25 @@ class __tree
 
 /* ======================== MEMBER CLASSES ================================ */
 
+template<typename T>
+class __Node {
+private:
+	pointer _rc; //left child
+	pointer _lc; // right child
+	pointer _parent; // ?
+	bool _color; // ? bool
+
+	__Node(): _rc(NULL), _lc(NULL), color(red), parent(NULL) {}
+	~__Node() {};
+
+	// right rotate node:
+	// 	lc's parent becomes old node's parent
+	// 	lc becomes new parent
+	// 	lc'c lc becomes node's rc
+
+	// left rotate node -> reverse => test thees by trying to see if lrot + rrot == 0 rot
+
+};
 
 /* ======================== ATTRIBUTES ==================================== */
 
