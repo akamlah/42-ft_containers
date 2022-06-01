@@ -1,8 +1,9 @@
 /* ************************************************************************ */
+/*																			*/
 /*								ft:: STACK									*/
 /*																			*/
-/*																			*/
 /* ************************************************************************ */
+
 /* ------------------------------- CONTENTS ----------------------------------
 TYPEDEFS
 		container_type
@@ -26,16 +27,16 @@ NON MEMBER FUNCTIONS
 	operator==,!=,<,<=,>,>=,<=>
 --------------------------------------------------------------------------- */
 
-
-#ifndef _STACK_HPP__
-# define _STACK_HPP__
+#ifndef __FT_STACK_HPP__
+# define __FT_STACK_HPP__
 
 #include "vector.hpp"
 #include "iterator.hpp"
 
-namespace ft {
 
-template< typename T, class Container = ft::vector<T> >
+namespace ft { /* NAMESPACE FT -------------------------------------------- */
+
+template< typename T, class Container = ft::vector<T> > // STACK --------- */
 class stack {
 
 public:
@@ -52,32 +53,39 @@ protected:
 
 public:
 
-	// stack(): c() { __dbg_funcid(); } // default
-	explicit stack(const Container& cont = Container()): c(cont) { __dbg_funcid(); }
-	stack(const stack& other): c(other.c) { __dbg_funcid(); }
-	// virtual ~stack() { __dbg_funcid(); } // default
+	// stack(): c() { __dbg_funcid(__PRETTY_FUNCTION__); } // default
+	// virtual ~stack() { __dbg_funcid(__PRETTY_FUNCTION__); } // default
+	explicit stack(const Container& cont = Container()): c(cont) { __dbg_funcid(__PRETTY_FUNCTION__); }
+	stack(const stack& other): c(other.c) { __dbg_funcid(__PRETTY_FUNCTION__); }
 
 	stack& operator=( const stack& other ) { c = other.c; return (*this); }
-
 
 	reference top() { return (c.back()); }
 	const_reference top() const { return (c.back()); }
 	bool empty() const { return (c.empty()); }
 	size_type size() const { return (c.size()); }
 
-
 	void push( const value_type& value ) { c.push_back(value); }
 	void pop() { c.pop_back(); }
 
+	template< class __T, class __Container >
+	friend bool operator==( const stack<__T,__Container>& lhs,
+		const stack<__T,__Container>& rhs );
+
+	template< class __T, class __Container >
+	friend bool operator<( const ft::stack<__T,__Container>& lhs,
+		const stack<__T,__Container>& rhs );
+
 private:
 
-	void __dbg_funcid() {
+	void __dbg_funcid(const char * msg) const {
 		#if DBG
-			std::cout << "\033[38;5;228m" <<__PRETTY_FUNCTION__ << "\033[0m" << std::endl; 
+			std::cout << "\033[38;5;128m" << msg << "\033[0m" << std::endl; 
 		#endif
+		(void)msg;
 	}
 
-}; // STACK
+}; // STACK --------------------------------------------------------------- */
 
 /* - NON MEMBER FUNCTIONS ------------------------------------------------- */
 /* operator==,!=,<,<=,>,>=,<=> */
@@ -108,4 +116,4 @@ bool operator>=( const ft::stack<T,Container>& lhs,
 
 } // NAMESPACE_FT
 
-#endif // _STACK_HPP__
+#endif // __FT_STACK_HPP__

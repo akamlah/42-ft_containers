@@ -1,27 +1,22 @@
 /* ************************************************************************ */
 /*																			*/
-/*							ft:: ITERATOR									*/
+/*							ft:: TYPE TRAITS								*/
 /*																			*/
 /* ************************************************************************ */
 
-#ifndef _LIBFT_TYPE_TRAITS_H_
-# define _LIBFT_TYPE_TRAITS_H_
+/* CONTENTS ------------------------------------------------------------------
+ENABLE IF
+	enable if
+IS INTEGRAL
+	helper class ft::bool_constant
+	typedefs true_type, false_type
+	is_integral templates for every type that is integer
+--------------------------------------------------------------------------- */
 
-#include <type_traits>
+#ifndef __FT_TYPE_TRAITS_HPP_
+# define __FT_TYPE_TRAITS_HPP_
 
 namespace ft {
-// note: std defines true_type and false_type as struct _LIBCPP_BOOL...whatever
-/* ------------------------------------------------------------------------ */
-
-/* CONTENTS ------------------------------------------------------------------
-
-enable if
-
-helper class ft::bool_constant
-typedefs true_type, false_type
-is_integral templates for every type that is integer
-
---------------------------------------------------------------------------- */
 
 /* ------------------------------------------------------------------------ */
 /* ENABLE IF 
@@ -47,42 +42,35 @@ implementation-defined extended integer types, including any signed,
 unsigned, and cv-qualified variants. Otherwise, value is equal to false.
 */
 
-/* helper class bool */
+/* helper class bool_constant */
 template<bool __v = true>
-class bool_constant {
-
-	private :
-
-		static const bool _value = __v;
-
-	public:
-
-		typedef bool			value_type;
-		typedef bool_constant	type;
-
-		operator value_type() const { return (_value); }
-
+struct bool_constant {
+	static const bool value = __v;
+	typedef bool			value_type;
+	typedef bool_constant	type;
 };
 
-typedef bool_constant< (true) >		true_type;
-typedef bool_constant< (false) >	false_type;
+typedef bool_constant< true >	true_type;
+typedef bool_constant< false >	false_type;
 
-template< class T > struct _libft_is_integral 				: public false_type {};
-template< > struct _libft_is_integral< bool >				: public true_type {};
-template< > struct _libft_is_integral< char >				: public true_type {};
-template< > struct _libft_is_integral< signed char >		: public true_type {};
-template< > struct _libft_is_integral< unsigned char >		: public true_type {};
-template< > struct _libft_is_integral< short >				: public true_type {};
-template< > struct _libft_is_integral< unsigned short >		: public true_type {};
-template< > struct _libft_is_integral< int >				: public true_type {};
-template< > struct _libft_is_integral< unsigned int >		: public true_type {};
-template< > struct _libft_is_integral< long >				: public true_type {};
-template< > struct _libft_is_integral< unsigned long >		: public true_type {};
-// c++11:
-// template< > struct _libft_is_integral< long long >			: public true_type {};
-// template< > struct _libft_is_integral< unsigned long long >	: public true_type {};
+template< class T > struct __ft_is_integral 			: public false_type {};
+
+template< > struct __ft_is_integral< bool >				: public true_type {};
+template< > struct __ft_is_integral< char >				: public true_type {};
+template< > struct __ft_is_integral< signed char >		: public true_type {};
+template< > struct __ft_is_integral< unsigned char >	: public true_type {};
+template< > struct __ft_is_integral< short >			: public true_type {};
+template< > struct __ft_is_integral< unsigned short >	: public true_type {};
+template< > struct __ft_is_integral< int >				: public true_type {};
+template< > struct __ft_is_integral< unsigned int >		: public true_type {};
+template< > struct __ft_is_integral< long >				: public true_type {};
+template< > struct __ft_is_integral< unsigned long >	: public true_type {};
+
+// is_integral:
+template< typename T >
+class is_integral : public __ft_is_integral< T > {};
 
 /* ------------------------------------------------------------------------ */
 
 } // NAMESPACE FT
-#endif // _LIBFT_TYPE_TRAITS_H_
+#endif // __FT_TYPE_TRAITS_HPP_

@@ -29,6 +29,8 @@ CLASSES = \
 OTHER_CPPFILES = \
 	tests_vector.cpp \
 	tests_stack.cpp \
+	tests_type_traits_and_utils.cpp \
+	tests_map.cpp \
 
 FT_LIB_TEMPLATES = \
 	type_traits.hpp \
@@ -37,6 +39,7 @@ FT_LIB_TEMPLATES = \
 	utility.hpp \
 	vector.hpp \
 	stack.hpp \
+	map.hpp \
 
 OTHER_HEADERS = \
 	ANSIpalette.h \
@@ -97,8 +100,8 @@ comp:
 	./std_compare/compare.sh
 
 endboss:
-	clang++ ENDBOSS_main.cpp -o ft_container
-	clang++ ENDBOSS_main.cpp -o std_container -DSTD
+	clang++ julians_main.cpp -o ft_container
+	clang++ julians_main.cpp -o std_container -DSTD
 	./ft_container > endboss.ft
 	./std_container > endboss.std
 	diff endboss.ft endboss.std

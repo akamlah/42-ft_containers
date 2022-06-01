@@ -4,99 +4,100 @@
 /*																			*/
 /* ************************************************************************ */
 
+/* CONTENTS ------------------------------------------------------------------
+PAIR
+	Member types
+		first_type
+		second_type
+	Member attributes (public)
+		first
+		second
+	Member functions
+		(constructor)
+		operator=
+	Non-member functions
+		make pair
+		operator==,!=,<,<=,>,>=,<=>
+--------------------------------------------------------------------------- */
+
 #ifndef _LIBFT_UTILITY_H_
 # define _LIBFT_UTILITY_H_
 
-namespace ft {
+namespace ft { /* NAMESPACE FT -------------------------------------------- */
 
-/* ------------------------------------------------------------------------ */
-/* CONTENTS ------------------------------------------------------------------
 
-template< class T1, class T2 > struct pair;
+/* PAIR ----------------------------------------------------------------------
+std::pair is a class template that provides a way to store two
+heterogeneous objects as a single unit. A pair is a specific case of a
+std::tuple with two elements. */
 
-	Member types
-		first_type	T1
-		second_type	T2
-
-	Member objects
-		first	T1
-		second	T2
-
-	Member functions
-		(constructor)
-			pair( const T1& x, const T2& y );
-			template< class U1, class U2 > pair( const pair<U1, U2>& p );
-			pair( const pair& p ) = default;
-		operator=
-		
-	Non-member functions
-		make_pair
-		operator==
-		operator!=
-		operator<
-		operator<=
-		operator>
-		operator>=
-
---------------------------------------------------------------------------- */
-/* ------------------------------------------------------------------------ */
-
-/*   +  +  +  +  +  +  +  --- IMPLEMENTATION ---  +  +  +  +  +  +  +  +  + */
-
-template< class T1, class T2 >
-struct pair {
-
-// typedefs
-
-public:
+template<
+	class T1,
+	class T2
+> struct pair {
 
 	typedef T1 first_type;
 	typedef T2 second_type;
 
-// attributes
-
-private:
-
 	first_type first;
 	second_type second;
 
-// construction
+	pair() : first(), second() {}
+	pair(const T1& x, const T2& y) : first(x), second(y) {}
+	template< class U1, class U2 >
+	pair(const pair<U1, U2>& p) : first(p.first), second(p.second) {}
+	// pair(const pair& p) = default {} ?
+	// ~pair() {} // trivial ?
 
-public:
+	pair& operator=(const pair& other) {
+		first = other.first;
+		second = other.second;
+		return (*this);
+	}
 
-	pair( const T1& x, const T2& y );
-	template< class U1, class U2 > pair( const pair<U1, U2>& p );
-	// pair( const pair& p ) = default; c++11 syntax
+}; // PAIR
 
-// member functions
-
-	pair& operator=( const pair& other );
-
-	// template< class T1, class T2 >
-	// ft::pair<T1,T2> make_pair( T1 t, T2 u ); wshadow
-	
-}; // FT PAIR
+/* make pair */
+template< class T1, class T2 >
+ft::pair< T1, T2 > make_pair(T1 t, T2 u) {
+	return (ft::pair< T1, T2 >(t, u));
+}
 
 /* operator==,!=,<,<=,>,>=,<=> */
 
 template< class T1, class T2 >
-bool operator==( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs );
+bool operator==( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs ) {
+	return (lhs.first == rhs.first && lhs.second == rhs.second);
+}
 
 template< class T1, class T2 >
-bool operator!=( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs );
+bool operator!=( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs ) {
+	return (!(lhs == rhs));
+}
 
 template< class T1, class T2 >
-bool operator<( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs );
+bool operator<( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs ) {
+	return (lhs.first < rhs.first
+		|| (!(rhs.first < lhs.first) && lhs.second < rhs.second));
+}
 
 template< class T1, class T2 >
-bool operator<=( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs );
+bool operator<=( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs ) {
+	return (!(rhs < lhs));
+}
 
 template< class T1, class T2 >
-bool operator>( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs );
+bool operator>( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs ) {
+	return (rhs < lhs);
+}
 
 template< class T1, class T2 >
-bool operator>=( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs );
+bool operator>=( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs ) {
+	return (!(lhs < rhs));
+}
 
+// ft::pair
+/* ------------------------------------------------------------------------ */
 
 } // NAMESPACE FT
 #endif // _LIBFT_UTILITY_H_

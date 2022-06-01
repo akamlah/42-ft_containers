@@ -4,35 +4,22 @@
 /*																			*/
 /* ************************************************************************ */
 
-#ifndef _LIBFT_ITERATOR_H_
-# define _LIBFT_ITERATOR_H_
-
-namespace ft {
-
-/* ------------------------------------------------------------------------ */
-/* CONTENTS ------------------------------------------------------------------
-
+/* ------------------------------- CONTENTS ----------------------------------
 * tags
 	struct input_iterator_tag {};
 	struct output_iterator_tag {};
 	struct forward_iterator_tag {};
 	struct bidirectional_iterator_tag {};
 	struct random_access_iterator_tag {};
-
 * traits
-
 	template< class Iter > struct iterator_traits;
 	specializations:
 		template< class T > struct iterator_traits<T*>;
 		template< class T > struct iterator_traits<const T*>;
-
 * iterators
-
 	template< typename T, class Category, class Distance = ptrdiff_t,
 		class Pointer = T*, class Reference = T& > struct iterator
-
 * iterator adaptors
-
 	template< class Iter >
 	class reverse_iterator : public iterator
 	<	typename iterator_traits<Iter>::iterator_category,
@@ -40,8 +27,12 @@ namespace ft {
 		typename iterator_traits<Iter>::difference_type,
 		typename iterator_traits<Iter>::pointer,
 		typename iterator_traits<Iter>::reference >
-
 --------------------------------------------------------------------------- */
+
+#ifndef __FT_ITERATOR_HPP_
+# define __FT_ITERATOR_HPP_
+
+namespace ft {
 
 /* ------------------------------------------------------------------------ */
 /* TAGS */
@@ -52,8 +43,6 @@ struct output_iterator_tag {};
 struct forward_iterator_tag: public input_iterator_tag {};
 struct bidirectional_iterator_tag: public forward_iterator_tag {};
 struct random_access_iterator_tag: public bidirectional_iterator_tag {};
-
-// overloas accessors for every type
 
 /* ------------------------------------------------------------------------ */
 /* ITERATOR TRAITS template overloads */
@@ -67,7 +56,6 @@ struct iterator_traits {
 	typedef typename Iter::reference			reference;
 	typedef typename Iter::iterator_category	iterator_category;
 };
-
 
 // specializations:
 
@@ -151,19 +139,17 @@ protected:
 
 private:
 
-	void __dbg_funcid(const char * msg) {
+	void __dbg_funcid(const char * msg) const {
 	#if DBG
-		std::cout << "\033[38;5;56m";
-		std::cout << msg;
-		std::cout << "\033[0m";
-		std::cout << std::endl;
+		std::cout << "\033[38;5;56m" << msg << "\033[0m" << std::endl;
 	#endif
 	(void)msg;
 }
 
 public:
 
-	reverse_iterator() { __dbg_funcid(__PRETTY_FUNCTION__); }
+	reverse_iterator() { __dbg_funcid(__PRETTY_FUNCTION__); } // default
+	~reverse_iterator() { __dbg_funcid(__PRETTY_FUNCTION__); } // default
 	explicit reverse_iterator( iterator_type x ): _current(x) { __dbg_funcid(__PRETTY_FUNCTION__); }
 	template< class U >
 	reverse_iterator( const reverse_iterator<U>& other ): _current(other.base()) { __dbg_funcid(__PRETTY_FUNCTION__); }
@@ -174,8 +160,6 @@ public:
 		_current = other.base();
 		return (*this);
 	}
-
-	~reverse_iterator() { __dbg_funcid(__PRETTY_FUNCTION__); } // ?
 
 	iterator_type base() const { return (_current); }
 
@@ -247,4 +231,4 @@ typename reverse_iterator< Iter1 >::difference_type
 
 } // NAMESPACE FT
 
-#endif // _LIBFT_ITERATOR_H_
+#endif // __FT_ITERATOR_HPP_

@@ -5,6 +5,9 @@
 /* ************************************************************************ */
 
 #include "testing.hpp"
+
+#include "../vector.hpp"
+
 #include <vector>
 #include <list>
 
@@ -38,23 +41,23 @@ void vector_performance();
 // #endif
 /* this^^ defines substitution as:
 	#if STD
-	#define __NS__ std
+	#define _NS__ std
 	#endif
 	#if !STD
-	#define __NS__ ft
+	#define _NS__ ft
 	#endif
 in the header "testing.hpp"
 */
 
 // select data type in container:
-#ifndef __TestType__
-// #define __TestType__ TestClass
-#define __TestType__ int
-// #define __TestType__ double
+#ifndef _TestType__
+// #define _TestType__ TestClass
+#define _TestType__ int
+// #define _TestType__ double
 #endif
 
 template<typename T>
-void info(__NS__::vector<T>& v) {
+void info(const _NS__::vector<T>& v) {
 	std::cout << "*begin: " << *v.begin() << ", ";
 	std::cout << "*end - 1: " << *(v.end() - 1) << ", ";
 	std::cout << "size: " << v.size() << ", ";
@@ -70,26 +73,27 @@ void info(__NS__::vector<T>& v) {
 
 // CALL ALL
 void test_vector() {
+	std::cout << MAGENTA_B "----\t VECTOR \t----" << NC << std::endl;
 
 	/* ------------------ */
 	// building tests
 
-	// vector_push_pop(); std::cout << std::endl;
-	// vector_resize_reserve(); std::cout << std::endl;
-	// vector_resize2(); std::cout << std::endl;
-	// vector_copies(); std::cout << std::endl;
-	// vector_range_construct(); std::cout << std::endl;
-	// vector_swap(); std::cout << std::endl;
-	// vector_assign(); std::cout << std::endl;
-	// vector_insert(); std::cout << std::endl;
-	// vector_erase_range(); std::cout << std::endl;
-	// vector_erase(); std::cout << std::endl;
-	// vector_at(); std::cout << std::endl;
-	// vector_comp_int(); std::cout << std::endl;
-	// vector_rev_iter1(); std::cout << std::endl;
-	// vector_rev_iter2(); std::cout << std::endl;
-	// vector_rev_iter3(); std::cout << std::endl;
-	// vector_bidirect(); std::cout << std::endl;
+	vector_push_pop(); std::cout << std::endl;
+	vector_resize_reserve(); std::cout << std::endl;
+	vector_resize2(); std::cout << std::endl;
+	vector_copies(); std::cout << std::endl;
+	vector_range_construct(); std::cout << std::endl;
+	vector_swap(); std::cout << std::endl;
+	vector_assign(); std::cout << std::endl;
+	vector_insert(); std::cout << std::endl;
+	vector_erase_range(); std::cout << std::endl;
+	vector_erase(); std::cout << std::endl;
+	vector_at(); std::cout << std::endl;
+	vector_comp_int(); std::cout << std::endl;
+	vector_rev_iter1(); std::cout << std::endl;
+	vector_rev_iter2(); std::cout << std::endl;
+	vector_rev_iter3(); std::cout << std::endl;
+	vector_bidirect(); std::cout << std::endl;
 
 	/* ------------------ */
 	// performance tests
@@ -110,13 +114,13 @@ void test_vector() {
 // #if 0
 void performance1() {
 	// case 1
-	__NS__::vector<__TestType__> v(10);
+	_NS__::vector<_TestType__> v(10);
 	for (int i = 1; i < _nb_elements__; i++) {
-		v.push_back(__TestType__(i));
+		v.push_back(_TestType__(i));
 	}
-	__NS__::vector<__TestType__> src(10);
+	_NS__::vector<_TestType__> src(10);
 	for (int i = 1; i < _nb_elements__ / 2; i++) {
-		src.push_back(__TestType__(i));
+		src.push_back(_TestType__(i));
 	}
 
 	info(v);
@@ -129,13 +133,13 @@ void performance1() {
 	for (int i = 0; i < 100; i++) {
 		v.resize(5);
 		info(v);
-		v.resize(5 * i, __TestType__(1));
+		v.resize(5 * i, _TestType__(1));
 		info(v);
 		v.insert(v.begin(), src.begin(), src.end());
 		info(v);
 		v.erase((v.begin() + (src.size() / 2)), v.end() - 10);
 		for (int i = 1; i < _nb_elements__ / 2; i++) {
-			v.push_back(__TestType__(i));
+			v.push_back(_TestType__(i));
 		}
 		info(v);
 		v.erase((v.begin() + (src.size() / 2)));
@@ -182,18 +186,18 @@ void vector_performance() {
 
 void vector_push_pop(){
 	std::cout << CYAN_B"----\t vector_push_pop \t----" << NC << std::endl;
-	__NS__::vector<__TestType__> v(10);
+	_NS__::vector<_TestType__> v(10);
 	v.pop_back();
 	// info(v);
-	v.push_back(__TestType__(777));
+	v.push_back(_TestType__(777));
 	info(v);
-	v.push_back(__TestType__(888));
+	v.push_back(_TestType__(888));
 	info(v);
-	v.push_back(__TestType__(999));
+	v.push_back(_TestType__(999));
 	info(v);
-	v.push_back(__TestType__(111));
+	v.push_back(_TestType__(111));
 	info(v);
-	v.push_back(__TestType__(222));
+	v.push_back(_TestType__(222));
 	info(v);
 	std::cout << "access[3]: " << v[3] << std::endl;
 	v.pop_back();
@@ -209,9 +213,9 @@ void vector_push_pop(){
 	v.pop_back();
 	info(v);
 
-	__NS__::vector<std::string> vct(8);
-	__NS__::vector<std::string> vct2;
-	__NS__::vector<std::string>::iterator it = vct.begin();
+	_NS__::vector<std::string> vct(8);
+	_NS__::vector<std::string> vct2;
+	_NS__::vector<std::string>::iterator it = vct.begin();
 	// info(vct);
 	// info(vct2);
 	for (unsigned long int i = 0; i < vct.size(); ++i)
@@ -228,15 +232,15 @@ void vector_push_pop(){
 
 void vector_resize_reserve() {
 	std::cout << CYAN_B"----\t vector_resize_reserve \t----" << NC << std::endl;
-	__NS__::vector<__TestType__> v;
+	_NS__::vector<_TestType__> v;
 
 	v.resize(5);
 	v.reserve(12);
 	for (int i = 1; i < 21; i++) {
-		v.push_back(__TestType__(i * 2));
+		v.push_back(_TestType__(i * 2));
 	}
 	info(v); // cap = 24, size 
-	for (__NS__::vector<__TestType__>::size_type i = 0; i < v.size(); i++) {
+	for (_NS__::vector<_TestType__>::size_type i = 0; i < v.size(); i++) {
 		std::cout << "element[" << i << "] = " << v[i] << std::endl;
 	}
 	// try resize with count == size also
@@ -244,13 +248,13 @@ void vector_resize_reserve() {
 	info(v); // cap = 24, size 
 	v.resize(50);
 	info(v); // cap = 50, size 50
-	for (__NS__::vector<__TestType__>::size_type i = 1; i < v.size(); i++) {
+	for (_NS__::vector<_TestType__>::size_type i = 1; i < v.size(); i++) {
 		std::cout << "element[" << i << "] = " << v[i] << std::endl;
 	}
 	v.resize(5);
 	info(v); // cap = 50, size 5
 	for (int i = 1; i < 20; i++) {
-		v.push_back(__TestType__(i * 2));
+		v.push_back(_TestType__(i * 2));
 	}
 	info(v); // cap 
 	v.reserve(27);
@@ -260,9 +264,9 @@ void vector_resize_reserve() {
 
 void vector_resize2() {
 	std::cout << CYAN_B"----\t vector_resize2 \t----" << NC << std::endl;
-	__NS__::vector<__TestType__> v(10);
+	_NS__::vector<_TestType__> v(10);
 	for (int i = 1; i < 5000; i++) {
-		v.push_back(__TestType__(i));
+		v.push_back(_TestType__(i));
 	}
 	info(v);
 	v.resize(5);
@@ -275,24 +279,24 @@ void vector_resize2() {
 void vector_copies() {
 	std::cout << CYAN_B"----\t vector_copies \t----" << NC << std::endl;
 
-	__NS__::vector<__TestType__> src;
+	_NS__::vector<_TestType__> src;
 	for (int i = 1; i < 21; i++) {
-		src.push_back(__TestType__(i * 2));
+		src.push_back(_TestType__(i * 2));
 	}
 	info(src);
 	for (unsigned int i = 0; i < src.size(); i++) {
 		std::cout << src[i] << std::endl;
 	}
 
-	__NS__::vector<__TestType__> v(src);
+	_NS__::vector<_TestType__> v(src);
 	for (unsigned int i = 0; i < v.size(); i++) {
 		std::cout << v[i] << std::endl;
 	}
 	info(v);
 
-	__NS__::vector<__TestType__> v2; // test cpy to bigger
+	_NS__::vector<_TestType__> v2; // test cpy to bigger
 	for (int i = 1; i < 5; i++) {
-		v2.push_back(__TestType__(i * 3));
+		v2.push_back(_TestType__(i * 3));
 	}
 	info(v2);
 	for (unsigned int i = 0; i < v2.size(); i++) {
@@ -304,9 +308,9 @@ void vector_copies() {
 		std::cout << v2[i] << std::endl;
 	}
 	// bug in std? weird stuff anyways... double free if cpy to bigger
-	// __NS__::vector<__TestType__> v3; // test cpy to smaller
+	// _NS__::vector<_TestType__> v3; // test cpy to smaller
 	// for (int i = 1; i < 50; i++) {
-	// 	v3.push_back(__TestType__(i * 7));
+	// 	v3.push_back(_TestType__(i * 7));
 	// }
 	// info(v3);
 	// // for (unsigned int i = 0; i < v3.size(); i++) {
@@ -322,15 +326,15 @@ void vector_copies() {
 
 void vector_range_construct() {
 	std::cout << CYAN_B"----\t vector_range_construct \t----" << NC << std::endl;
-	__NS__::vector<__TestType__> src;
+	_NS__::vector<_TestType__> src;
 	for (int i = 0; i < 10; i++) {
-		src.push_back(__TestType__(i * 3));
+		src.push_back(_TestType__(i * 3));
 	}
 	for (int i = 0; i < 10; i++) {
 		std::cout << src[i] << std::endl;
 	}
 
-	__NS__::vector<__TestType__> v(src.begin() + 2, src.begin() + 6);
+	_NS__::vector<_TestType__> v(src.begin() + 2, src.begin() + 6);
 	info(v);
 	for (unsigned int i = 0; i < v.size(); i++) {
 		std::cout << v[i] << std::endl;
@@ -339,11 +343,11 @@ void vector_range_construct() {
 
 void vector_swap() {
 	std::cout << CYAN_B"----\t vector_swap \t----" << NC << std::endl;
-	__NS__::vector<__TestType__> foo(3, 15);
-	__NS__::vector<__TestType__> bar(5, 42);
+	_NS__::vector<_TestType__> foo(3, 15);
+	_NS__::vector<_TestType__> bar(5, 42);
 	
-	__NS__::vector<__TestType__>::const_iterator it_foo = foo.begin();
-	__NS__::vector<__TestType__>::const_iterator it_bar = bar.begin();
+	_NS__::vector<_TestType__>::const_iterator it_foo = foo.begin();
+	_NS__::vector<_TestType__>::const_iterator it_bar = bar.begin();
 
 	std::cout << "BEFORE SWAP" << std::endl;
 
@@ -368,16 +372,16 @@ void vector_swap() {
 
 void vector_assign() {
 	std::cout << CYAN_B"----\t vector_assign \t----" << NC << std::endl;
-	__NS__::vector<__TestType__> v;
+	_NS__::vector<_TestType__> v;
 	unsigned int size = 20;
 	for (unsigned int i = 0; i < size; i++) {
-		v.push_back(__TestType__(i * 2));
+		v.push_back(_TestType__(i * 2));
 	}
 
 	std::cout << CYAN" - \t assign n \t----" << NC << std::endl;
 	// CASE 1 : n < size -> first n values get replaced by value given
 	std::cout << CYAN << "n < size < capacity:" << NC << std::endl;
-	v.assign(5, __TestType__(-1));
+	v.assign(5, _TestType__(-1));
 	info(v); // (cap = 32 std)
 	for (unsigned int i = 0; i < v.size(); i++) {
 		std::cout << "i: " << i \
@@ -385,7 +389,7 @@ void vector_assign() {
 	}
 	// CASE 2 : n > size < capacity -> all repaced & filled up to n
 	std::cout << CYAN << "size < n < capacity:" << NC << std::endl;
-	v.assign(30, __TestType__(-1));
+	v.assign(30, _TestType__(-1));
 	info(v); // (cap = 32 std)
 	for (unsigned int i = 0; i < v.size(); i++) {
 		std::cout << "i: " << i \
@@ -393,7 +397,7 @@ void vector_assign() {
 	}
 	// CASE 3 : n > size < capacity -> all repaced and cap increased
 	std::cout << CYAN << "size < capacity < n:" << NC << std::endl;
-	v.assign(40, __TestType__(-1));
+	v.assign(40, _TestType__(-1));
 	info(v);
 	for (unsigned int i = 0; i < v.size(); i++) {
 		std::cout << "i: " << i \
@@ -401,10 +405,10 @@ void vector_assign() {
 	}
 
 	std::cout << CYAN" - \t assign range \t----" << NC << std::endl;
-	__NS__::vector<__TestType__> src;
+	_NS__::vector<_TestType__> src;
 	unsigned int src_size = 50;
 	for (unsigned int i = 0; i < src_size; i++) {
-		src.push_back(__TestType__(i * 3));
+		src.push_back(_TestType__(i * 3));
 	}
 	info(v); // (cap = 32 std)
 	for (unsigned int i = 0; i < src.size(); i++) {
@@ -451,72 +455,72 @@ void vector_assign() {
 
 void vector_insert() {
 	std::cout << CYAN_B"----\t vector_insert \t----" << NC << std::endl;
-	// __NS__::vector<__TestType__> v;
-	// unsigned int size = 20;
-	// for (unsigned int i = 0; i < size; i++) {
-	// 	v.push_back(__TestType__(i * 2));
-	// }
-	// info(v);
+	_NS__::vector<_TestType__> v;
+	unsigned int size = 20;
+	for (unsigned int i = 0; i < size; i++) {
+		v.push_back(_TestType__(i * 2));
+	}
+	info(v);
+	for (unsigned int i = 0; i < v.size(); i++) {
+		std::cout << "i: " << i \
+		<< " | v: " << v[i] << std::endl;
+	}
+	std::cout << *(v.insert(v.begin() + 5, _TestType__(-1))) << std::endl;
+	info(v);
+	for (unsigned int i = 0; i < v.size(); i++) {
+		std::cout << "i: " << i \
+		<< " | v: " << v[i] << std::endl;
+	}
+	// invalid ite ?
+	// std::cout << *(v.insert(v.begin() - 1, _TestType__(-1))) << std::endl;
+	// info(v); // (cap = 32 std)
 	// for (unsigned int i = 0; i < v.size(); i++) {
 	// 	std::cout << "i: " << i \
 	// 	<< " | v: " << v[i] << std::endl;
 	// }
-	// std::cout << *(v.insert(v.begin() + 5, __TestType__(-1))) << std::endl;
-	// info(v);
-	// for (unsigned int i = 0; i < v.size(); i++) {
-	// 	std::cout << "i: " << i \
-	// 	<< " | v: " << v[i] << std::endl;
-	// }
-	// // invalid ite ?
-	// // std::cout << *(v.insert(v.begin() - 1, __TestType__(-1))) << std::endl;
-	// // info(v); // (cap = 32 std)
-	// // for (unsigned int i = 0; i < v.size(); i++) {
-	// // 	std::cout << "i: " << i \
-	// // 	<< " | v: " << v[i] << std::endl;
-	// // }
-	// std::cout << *(v.insert(v.end(), __TestType__(-1))) << std::endl;
-	// info(v);
-	// for (unsigned int i = 0; i < v.size(); i++) {
-	// 	std::cout << "i: " << i \
-	// 	<< " | v: " << v[i] << std::endl;
-	// }
-	// v.insert(v.begin() + 4, 7, __TestType__(-2));
-	// info(v);
-	// for (unsigned int i = 0; i < v.size(); i++) {
-	// 	std::cout << "i: " << i \
-	// 	<< " | v: " << v[i] << std::endl;
-	// }
-	// v.insert(v.end(), 7, __TestType__(-2));
-	// info(v);
-	// for (unsigned int i = 0; i < v.size(); i++) {
-	// 	std::cout << "i: " << i \
-	// 	<< " | v: " << v[i] << std::endl;
-	// }
-	// __NS__::vector<__TestType__> vct(10);
-	// __NS__::vector<__TestType__> vct2;
+	std::cout << *(v.insert(v.end(), _TestType__(-1))) << std::endl;
+	info(v);
+	for (unsigned int i = 0; i < v.size(); i++) {
+		std::cout << "i: " << i \
+		<< " | v: " << v[i] << std::endl;
+	}
+	v.insert(v.begin() + 4, 7, _TestType__(-2));
+	info(v);
+	for (unsigned int i = 0; i < v.size(); i++) {
+		std::cout << "i: " << i \
+		<< " | v: " << v[i] << std::endl;
+	}
+	v.insert(v.end(), 7, _TestType__(-2));
+	info(v);
+	for (unsigned int i = 0; i < v.size(); i++) {
+		std::cout << "i: " << i \
+		<< " | v: " << v[i] << std::endl;
+	}
+	_NS__::vector<_TestType__> vct(10);
+	_NS__::vector<_TestType__> vct2;
 
-	// for (unsigned long int i = 0; i < vct.size(); ++i)
-	// 	vct[i] = (vct.size() - i) * 3;
-	// info(vct);
+	for (unsigned long int i = 0; i < vct.size(); ++i)
+		vct[i] = (vct.size() - i) * 3;
+	info(vct);
 
-	// vct2.insert(vct2.end(), 42);
-	// vct2.insert(vct2.begin(), 2, 21);
-	// info(vct2);
+	vct2.insert(vct2.end(), 42);
+	vct2.insert(vct2.begin(), 2, 21);
+	info(vct2);
 
-	// vct2.insert(vct2.end() - 2, 42);
-	// info(vct2);
+	vct2.insert(vct2.end() - 2, 42);
+	info(vct2);
 
-	// vct2.insert(vct2.end(), 2, 84);
-	// info(vct2);
+	vct2.insert(vct2.end(), 2, 84);
+	info(vct2);
 
-	// vct2.resize(4);
-	// info(vct2);
+	vct2.resize(4);
+	info(vct2);
 
-	// vct2.insert(vct2.begin() + 2, vct.begin(), vct.end());
-	// vct.clear();
-	// info(vct2);
+	vct2.insert(vct2.begin() + 2, vct.begin(), vct.end());
+	vct.clear();
+	info(vct2);
 
-	// info(vct);
+	info(vct);
 
 	ft::vector<int> myvector4;
 	for (int i=1;i<10;i++) myvector4.push_back(i);
@@ -531,10 +535,10 @@ void vector_insert() {
 
 void vector_erase_range() {
 	std::cout << CYAN_B"----\t vector_erase_range \t----" << NC << std::endl;
-	__NS__::vector<__TestType__> v;
+	_NS__::vector<_TestType__> v;
 	unsigned int size = 20;
 	for (unsigned int i = 0; i < size; i++) {
-		v.push_back(__TestType__(i));
+		v.push_back(_TestType__(i));
 	}
 	info(v);
 	for (unsigned int i = 0; i < v.size(); i++) {
@@ -601,10 +605,10 @@ void vector_erase_range() {
 
 void vector_erase() {
 	std::cout << CYAN_B"----\t vector_erase \t----" << NC << std::endl;
-	__NS__::vector<__TestType__> v;
+	_NS__::vector<_TestType__> v;
 	unsigned int size = 20;
 	for (unsigned int i = 0; i < size; i++) {
-		v.push_back(__TestType__(i));
+		v.push_back(_TestType__(i));
 	}
 	info(v);
 	for (unsigned int i = 0; i < v.size(); i++) {
@@ -651,19 +655,46 @@ void vector_erase() {
 
 void vector_at() {
 	std::cout << CYAN_B"----\t vector_at \t----" << NC << std::endl;
-	__NS__::vector<__TestType__> vct(7);
+	// (from tester)
+	// _NS__::vector<_TestType__> vct(7);
+	// for (unsigned long int i = 0; i < vct.size(); ++i)
+	// {
+	// 	vct.at(i) = (vct.size() - i) * 3;
+	// 	std::cout << "vct.at(): " << vct.at(i) << " | ";
+	// 	std::cout << "vct[]: " << vct[i] << std::endl;
+	// }
+	// info(vct);
+	// _NS__::vector<_TestType__> const vct_c(vct);
+	// std::cout << "front(): " << vct.front() << " " << vct_c.front() << std::endl;
+	// std::cout << "back(): " << vct.back() << " " <<  vct_c.back() << std::endl;
+	// try {
+	// 	vct.at(10) = 42;
+	// }
+	// catch (std::out_of_range &e) {
+	// 	std::cout << "Catch out_of_range exception!" << std::endl;
+	// }
+	// catch (std::exception &e) {
+	// 	std::cout << "Catch exception: " << e.what() << std::endl;
+	// }
+	std::cout << CYAN_B"----\t vector_at2 \t----" << NC << std::endl;
+	_NS__::vector<_TestType__> vct(7);
+
 	for (unsigned long int i = 0; i < vct.size(); ++i)
 	{
 		vct.at(i) = (vct.size() - i) * 3;
-		std::cout << "vct.at(): " << vct.at(i) << " | ";
 		std::cout << "vct[]: " << vct[i] << std::endl;
 	}
 	info(vct);
-	__NS__::vector<__TestType__> const vct_c(vct);
+
+	_NS__::vector<_TestType__> const vct_c(vct);
+
 	std::cout << "front(): " << vct.front() << " " << vct_c.front() << std::endl;
 	std::cout << "back(): " << vct.back() << " " <<  vct_c.back() << std::endl;
+
+	for (unsigned long int i = 0; i < vct_c.size(); ++i)
+		std::cout << "vct_c.at(): " << vct_c.at(i) << std::endl;
 	try {
-		vct.at(10) = 42;
+		std::cout << vct_c.at(10) << std::endl;
 	}
 	catch (std::out_of_range &e) {
 		std::cout << "Catch out_of_range exception!" << std::endl;
@@ -671,13 +702,14 @@ void vector_at() {
 	catch (std::exception &e) {
 		std::cout << "Catch exception: " << e.what() << std::endl;
 	}
+	info(vct_c);
 }
 
 void vector_comp_int() {
 	std::cout << CYAN_B"----\t vector_comp_int \t----" << NC << std::endl;
-	__NS__::vector<int> v1;
-	__NS__::vector<int> v2;
-	__NS__::vector<int, std::allocator<int> > v3;
+	_NS__::vector<int> v1;
+	_NS__::vector<int> v2;
+	_NS__::vector<int, std::allocator<int> > v3;
 	unsigned int size = 20;
 	for (unsigned int i = 0; i < size; i++) {
 		v1.push_back(int(i));
@@ -728,9 +760,20 @@ void vector_comp_int() {
 	std::cout << "v1 >= v1: " << (v1 >= v1) << std::endl;
 }
 
+template <typename Ite_1, typename Ite_2>
+void ft_eq_ope(const Ite_1 &first, const Ite_2 &second, const bool redo = 1)
+{
+	std::cout << (first < second) << std::endl;
+	std::cout << (first <= second) << std::endl;
+	std::cout << (first > second) << std::endl;
+	std::cout << (first >= second) << std::endl;
+	if (redo)
+		ft_eq_ope(second, first, 0);
+}
+
 void vector_rev_iter1() {
 	std::cout << CYAN_B"----\t vector_rev_iter1 \t----" << NC << std::endl;
-	__NS__::vector<int> v;
+	_NS__::vector<int> v;
 	unsigned int size = 20;
 
 	for (unsigned int i = 0; i < size; i++) {
@@ -749,50 +792,54 @@ void vector_rev_iter1() {
 	std::cout << "rbegin: " << *(v.rbegin()) << std::endl;
 	std::cout << "rbegin - 1: " << *(v.rbegin() - 1) << std::endl;
 	std::cout << "rbegin + 1: " << *(v.rbegin() + 1) << std::endl;
+
+	std::cout << CYAN_B"----\t vector_rev_iter1.2 \t----" << NC << std::endl;
+	// ( TESTER )
+	size = 5;
+	_NS__::vector<_TestType__> vct(size);
+	_NS__::vector<_TestType__>::reverse_iterator it_0(vct.rbegin());
+	_NS__::vector<_TestType__>::reverse_iterator it_1(vct.rend());
+	_NS__::vector<_TestType__>::reverse_iterator it_mid;
+
+	_NS__::vector<_TestType__>::const_reverse_iterator cit_0 = vct.rbegin();
+	_NS__::vector<_TestType__>::const_reverse_iterator cit_1;
+	_NS__::vector<_TestType__>::const_reverse_iterator cit_mid;
+
+	for (int i = size; it_0 != it_1; --i)
+		*it_0++ = i;
+	info(vct);
+	it_0 = vct.rbegin();
+	cit_1 = vct.rend();
+	it_mid = it_0 + 3;
+	cit_mid = it_0 + 3; cit_mid = cit_0 + 3; cit_mid = it_mid;
+
+	std::cout << std::boolalpha;
+	std::cout << ((it_0 + 3 == cit_0 + 3) && (cit_0 + 3 == it_mid)) << std::endl;
+
+	std::cout << "\t\tft_eq_ope:" << std::endl;
+	// regular it
+	ft_eq_ope(it_0 + 3, it_mid);
+	ft_eq_ope(it_0, it_1);
+	ft_eq_ope(it_1 - 3, it_mid);
+	// const it
+	ft_eq_ope(cit_0 + 3, cit_mid);
+	ft_eq_ope(cit_0, cit_1);
+	ft_eq_ope(cit_1 - 3, cit_mid);
+	// both it
+	ft_eq_ope(it_0 + 3, cit_mid);
+	ft_eq_ope(it_mid, cit_0 + 3);
+	ft_eq_ope(it_0, cit_1);
+	ft_eq_ope(it_1, cit_0);
+	ft_eq_ope(it_1 - 3, cit_mid);
+	ft_eq_ope(it_mid, cit_1 - 3);
 }
-
-// // --- Class foo
-// template <typename T>
-// class foo {
-// 	public:
-// 		typedef T	value_type;
-
-// 		foo(void) : value(), _verbose(false) { };
-// 		foo(value_type src, const bool verbose = false) : value(src), _verbose(verbose) { };
-// 		foo(foo const &src, const bool verbose = false) : value(src.value), _verbose(verbose) { };
-// 		~foo(void) { if (this->_verbose) std::cout << "~foo::foo()" << std::endl; };
-// 		void m(void) { std::cout << "foo::m called [" << this->value << "]" << std::endl; };
-// 		void m(void) const { std::cout << "foo::m const called [" << this->value << "]" << std::endl; };
-// 		foo &operator=(value_type src) { this->value = src; return *this; };
-// 		foo &operator=(foo const &src) {
-// 			if (this->_verbose || src._verbose)
-// 				std::cout << "foo::operator=(foo) CALLED" << std::endl;
-// 			this->value = src.value;
-// 			return *this;
-// 		};
-// 		value_type	getValue(void) const { return this->value; };
-// 		void		switchVerbose(void) { this->_verbose = !(this->_verbose); };
-
-// 		operator value_type(void) const {
-// 			return value_type(this->value);
-// 		}
-// 	private:
-// 		value_type	value;
-// 		bool		_verbose;
-// };
-
-// template <typename T>
-// std::ostream	&operator<<(std::ostream &o, foo<T> const &bar) {
-// 	o << bar.getValue();
-// 	return o;
-// } // ---
 
 void vector_rev_iter2() {
 	std::cout << CYAN_B"----\t vector_rev_iter2 \t----" << NC << std::endl;
 	unsigned int size = 5;
-	__NS__::vector<foo <int> > vct(size);
-	__NS__::vector<foo <int> >::reverse_iterator it(vct.rbegin());
-	__NS__::vector<foo <int> >::const_reverse_iterator ite(vct.rend());
+	_NS__::vector<foo <int> > vct(size);
+	_NS__::vector<foo <int> >::reverse_iterator it(vct.rbegin());
+	_NS__::vector<foo <int> >::const_reverse_iterator ite(vct.rend());
 	for (int i = 1; it != ite; ++i)
 		*it++ = (i * 7);
 	info(vct);
@@ -823,9 +870,9 @@ void vector_rev_iter2() {
 void vector_rev_iter3() {
 	std::cout << CYAN_B"----\t vector_rev_iter3 \t----" << NC << std::endl;
 	unsigned int size = 5;
-	__NS__::vector< foo <int> > v3(size);
-	__NS__::vector<foo <int> >::reverse_iterator it = v3.rbegin();
-	__NS__::vector<foo <int> >::const_reverse_iterator ite = v3.rbegin();
+	_NS__::vector< foo <int> > v3(size);
+	_NS__::vector<foo <int> >::reverse_iterator it = v3.rbegin();
+	_NS__::vector<foo <int> >::const_reverse_iterator ite = v3.rbegin();
 	for (unsigned int i = 0; i < size; ++i)
 		it[i] = (size - i) * 5;
 	it = it + 5;
@@ -842,15 +889,13 @@ void vector_rev_iter3() {
 	info(v3);
 }
 
-// #endif
-
 void vector_bidirect() {
 	std::cout << CYAN_B"----\t vector_bidirect \t----" << NC << std::endl;
 	std::list<int> lst;
 	std::list<int>::iterator lst_it;
 	for (int i = 1; i < 5; ++i)
 		lst.push_back(i * 3);
-	__NS__::vector<int> vct(lst.begin(), lst.end());
+	_NS__::vector<int> vct(lst.begin(), lst.end());
 	info(vct);
 	lst_it = lst.begin();
 	for (int i = 1; lst_it != lst.end(); ++i)
@@ -861,7 +906,9 @@ void vector_bidirect() {
 	info(vct);
 }
 
+// #endif // ( #if <bool> )
+
 /* ------------------------------------------------------------------------ */
 // end of tests
 
-#undef __TestType__
+#undef _TestType__

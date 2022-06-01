@@ -4,79 +4,29 @@
 /*																			*/
 /* ************************************************************************ */
 
-// std::
-#include <iostream>
-#include <cassert>
-#include <algorithm>
-#include <iterator>
+/* ------------------------------- CONTENTS ----------------------------------
+- TYPEDEFS
+	value_type              T
+	allocator_type          Allocator
+	size_type               Unsigned integer type (usually std::size_t)
+	difference_type	Signed  integer type (usually std::ptrdiff_t)
+	reference               value_type&
+	const_reference         const value_type&
+	pointer                 Allocator::pointer
+	const_pointer           Allocator::const_pointer
+	iterator                LegacyRandomAccessIterator and LegacyContiguousIterator
+							to value_type
+	const_iterator          LegacyRandomAccessIterator and LegacyContiguousIterator
+							to const value_type
+	reverse_iterator        std::reverse_iterator<iterator>
+	const_reverse_iterator  std::reverse_iterator<const_iterator>
 
-// ft::
-#include "iterator.hpp"
-#include "type_traits.hpp"
-#include "utility.hpp"
+- ATTRIBUTES
+	static allocator _allocator;
+	ierator start;
+	iterator end;
 
-// have a __config header for this: ?
-#ifndef _LIBFT_VECTOR_H_
-# define _LIBFT_VECTOR_H_
-
-#define PF __PRETTY_FUNCTION__
-#ifndef DBG
-# define DBG 0
-#endif
-
-#ifndef _THROWS_OUT_OF_RANGE
-# define _THROWS_OUT_OF_RANGE throw(std::out_of_range)
-#endif
-
-#ifndef _THROWS_LENGTH_ERROR
-# define _THROWS_LENGTH_ERROR throw(std::length_error)
-#endif
-
-#ifndef _NOEXCEPT
-# define _NOEXCEPT throw()
-#endif
-
-// #ifndef vector
-// #define vector vector
-// #endif
-
-/*
-
-/Applications/Xcode.app/Contents/Developer/Toolchains
-/XcodeDefault.xctoolchain/usr/include/c++/v1
-
-*/
-
-/* ***************************************************************************
-
-  +  +  +  +  +  +  +  +  +  --- CONTENTS ---  +  +  +  +  +  +  +  +  +  +  +
-
-- TYPEDEFS -------------------------------------------------------------------
-
-value_type              T
-allocator_type          Allocator
-size_type               Unsigned integer type (usually std::size_t)
-difference_type	Signed  integer type (usually std::ptrdiff_t)
-reference               value_type&
-const_reference         const value_type&
-pointer                 Allocator::pointer
-const_pointer           Allocator::const_pointer
-iterator                LegacyRandomAccessIterator and LegacyContiguousIterator
-                        to value_type
-const_iterator          LegacyRandomAccessIterator and LegacyContiguousIterator
-                        to const value_type
-reverse_iterator        std::reverse_iterator<iterator>
-const_reverse_iterator  std::reverse_iterator<const_iterator>
-
-
-- ATTRIBUTES -----------------------------------------------------------------
-
-static allocator _allocator;
-ierator start;
-iterator end;
-
-- MEMBER FUNCTIONS -----------------------------------------------------------
-
+- MEMBER FUNCTIONS
 CONSTRUCTION
 	vector();
 	explicit vector( const Allocator& alloc );
@@ -86,33 +36,13 @@ CONSTRUCTION
 		vector( const_iterator first, const_iterator last, \
 			const Allocator& alloc = Allocator() );
 	vector( const vector& other );
-
 DESTRUCTION
 	~vector();
-
 ASSIGNMENTS
 	vector& operator=( const vector& other );
 	void assign( size_type n, const T& value );
 	template< class const_iterator >
 		void assign( const_iterator first, const_iterator last );
-
-MODIFIERS
- -	deletion
-		void clear();
-		iterator erase( iterator pos );
-		iterator erase( iterator first, iterator last );
-		void pop_back();
- -	insertion:
-		void push_back( const T& value );
-		iterator insert( iterator pos, const T& value );
-		void insert( iterator pos, size_type n, const T& value );
-		template< class const_iterator >
-			void insert( iterator pos, const_iterator first, const_iterator last );
- -	resize:
-		void resize( size_type n, T value = T() );
- - 	swap:
-		void swap( vector& other );
-
 ACCESSORS
  -	allocator:
 		allocator_type get_allocator() const;
@@ -142,11 +72,25 @@ ACCESSORS
 		size_type max_size() const;
 		void reserve( size_type new_cap ); // setter for cpacity
 		size_type capacity() const;
+MODIFIERS
+ -	deletion
+		void clear();
+		iterator erase( iterator pos );
+		iterator erase( iterator first, iterator last );
+		void pop_back();
+ -	insertion:
+		void push_back( const T& value );
+		iterator insert( iterator pos, const T& value );
+		void insert( iterator pos, size_type n, const T& value );
+		template< class const_iterator >
+			void insert( iterator pos, const_iterator first, const_iterator last );
+ -	resize:
+		void resize( size_type n, T value = T() );
+ - 	swap:
+		void swap( vector& other );
 
-- NON MEMBER FUNCTIONS -------------------------------------------------------
-
+- NON MEMBER FUNCTIONS
 operator==,!=,<,<=,>,>=,<=>
-
 	template< class T, class Alloc >
 	bool operator==(const ft::vector<T, Alloc>& lhs, const std::vector<T>& rhs);
 	template< class T, class Alloc >
@@ -161,23 +105,55 @@ operator==,!=,<,<=,>,>=,<=>
 	bool operator>=(const ft::vector<T, Alloc>& lhs, const ft::vector<T>& rh );
 
 std::swap specialization
-
 	template< class T, class Alloc >
 	void swap( std::vector<T,Alloc>& lhs,
 			std::vector<T,Alloc>& rhs );
+--------------------------------------------------------------------------- */
 
-*************************************************************************** */
+// have a __config header for this: ?
+#ifndef __FT_VECTOR_HPP_
+# define __FT_VECTOR_HPP_
 
-/*   +  +  +  +  +  +  +  --- IMPLEMENTATION ---  +  +  +  +  +  +  +  +  + */
+// std::
+#include <iostream>
+#include <cassert>
+#include <algorithm>
+#include <iterator> // for std::distance
 
-namespace ft { /* NAMESPACE FT -------------------------------------------- */
+// ft::
+#include "iterator.hpp"
+#include "type_traits.hpp"
+#include "utility.hpp"
 
-template <typename T, class Alloc = std::allocator<T> >
-class vector { /* VECTOR -------------------------------------------------- */
+#ifndef _THROWS_OUT_OF_RANGE
+# define _THROWS_OUT_OF_RANGE throw(std::out_of_range)
+#endif
 
-/* - TYPEDEFS ------------------------------------------------------------- */
+#ifndef _THROWS_LENGTH_ERROR
+# define _THROWS_LENGTH_ERROR throw(std::length_error)
+#endif
+
+#ifndef _NOEXCEPT
+# define _NOEXCEPT throw()
+#endif
+
+#ifndef __IS_INTEGRAL
+// # define __IS_INTEGRAL std::is_integral
+# define __IS_INTEGRAL ft::is_integral
+#endif
+
+/* ------------------------------------------------------------------------ */
+
+namespace ft { /* NAMESPACE FT*/
+
+template < /* VECTOR */
+	typename T,
+	class Alloc = std::allocator<T>
+> class vector {
 
 public:
+
+/* ======================== TYPEDEFS ====================================== */
 
 	typedef Alloc										allocator_type;
 	typedef typename allocator_type::value_type			value_type;
@@ -194,7 +170,7 @@ public:
 	typedef typename ft::reverse_iterator<iterator>			reverse_iterator;
 	typedef typename ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
-/* - ATTRIBUTES ----------------------------------------------------------- */
+/* ======================== ATTRIBUTES ==================================== */
 
 private: // protected: ?
 
@@ -203,77 +179,13 @@ private: // protected: ?
 	iterator		_end_size;
 	iterator		_end_capacity;
 
-/* - INTERNAL FUNCTIONALITIES --------------------------------------------- */
-
-private:
-
-	void __resize_empty_vector(size_type new_cap) {
-		pointer new_block = _allocator.allocate(new_cap);
-		_allocator.deallocate(_begin, capacity());
-		_begin = new_block;
-		_end_size = _begin;
-		_end_capacity = _begin + new_cap;
-	}
-
-	void __allocate_empty_vector(size_type new_cap) {
-		_begin = _allocator.allocate(new_cap);
-		_end_size = _begin;
-		_end_capacity = _begin + new_cap;
-	}
-
-	size_type __calculate_new_capacity() const {
-		size_type new_cap;
-		size_type current_cap = capacity();
-		if (empty())
-			new_cap = 1;
-		else if (current_cap < 128)
-			new_cap = current_cap * 2;
-		else
-			new_cap = current_cap + current_cap / 2;
-		return (new_cap);
-	}
-
-	void __resize_filled_vector(size_type new_cap) {
-		pointer new_block = _allocator.allocate(new_cap);
-		size_type i;
-		for (i = 0; i < size(); i++) {
-			_allocator.construct(new_block + i, _begin[i]);
-			_allocator.destroy(_begin + i);
-		}
-		_allocator.deallocate(_begin, capacity());
-		_begin = new_block;
-		_end_size = _begin + i;
-		_end_capacity = _begin + new_cap;
-	}
-
-	template< typename InputIter >
-	bool __iterator_is_in_range(InputIter it,
-		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) const {
-		InputIter curr = _begin;
-		while (curr != _end_size) {
-			if (curr == it)
-				return (true);
-			curr++;
-		}
-		if (it == _end_size)
-			return (true);
-		return (false);
-	}
-
-	void __dbg_funcid(const char * msg) {
-		#if DBG
-			std::cout << "\033[38;5;227m";
-			std::cout << msg;
-			std::cout << "\033[0m";
-			std::cout << std::endl;
-		#endif
-		(void)msg;
-	}
-
 /* ------------------------------------------------------------------------ */
-/* - CONSTRUCTION --------------------------------------------------------- */
+/* ======================== MEMBER FUNCTIONS ============================== */
+/* ------------------------------------------------------------------------ */
 
 public:
+
+/* ------------------------ construction: --------------------------------- */
 
 	vector() {
 		__dbg_funcid(__PRETTY_FUNCTION__);
@@ -298,7 +210,7 @@ public:
 
 	template< typename InputIter>
 	vector(const InputIter first, const InputIter last, const Alloc&alloc = allocator_type(),
-		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0)
+		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0)
 		: _allocator(alloc) {
 		__dbg_funcid(__PRETTY_FUNCTION__);
 		size_type range = std::distance(first, last);
@@ -316,7 +228,7 @@ public:
 		}
 	}
 
-/* - DESTRUCTION ---------------------------------------------------------- */
+/* ------------------------ destruction: ---------------------------------- */
 
 	~vector() {
 		__dbg_funcid(__PRETTY_FUNCTION__);
@@ -327,12 +239,7 @@ public:
 		_begin = NULL;
 	}
 
-/* ------------------------------------------------------------------------ */
-/* - MEMBER FUNCTIONS ----------------------------------------------------- */
-
-public:
-
-/* ASSIGNMENTS */
+/* ------------------------ assignment: ---------------------------------- */
 
 	vector& operator=(const vector& other) {
 		__dbg_funcid(__PRETTY_FUNCTION__);
@@ -356,7 +263,7 @@ public:
 
 	template< typename InputIter >
 	void assign(const InputIter first, const InputIter last,
-		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
+		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) {
 		__dbg_funcid(__PRETTY_FUNCTION__);
 		clear();
 		size_type range = std::distance(first, last);
@@ -367,193 +274,7 @@ public:
 		}
 	}
 
-
-/* MODIFIERS */
-
-/* ------------------------ deletion -------------------------------------- */
-
-	void clear() {
-		for (size_type i = 0; i < size(); i++) {
-			_allocator.destroy(_begin + i);
-		}
-		_end_size = _begin;
-	}
-
-	template< typename InputIter >
-	InputIter erase(InputIter pos,
-		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
-		if (!__iterator_is_in_range(pos) || pos == _end_size)
-			return (pos);
-		InputIter curr = pos;
-		_allocator.destroy(curr);
-		while (curr + 1 != _end_size) {
-			_allocator.construct(curr, *(curr + 1));
-			_allocator.destroy(++curr);
-		}
-		_end_size = curr;
-		return (pos);
-	}
-
-	template< typename InputIter >
-	InputIter erase(InputIter first, InputIter last,
-		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
-		iterator curr = first;
-		iterator remaining = last;
-		bool destroy_curr = true;
-		if (!__iterator_is_in_range(first) && __iterator_is_in_range(last))
-			curr = _begin;
-		if (curr == last)
-			return (curr);
-		while (remaining != _end_size) {
-			if (destroy_curr == true)
-				_allocator.destroy(curr);
-			_allocator.construct(curr++, *remaining);
-			_allocator.destroy(remaining++);
-			if (curr == last)
-				destroy_curr = false;
-		}
-		_end_size = curr;
-		if (destroy_curr == true) {
-			while (curr != remaining)
-				_allocator.destroy(curr++);
-		}
-		return (first);
-	}
-
-	void pop_back() {
-		if (empty())
-			return ;
-		_allocator.destroy(--_end_size);
-	}
-
-/* ------------------------ insertion: ------------------------------------ */
-
-	void push_back(const T& value) {
-		if (capacity() <= size()) {
-			__resize_filled_vector(__calculate_new_capacity());
-		}
-		_allocator.construct(_end_size, value);
-		++_end_size;
-	}
-
-	template< typename InputIter >
-	InputIter insert(InputIter pos, const T& value,
-		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
-		if (pos == _end_size) {
-			push_back(value);
-			return (_end_size - 1);
-		}
-		size_type new_cap = capacity();
-		if (size() == new_cap)
-			new_cap = __calculate_new_capacity();
-		pointer new_block = _allocator.allocate(new_cap);
-		InputIter new_curr = new_block;
-		InputIter curr = _begin;
-		while (curr != _end_size) {
-			if (curr == pos) {
-				pos = new_curr;
-				_allocator.construct(new_curr++, value);
-			}
-			_allocator.construct(new_curr++, *(curr++));
-		}
-		clear();
-		_allocator.deallocate(_begin, capacity());
-		_begin = new_block;
-		_end_size = new_curr;
-		_end_capacity = _begin + new_cap;
-		return (pos);
-	}
-
-	template< typename InputIter >
-	void insert(InputIter pos, size_type n, const T& value,
-		typename enable_if<!std::is_integral<InputIter>::value, bool>::type* = 0) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
-		size_type new_cap = size() + n;
-		if (new_cap < capacity())
-			new_cap = capacity();
-		if (pos == _end_size) {
-			reserve(new_cap);
-			for (size_type cpys = 0; cpys < n; cpys++)
-				push_back(value);
-			return ;
-		}
-		pointer new_block = _allocator.allocate(new_cap);
-		iterator new_curr = new_block;
-		iterator curr = _begin;
-		while (curr != _end_size) {
-			if (curr == pos)
-				for (size_type cpys = 0; cpys < n; cpys++)
-						_allocator.construct(new_curr++, value);
-			_allocator.construct(new_curr++, *(curr++));
-		}
-		clear();
-		_allocator.deallocate(_begin, capacity());
-		_begin = new_block;
-		_end_size = new_curr;
-		_end_capacity = _begin + new_cap;
-	}
-
-	template< typename IterVect, typename InterCont2 >
-	void insert(IterVect pos, const InterCont2 first, const InterCont2 last,
-		typename enable_if<!std::is_integral<IterVect>::value, bool>::type* = 0,
-		typename enable_if<!std::is_integral<InterCont2>::value, bool>::type* = 0) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
-		size_type range = std::distance(first, last);
-		size_type new_cap = size() + range;
-		if (new_cap < capacity())
-			new_cap = capacity();
-		if (pos == _end_size) {
-			reserve(new_cap);
-			for (InterCont2 set = first; set != last; set++)
-				push_back(*set);
-			return ;
-		}
-		pointer new_block = _allocator.allocate(new_cap);
-		IterVect new_curr = new_block;
-		IterVect curr = _begin;
-		while (curr != _end_size) {
-			if (curr == pos)
-				for (InterCont2 set = first; set != last; set++)
-					_allocator.construct(new_curr++, *set);
-			_allocator.construct(new_curr++, *(curr++));
-		}
-		clear();
-		_allocator.deallocate(_begin, capacity());
-		_begin = new_block;
-		_end_size = new_curr;
-		_end_capacity = _begin + new_cap;
-	}
-
-/* ------------------------ resize: --------------------------------------- */
-
-	void resize(size_type n, T value = T()) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
-		if (n == size())
-			return ;
-		if (n > size()) {
-			if (n > capacity())
-				__resize_filled_vector(n);
-			while (size() != n)
-				_allocator.construct(_end_size++, value);
-			return ;
-		}
-		for (size_type i = size(); i > n; i--)
-			_allocator.destroy(--_end_size);
-	}
- 
-/*  ----------------------- swap: ----------------------------------------- */
-
-	void swap(vector& other) {
-		std::swap(_end_size, other._end_size);
-		std::swap(_end_capacity, other._end_capacity);
-		std::swap(_begin, other._begin);
-		std::swap(_allocator, other._allocator);
-	}
-
-/* ACCESSORS */
+/* ======================== ACCESSORS ===================================== */
 
 /* ------------------------ capacity: ------------------------------------- */
 
@@ -610,13 +331,262 @@ public:
 	const_reverse_iterator rbegin() const { return (const_reverse_iterator(end())); }
 	reverse_iterator rend() { return (reverse_iterator(begin())); }
 	const_reverse_iterator rend() const { return (const_reverse_iterator(begin())); }
+	
+/* ======================== MODIFIERS ===================================== */
 
+/* ------------------------ deletion -------------------------------------- */
+
+	void clear() {
+		for (size_type i = 0; i < size(); i++) {
+			_allocator.destroy(_begin + i);
+		}
+		_end_size = _begin;
+	}
+
+	template< typename InputIter >
+	InputIter erase(InputIter pos,
+		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
+		if (!__iterator_is_in_range(pos) || pos == _end_size)
+			return (pos);
+		InputIter curr = pos;
+		_allocator.destroy(curr);
+		while (curr + 1 != _end_size) {
+			_allocator.construct(curr, *(curr + 1));
+			_allocator.destroy(++curr);
+		}
+		_end_size = curr;
+		return (pos);
+	}
+
+	template< typename InputIter >
+	InputIter erase(InputIter first, InputIter last,
+		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
+		iterator curr = first;
+		iterator remaining = last;
+		bool destroy_curr = true;
+		if (!__iterator_is_in_range(first) && __iterator_is_in_range(last))
+			curr = _begin;
+		if (curr == last)
+			return (curr);
+		while (remaining != _end_size) {
+			if (destroy_curr == true)
+				_allocator.destroy(curr);
+			_allocator.construct(curr++, *remaining);
+			_allocator.destroy(remaining++);
+			if (curr == last)
+				destroy_curr = false;
+		}
+		_end_size = curr;
+		if (destroy_curr == true) {
+			while (curr != remaining)
+				_allocator.destroy(curr++);
+		}
+		return (first);
+	}
+
+	void pop_back() {
+		if (empty())
+			return ;
+		_allocator.destroy(--_end_size);
+	}
+
+/* ------------------------ insertion: ------------------------------------ */
+
+	void push_back(const T& value) {
+		if (capacity() <= size()) {
+			__resize_filled_vector(__calculate_new_capacity());
+		}
+		_allocator.construct(_end_size, value);
+		++_end_size;
+	}
+
+	template< typename InputIter >
+	InputIter insert(InputIter pos, const T& value,
+		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
+		if (pos == _end_size) {
+			push_back(value);
+			return (_end_size - 1);
+		}
+		size_type new_cap = capacity();
+		if (size() == new_cap)
+			new_cap = __calculate_new_capacity();
+		pointer new_block = _allocator.allocate(new_cap);
+		InputIter new_curr = new_block;
+		InputIter curr = _begin;
+		while (curr != _end_size) {
+			if (curr == pos) {
+				pos = new_curr;
+				_allocator.construct(new_curr++, value);
+			}
+			_allocator.construct(new_curr++, *(curr++));
+		}
+		clear();
+		_allocator.deallocate(_begin, capacity());
+		_begin = new_block;
+		_end_size = new_curr;
+		_end_capacity = _begin + new_cap;
+		return (pos);
+	}
+
+	template< typename InputIter >
+	void insert(InputIter pos, size_type n, const T& value,
+		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
+		size_type new_cap = size() + n;
+		if (new_cap < capacity())
+			new_cap = capacity();
+		if (pos == _end_size) {
+			reserve(new_cap);
+			for (size_type cpys = 0; cpys < n; cpys++)
+				push_back(value);
+			return ;
+		}
+		pointer new_block = _allocator.allocate(new_cap);
+		iterator new_curr = new_block;
+		iterator curr = _begin;
+		while (curr != _end_size) {
+			if (curr == pos)
+				for (size_type cpys = 0; cpys < n; cpys++)
+						_allocator.construct(new_curr++, value);
+			_allocator.construct(new_curr++, *(curr++));
+		}
+		clear();
+		_allocator.deallocate(_begin, capacity());
+		_begin = new_block;
+		_end_size = new_curr;
+		_end_capacity = _begin + new_cap;
+	}
+
+	template< typename IterVect, typename InterCont2 >
+	void insert(IterVect pos, const InterCont2 first, const InterCont2 last,
+		typename enable_if<!__IS_INTEGRAL<IterVect>::value, bool>::type* = 0,
+		typename enable_if<!__IS_INTEGRAL<InterCont2>::value, bool>::type* = 0) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
+		size_type range = std::distance(first, last);
+		size_type new_cap = size() + range;
+		if (new_cap < capacity())
+			new_cap = capacity();
+		if (pos == _end_size) {
+			reserve(new_cap);
+			for (InterCont2 set = first; set != last; set++)
+				push_back(*set);
+			return ;
+		}
+		pointer new_block = _allocator.allocate(new_cap);
+		IterVect new_curr = new_block;
+		IterVect curr = _begin;
+		while (curr != _end_size) {
+			if (curr == pos)
+				for (InterCont2 set = first; set != last; set++)
+					_allocator.construct(new_curr++, *set);
+			_allocator.construct(new_curr++, *(curr++));
+		}
+		clear();
+		_allocator.deallocate(_begin, capacity());
+		_begin = new_block;
+		_end_size = new_curr;
+		_end_capacity = _begin + new_cap;
+	}
+
+/* ------------------------ resize: --------------------------------------- */
+
+	void resize(size_type n, T value = T()) {
+		__dbg_funcid(__PRETTY_FUNCTION__);
+		if (n == size())
+			return ;
+		if (n > size()) {
+			if (n > capacity())
+				__resize_filled_vector(n);
+			while (size() != n)
+				_allocator.construct(_end_size++, value);
+			return ;
+		}
+		for (size_type i = size(); i > n; i--)
+			_allocator.destroy(--_end_size);
+	}
+ 
+/*  ----------------------- swap: ----------------------------------------- */
+
+	void swap(vector& other) {
+		std::swap(_end_size, other._end_size);
+		std::swap(_end_capacity, other._end_capacity);
+		std::swap(_begin, other._begin);
+		std::swap(_allocator, other._allocator);
+	}
+
+/* ======================== INTERNAL FUNCTIONALITIES ====================== */
+
+private:
+
+	void __resize_empty_vector(size_type new_cap) {
+		pointer new_block = _allocator.allocate(new_cap);
+		_allocator.deallocate(_begin, capacity());
+		_begin = new_block;
+		_end_size = _begin;
+		_end_capacity = _begin + new_cap;
+	}
+
+	void __allocate_empty_vector(size_type new_cap) {
+		_begin = _allocator.allocate(new_cap);
+		_end_size = _begin;
+		_end_capacity = _begin + new_cap;
+	}
+
+	size_type __calculate_new_capacity() const {
+		size_type new_cap;
+		size_type current_cap = capacity();
+		if (empty())
+			new_cap = 1;
+		else if (current_cap < 128)
+			new_cap = current_cap * 2;
+		else
+			new_cap = current_cap + current_cap / 2;
+		return (new_cap);
+	}
+
+	void __resize_filled_vector(size_type new_cap) {
+		pointer new_block = _allocator.allocate(new_cap);
+		size_type i;
+		for (i = 0; i < size(); i++) {
+			_allocator.construct(new_block + i, _begin[i]);
+			_allocator.destroy(_begin + i);
+		}
+		_allocator.deallocate(_begin, capacity());
+		_begin = new_block;
+		_end_size = _begin + i;
+		_end_capacity = _begin + new_cap;
+	}
+
+	template< typename InputIter >
+	bool __iterator_is_in_range(InputIter it,
+		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) const {
+		InputIter curr = _begin;
+		while (curr != _end_size) {
+			if (curr == it)
+				return (true);
+			curr++;
+		}
+		if (it == _end_size)
+			return (true);
+		return (false);
+	}
+
+	void __dbg_funcid(const char * msg) const {
+		#if DBG
+			std::cout << "\033[38;5;227m";
+			std::cout << msg;
+			std::cout << "\033[0m";
+			std::cout << std::endl;
+		#endif
+		(void)msg;
+	}
 }; /* vector */
 
 /* - NON MEMBER FUNCTIONS ------------------------------------------------- */
 /* operator==,!=,<,<=,>,>=,<=> */
-
-// + enable ifs ?
 
 template< class T, class Alloc >
 bool operator==(const ft::vector<T, Alloc>& lhs,
@@ -659,8 +629,13 @@ bool operator>=(const ft::vector<T, Alloc>& lhs,
 		lhs.begin(), lhs.end()) || rhs == lhs);
 }
 
+// std::swap specialization
+// 	template< class T, class Alloc >
+// 	void swap( std::vector<T,Alloc>& lhs,
+// 			std::vector<T,Alloc>& rhs );
+
 /* - end VECTOR ----------------------------------------------------------- */
 // #undef vector
 
 } /* NAMESPACE FT end ------------------------------------------------------*/
-#endif // _LIBFT_VECTOR_H_
+#endif // __FT_VECTOR_HPP_

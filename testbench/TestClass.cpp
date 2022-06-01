@@ -56,8 +56,33 @@ TestClass& TestClass::operator=(const TestClass& other) {
 	_someValue = other._someValue;
 	return (*this);
 }
-int TestClass::getValue() const { return (_someValue); }
-int TestClass::getHeapValue() const { return (*_someStuffOnHeap); }
+
+int TestClass::getValue() const {
+	return (_someValue);
+}
+
+int TestClass::getHeapValue() const {
+	return (*_someStuffOnHeap);
+}
+
+bool operator==(const TestClass& lhs, const TestClass& rhs) {
+	return (lhs.getValue() == rhs.getValue());
+}
+bool operator!=(const TestClass& lhs, const TestClass& rhs) {
+	return (!(lhs == rhs));
+}
+bool operator<(const TestClass& lhs, const TestClass& rhs) {
+	return (lhs.getValue() < rhs.getValue());
+}
+bool operator>(const TestClass& lhs, const TestClass& rhs) {
+	return (rhs < lhs);
+}
+bool operator<=(const TestClass& lhs, const TestClass& rhs) {
+	return (!(rhs < lhs));
+}
+bool operator>=(const TestClass& lhs, const TestClass& rhs) {
+	return (!(lhs < rhs));
+}
 
 std::ostream& operator<<(std::ostream& o, const TestClass& x) {
 	o << x.getValue();// << "-" << x.getHeapValue();

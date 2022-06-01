@@ -9,22 +9,17 @@
 #include <list>
 #include <stack>
 
-#include "../vector.hpp"
-#include "../iterator.hpp"
-#include "../utility.hpp"
-#include "../algorithm.hpp"
-#include "../stack.hpp"
-
 #include "ANSIpalette.h"
 #include "TestClass.hpp"
 
-#if STD
-#define __NS__ std
-#endif
-#if !STD
-#define __NS__ ft
+// tested namespace
+#if STD // defined in compiletime ( -DSTD )
+#define _NS__ std
 #endif
 
+#if !STD
+#define _NS__ ft
+#endif
 
 // --- Class foo
 template <typename T>
@@ -64,5 +59,7 @@ std::ostream	&operator<<(std::ostream &o, foo<T> const &bar) {
 
 void test_vector();
 void test_stack();
+void tests_type_traits_and_utils();
+void test_map();
 
 #endif // TESTING_H
