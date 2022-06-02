@@ -11,7 +11,7 @@ int main() {
 
 	// test_vector();
 	// test_stack();
-	tests_type_traits_and_utils();
+	// tests_type_traits_and_utils();
 	test_map();
 
 	system("leaks test_ft_containers | tail -3");

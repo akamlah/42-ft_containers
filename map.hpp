@@ -114,8 +114,8 @@ template <  /* MAP */
 	class Key,
 	class T,
 	class Compare = std::less<Key>,
-	class Allocator = std::allocator<ft::pair<const Key, T> >
-> class map {
+	class Allocator = std::allocator<ft::pair<const Key, T> > >
+class map {
 
 public:
 
@@ -173,7 +173,7 @@ public:
 
 private:
 
-	__tree _base;
+	// __tree _base;
 
 /* ------------------------------------------------------------------------ */
 /* ======================== MEMBER FUNCTIONS ============================== */
@@ -217,14 +217,14 @@ public:
 
 /* ------------------------ iterators: ------------------------------------ */
 
-	iterator begin();
-	const_iterator begin() const;
-	iterator end();
-	const_iterator end() const;
-	reverse_iterator rbegin();
-	const_reverse_iterator rbegin() const;
-	reverse_iterator rend();
-	const_reverse_iterator rend() const;
+	// iterator begin();
+	// const_iterator begin() const;
+	// iterator end();
+	// const_iterator end() const;
+	// reverse_iterator rbegin();
+	// const_reverse_iterator rbegin() const;
+	// reverse_iterator rend();
+	// const_reverse_iterator rend() const;
 
 /* ------------------------ capacity: ------------------------------------- */
 
@@ -236,9 +236,9 @@ public:
 
 /* ------------------------ insertion: ------------------------------------ */
 
-	ft::pair<iterator, bool> insert( const value_type& value );
+	// ft::pair<iterator, bool> insert( const value_type& value );
 	
-	iterator insert( iterator hint, const value_type& value );
+	// iterator insert( iterator hint, const value_type& value );
 	
 	template< class InputIt >
 	void insert( InputIt first, InputIt last );
@@ -247,9 +247,9 @@ public:
 
 	void clear();
 
-	void erase( iterator pos );
+	// void erase( iterator pos );
 
-	void erase( iterator first, iterator last );
+	// void erase( iterator first, iterator last );
 
 	size_type erase( const Key& key );
 
@@ -261,27 +261,27 @@ public:
 
 	size_type count( const Key& key ) const;
 
-	iterator find( const Key& key );
+	// iterator find( const Key& key );
 
-	const_iterator find( const Key& key ) const;
+	// const_iterator find( const Key& key ) const;
 
-	ft::pair<iterator,iterator> equal_range( const Key& key );
+	// ft::pair<iterator,iterator> equal_range( const Key& key );
 
-	ft::pair<const_iterator,const_iterator> equal_range( const Key& key ) const;
+	// ft::pair<const_iterator,const_iterator> equal_range( const Key& key ) const;
 
-	iterator lower_bound( const Key& key );
+	// iterator lower_bound( const Key& key );
 	
-	const_iterator lower_bound( const Key& key ) const;
+	// const_iterator lower_bound( const Key& key ) const;
 
-	iterator upper_bound( const Key& key );
+	// iterator upper_bound( const Key& key );
 
-	const_iterator upper_bound( const Key& key ) const;
+	// const_iterator upper_bound( const Key& key ) const;
 
 /* ======================== OBSERVERS ===================================== */
 
 	key_compare key_comp() const;
 
-	ft::map::value_compare value_comp() const;
+	value_compare value_comp() const;
 
 /* ======================== INTERNAL FUNCTIONALITIES ====================== */
 

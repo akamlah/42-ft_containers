@@ -5,10 +5,14 @@
 /* ************************************************************************ */
 
 #include "testing.hpp"
-#include "../map.hpp"
+// #include "../map.hpp"
+#include "../naive_tree.hpp"
+
+class map;
 
 // in this file:
-void map_construct();
+void tree_build();
+// void map_construct();
 
 /* ************************************************************************ */
 // UTILS:
@@ -36,18 +40,36 @@ void map_construct();
 // CALL ALL
 void test_map() {
 	std::cout << MAGENTA_B "----\t MAP \t----" << NC << std::endl;
-	map_construct(); std::cout << std::endl;
+	tree_build(); std::cout << std::endl;
+
+
+	// map_construct(); std::cout << std::endl;
 }
 
 /* ************************************************************************ */
 // TESTS
 /* ************************************************************************ */
 
-void map_construct() {
-	std::cout << CYAN_B"----\t map_construct \t----" << NC << std::endl;
-	_NS__::map<_TestType1__, _TestType2__> m;
+void tree_build() {
+	std::cout << CYAN_B"----\t tree_build \t----" << NC << std::endl;
+	ft::Tree<_TestType1__> T;
 
 }
+
+
+
+
+
+
+
+
+
+
+// void map_construct() {
+// 	std::cout << CYAN_B"----\t map_construct \t----" << NC << std::endl;
+// 	// _NS__::map<_TestType1__, _TestType2__> m;
+// }
+
 
 #undef _TestType1__
 #undef _TestType2__
