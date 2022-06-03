@@ -9,7 +9,7 @@
 #ifndef _FT_NAIVE_TREE_HPP_
 # define _FT_NAIVE_TREE_HPP_
 
-#define DBG_ME 1
+#define DBG_ME 0
 
 namespace ft { /* NAMESPACE FT */
 
@@ -148,7 +148,7 @@ private:
 		_value_allocator.construct(&node->value, value);
 		// node->value = value;
 
-		node->p = _nil;
+		node->p = NULL;
 		node->left = _nil;
 		node->right = _nil;
 
@@ -164,14 +164,121 @@ private:
 		return (node);
 	}
 
-	// x is a preallocated node with links pointing to T.nil
-	void __rb_insert_node(node_pointer x) {
-		if (empty()) {
-			_root = x;
-			_leftmost = x;
-			_rightmost = x;
-			return ;
+	// todo : leftmost/rightmost maintainance
+	void __rb_left_rotate(node_pointer x) {
+		if (!x || x == _nil) {
+			std::cout << "RETURN Lrot" << std::endl;
+			return ; // ?
 		}
+		node_pointer y = x->right;
+		x->right = y->left;
+		if (y->left != _nil)
+			y->left-> p = x;
+		y->p = x->p;
+		if (x->p == _nil)
+			_root = y;
+		else if (x->p == x->p->left)
+			x->p->left = y;
+		else
+			x->p->right = y;
+		y->left = x;
+		x->p = y;
+	}
+
+	// todo : leftmost/rightmost maintainance
+	void __rb_right_rotate(node_pointer x) {
+		if (!x || x == _nil) {
+			std::cout << "RETURN Rrot" << std::endl;
+			return ; // ?
+		}
+		node_pointer y = x->left;
+		x->left = y->right;
+		if (y->right != _nil)
+			y->right-> p = x;
+		y->p = x->p;
+		if (x->p == _nil)
+			_root = y;
+		else if (x->p == x->p->right)
+			x->p->right = y;
+		else
+			x->p->left = y;
+		y->right = x;
+		x->p = y;
+	}
+
+	// x is a preallocated node with links pointing to T.nil
+	// todo : leftmost/rightmost maintainance
+	void __rb_insert_node(node_pointer node) {
+		node_pointer parent = _nil;
+		node_pointer trailing_ptr = _root;
+
+		while (trailing_ptr != _nil) {
+			parent = trailing_ptr;
+			if (node->value < trailing_ptr->value)
+				trailing_ptr = trailing_ptr->left;
+			else
+				trailing_ptr = trailing_ptr->right;
+		}
+		node->p = parent;
+		if (parent == _nil) {
+			_root = node;
+			// _leftmost = node;
+			// _rightmost = node;
+		}
+		else if (node->value < parent->value)
+			parent->left = node;
+		else
+			parent->right = node;
+		node->left = _nil;
+		node->right = _nil;
+		node->color = red;
+
+		// rebalancing routine: recoloring & rotations
+		node_pointer uncle;
+		node_pointer pivot = node;
+		
+		while (pivot->p->color == red && pivot->p->p != _root/* ? */) {
+		// while (pivot->color == red && pivot != _root && pivot->p->p != _root && pivot->p != _root/* ? */) {
+			if (pivot->p == pivot->p->p->left) {
+				uncle = pivot->p->p->right;
+				if (uncle->color == red) {
+					pivot->p->color = black;
+					uncle->color = black;
+					pivot->p->p->color = red;
+					pivot = pivot->p->p;
+				}
+				else if (pivot == pivot->p->right) {
+					pivot = pivot->p;
+					std::cout << "in if Lrot" << std::endl;
+					__rb_left_rotate(pivot);
+				}
+				pivot->p->color = black;
+				pivot->p->p->color = red;
+				std::cout << "in if Rrot" << std::endl;
+				__rb_right_rotate(pivot->p->p);
+			}
+			else {
+				uncle = pivot->p->p->left;
+				if (uncle->color == red) {
+					pivot->p->color = black;
+					uncle->color = black;
+					if (pivot->p != _root)
+						pivot->p->p->color = red;
+					pivot = pivot->p->p;
+				}
+				else if (pivot == pivot->p->left) {
+					pivot = pivot->p;
+					std::cout << "in else Rrot" << std::endl;
+					__rb_right_rotate(pivot);
+				}
+				pivot->p->color = black;
+				if (pivot->p != _root)
+					pivot->p->p->color = red;
+				std::cout << "in else Lrot" << std::endl;
+				__rb_left_rotate(pivot->p->p);
+			}
+			}
+		_root->color = black;
 	}
 
 	/*
@@ -192,13 +299,50 @@ private:
 public:
 
 	void print_tree() const { // ?
-		__rb_tree_inorder_walk(_root, &rb_tree_node::print_value);
+		// __rb_tree_inorder_walk(_root, &rb_tree_node::print_value);
+		__pretty_print("", _root, false, -1);
+		std::cout << std::endl;
 	}
 
-	static node_pointer nil() {
+	void info() const {
+		std::cout << "root:" << _root->value << std::endl;
+	}
+
+	static node_pointer __rb_tree_genarate_nil() {
 		node_pointer nil = _node_allocator.allocate(1);
 		_node_allocator.construct(nil, rb_tree_node());
 		return (nil);
+	}
+
+// * * *
+
+private:
+
+	void __pretty_print(std::string prefix, node_pointer x, bool isleft, int iter) const {
+		++iter;
+		if (x != NULL) {
+			std::cout << "\033[0;34m";
+			std::cout << prefix;
+			if (x == _root) {
+				std::cout << "└──";
+				std::cout << iter << "* ";
+			}
+			else {
+				std::cout << (isleft ? "├──" : "└──");
+				std::cout << iter;
+				std::cout << (isleft ? "L " : "R ");
+			}
+			std::cout << "\033[0m";
+			if (x->color == red)
+				std::cout << "\033[0;31m";
+			if (x == _nil)//<< "\033[0;34m"
+				std::cout  << "⁙";
+			else
+				std::cout << x->value;
+			std::cout << "\033[0m" << std::endl;
+			__pretty_print(prefix + (isleft ? "│     " : "      "), x->left, true, iter);
+			__pretty_print(prefix + (isleft ? "│     " : "      "), x->right, false, iter);
+		}
 	}
 
 }; /* RB TREE */
@@ -218,7 +362,7 @@ template <class Value, class Compare>
 // initialization of static node_pointer nil:
 template <class Value, class Compare>
 	typename rb_tree<Value, Compare>::node_pointer
-	rb_tree<Value, Compare>::_nil = rb_tree<Value, Compare>::nil();
+	rb_tree<Value, Compare>::_nil = rb_tree<Value, Compare>::__rb_tree_genarate_nil();
 // template <class Value, class Compare>
 // 	typename rb_tree<Value, Compare>::rb_tree_node
 // 	rb_tree<Value, Compare>::_nil; // calls dflt constructor rb_tree_node

@@ -19,8 +19,8 @@ void tree_build();
 /* ************************************************************************ */
 
 #ifndef _TestType1__
-#	define _TestType1__ TestClass
-// #	define _TestType1__ int
+// #	define _TestType1__ TestClass
+#	define _TestType1__ int
 // #	define _TestType1__ double
 // #	define _TestType1__ foo<int>
 #endif
@@ -56,7 +56,35 @@ void tree_build() {
 	ft::rb_tree<_TestType1__, ft::map<_TestType1__, _TestType2__>::value_compare> T;
 	T.rb_insert(_TestType1__(3));
 	T.print_tree();
+	T.rb_insert(_TestType1__(4));
+	T.print_tree();
+	T.rb_insert(_TestType1__(5));
+	T.print_tree();
+	T.rb_insert(_TestType1__(6));
+	T.print_tree();
+	T.rb_insert(_TestType1__(7));
+	T.print_tree();
+	T.rb_insert(_TestType1__(8));
+	T.print_tree();
+	T.rb_insert(_TestType1__(9));
+	T.print_tree();
+	T.info();
 
+	// T.rb_insert(_TestType1__(99));
+	// // T.print_tree();
+	// T.rb_insert(_TestType1__(8));
+	// // T.print_tree();
+	// T.rb_insert(_TestType1__(7));
+	// // T.print_tree();
+	// T.rb_insert(_TestType1__(6));
+	// // T.print_tree();
+	// T.rb_insert(_TestType1__(5));
+	// T.print_tree();
+	// T.rb_insert(_TestType1__(4));
+	// // T.print_tree();
+	// T.rb_insert(_TestType1__(3));
+	// // T.print_tree();
+	// T.info();
 }
 
 
