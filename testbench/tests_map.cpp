@@ -5,7 +5,7 @@
 /* ************************************************************************ */
 
 #include "testing.hpp"
-// #include "../map.hpp"
+#include "../map.hpp"
 #include "../naive_tree.hpp"
 
 class map;
@@ -19,8 +19,8 @@ void tree_build();
 /* ************************************************************************ */
 
 #ifndef _TestType1__
-// #	define _TestType1__ TestClass
-#	define _TestType1__ int
+#	define _TestType1__ TestClass
+// #	define _TestType1__ int
 // #	define _TestType1__ double
 // #	define _TestType1__ foo<int>
 #endif
@@ -52,7 +52,10 @@ void test_map() {
 
 void tree_build() {
 	std::cout << CYAN_B"----\t tree_build \t----" << NC << std::endl;
-	ft::Tree<_TestType1__> T;
+	// ft::rb_tree<_TestType1__, std::map::value_compare, std::allocator> T;
+	ft::rb_tree<_TestType1__, ft::map<_TestType1__, _TestType2__>::value_compare> T;
+	T.rb_insert(_TestType1__(3));
+	T.print_tree();
 
 }
 

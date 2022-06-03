@@ -14,8 +14,8 @@ int main() {
 	// tests_type_traits_and_utils();
 	test_map();
 
-	system("leaks test_ft_containers | tail -3");
-	// system("leaks test_ft_containers");
+	// system("leaks test_ft_containers | tail -3");
+	system("leaks test_ft_containers");
 
 	return (0);
 }

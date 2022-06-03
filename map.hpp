@@ -169,6 +169,7 @@ public:
 
 	};
 
+#if 0
 /* ======================== ATTRIBUTES ==================================== */
 
 private:
@@ -301,35 +302,37 @@ private:
 		#endif
 		(void)msg1; (void)msg2; (void)address;
 	}
+	
+#endif
 
 }; /* MAP */
 
 /* - NON MEMBER FUNCTIONS ------------------------------------------------- */
 /* operator==,!=,<,<=,>,>=,<=> */
 
-template< class Key, class T, class Compare, class Alloc >
-bool operator==(const ft::map<Key,T,Compare,Alloc>& lhs,
-	const ft::map<Key,T,Compare,Alloc>& rhs);
+// template< class Key, class T, class Compare, class Alloc >
+// bool operator==(const ft::map<Key,T,Compare,Alloc>& lhs,
+// 	const ft::map<Key,T,Compare,Alloc>& rhs);
 
-template< class Key, class T, class Compare, class Alloc >
-bool operator!=(const ft::map<Key,T,Compare,Alloc>& lhs,
-	const ft::map<Key,T,Compare,Alloc>& rhs);
+// template< class Key, class T, class Compare, class Alloc >
+// bool operator!=(const ft::map<Key,T,Compare,Alloc>& lhs,
+// 	const ft::map<Key,T,Compare,Alloc>& rhs);
 
-template< class Key, class T, class Compare, class Alloc >
-bool operator<(const ft::map<Key,T,Compare,Alloc>& lhs,
-	const ft::map<Key,T,Compare,Alloc>& rhs);
+// template< class Key, class T, class Compare, class Alloc >
+// bool operator<(const ft::map<Key,T,Compare,Alloc>& lhs,
+// 	const ft::map<Key,T,Compare,Alloc>& rhs);
 
-template< class Key, class T, class Compare, class Alloc >
-bool operator<=(const ft::map<Key,T,Compare,Alloc>& lhs,
-	const ft::map<Key,T,Compare,Alloc>& rhs);
+// template< class Key, class T, class Compare, class Alloc >
+// bool operator<=(const ft::map<Key,T,Compare,Alloc>& lhs,
+// 	const ft::map<Key,T,Compare,Alloc>& rhs);
 
-template< class Key, class T, class Compare, class Alloc >
-bool operator>(const ft::map<Key,T,Compare,Alloc>& lhs,
-				const ft::map<Key,T,Compare,Alloc>& rhs);
+// template< class Key, class T, class Compare, class Alloc >
+// bool operator>(const ft::map<Key,T,Compare,Alloc>& lhs,
+// 				const ft::map<Key,T,Compare,Alloc>& rhs);
 
-template< class Key, class T, class Compare, class Alloc >
-bool operator>=(const ft::map<Key,T,Compare,Alloc>& lhs,
-	const ft::map<Key,T,Compare,Alloc>& rhs);
+// template< class Key, class T, class Compare, class Alloc >
+// bool operator>=(const ft::map<Key,T,Compare,Alloc>& lhs,
+// 	const ft::map<Key,T,Compare,Alloc>& rhs);
 
 // + swap spec
 /* - end MAP -------------------------------------------------------------- */

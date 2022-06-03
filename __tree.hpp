@@ -9,6 +9,8 @@
 #ifndef _FT_TREE_HPP_
 # define _FT_TREE_HPP_
 
+#if 0
+
 namespace ft { /* NAMESPACE FT */
 
 
@@ -189,7 +191,7 @@ public:
 
 } /* NAMESPACE FT end ------------------------------------------------------*/
 
+#endif
+
 #endif // _FT_TREE_HPP_
 
-#undef RED
-#undef BLACK
