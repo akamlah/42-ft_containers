@@ -159,22 +159,22 @@ private:
 		return (node);
 	}
 
-/* ------------------------ rotations: ------------------------------------- */
+/* ------------------------ rotations: ------------------------------------ */
 	/*
 		X, Y are nodes, a,b, and c subtrees (either nodes, _nil, or branching subtrees)
-		Rotetions are reversible and change the local structure as follows:
-		|                                                   |
-		|       |          right rotate ->        |         |
-		|       X                                 Y         |
-		|      / \         <- left rotate        / \        |
-		|     a   Y                             X   c       |
-		|        / \                           / \          |
-		|       b   c                         a   b         |
-		|                                                   |
+		Rotations are reversible and change the local structure as follows:
+		|                                                      |
+		|       |          right rotate X ->         |         |
+		|       X                                    Y         |
+		|      / \         <- left rotate Y         / \        |
+		|     a   Y                                X   c       |
+		|        / \                              / \          |
+		|       b   c                            a   b         |
+		|                                                      |
 	*/
 
 	/*
-		Right-rotetes a node assuming node->right != _nil
+		Right-rotates a node assuming node->right != _nil
 		and the root's parent is _end_node
 	*/
 	void __rb_left_rotate(node_pointer x) {
@@ -194,7 +194,7 @@ private:
 	}
 
 	/*
-		Right-rotetes a node assuming node->left != _nil
+		Right-rotates a node assuming node->left != _nil
 		and the root's parent is _end_node
 	*/
 	void __rb_right_rotate(node_pointer x) {
@@ -211,6 +211,15 @@ private:
 			x->p->left = y;
 		y->right = x;
 		x->p = y;
+	}
+
+/* ------------------------ transplant: ----------------------------------- */
+
+	/*
+		Transplants subtree rooted in node v to node u.
+	*/
+	__rb_transplant(node_pointer u, node_pointer v) {
+		
 	}
 
 /* ------------------------ insertion: ------------------------------------ */
