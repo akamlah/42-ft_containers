@@ -5,10 +5,6 @@
 /* ************************************************************************ */
 /* ------------------------------- CONTENTS ----------------------------------
 
-all leaves are objet node nil, const isblack black
-_root->p = NULL;
-NULL->left = _root;
-NULL->right = NULL;
 --------------------------------------------------------------------------- */
 
 #ifndef _FT_NAIVE_TREE_HPP_
@@ -18,6 +14,18 @@ NULL->right = NULL;
 #define DBG_ME 1
 
 namespace ft { /* NAMESPACE FT */
+
+
+/*
+	Red-black tree datastructure implementation.
+	The parent of the root is a node colled "_end_node"
+	The leaves are implemented as nodes called "_nil".
+	This allows to store variables as _nil->p (parent) in algorithms without
+	extra cases. So all last nodes point to _nil.
+
+	The end node is red.
+	Root and _nil are black.
+*/
 
 template < /* RB TREE */
 	class Value,
@@ -75,21 +83,15 @@ public:
 
 private: // (protected ?)
 
-
 	static node_allocator_type _node_allocator;
 	static value_allocator_type _value_allocator;
-	// static nil_allocator_type NULL_allocator;
 
 	node_pointer _end_node;
-	node_pointer _root; // make pvt with accessor
+	node_pointer _root;
 	node_pointer _nil;
 
-	// node_pointer _leftmost; // for linear time begin()
-	// node_pointer _rightmost; // for linear time in set functions (?) & empty()
-
-
 /* ------------------------------------------------------------------------ */
-/* ======================== MEMBER FUNCTIONS ============================== */
+/* ======================== PUBLIC MEMBER FUNCTIONS ======================= */
 /* ------------------------------------------------------------------------ */
 
 public:
@@ -98,7 +100,7 @@ public:
 
 	rb_tree() {
 
-		_end_node = __allocate_rb_node(value_type()); // is red ... 
+		_end_node = __allocate_rb_node(value_type());
 		_nil = __allocate_rb_node(value_type());
 		_nil->isblack = true;
 		_root = _nil;
@@ -110,9 +112,8 @@ public:
 /* ------------------------ destruction: ---------------------------------- */
 	
 	~rb_tree() {
-		// destroy & free all nodes (and values?)
 		__rb_tree_branching_walk(_root, &rb_tree_node::__destroy_node);
-		
+
 		_node_allocator.destroy(_end_node);
 		_node_allocator.deallocate(_end_node, 1);
 		_node_allocator.destroy(_nil);
@@ -136,51 +137,53 @@ public:
 
 	void rb_insert(const_reference value) {
 		node_pointer node = __allocate_rb_node(value);
-		if (_root == _nil) {
-			_root = node;
-			node->p = _end_node;
-			_end_node->left = _root;
-			_end_node->right = _root;
-			// _leftmost = _root;
-			// _rightmost = _root;
-			_root->isblack = true;
-			std::cout << "insert node (case root): "; node->__node_info_();
-			print_tree();
-			return ;
-		}
-		std::cout << "insert node (case normal): "; node->__node_info_();
 		__rb_insert_node(node);
-		print_tree();
 	}
 
-/* ======================== INTERNAL FUNCTIONALITIES ====================== */
-// private:
 
-// * * *
+/* ------------------------------------------------------------------------ */
+/* ======================== INTERNAL FUNCTIONALITIES ====================== */
+/* ------------------------------------------------------------------------ */
+
+private:
 
 	node_pointer __allocate_rb_node(const_reference value) const {
 		node_pointer node = _node_allocator.allocate(1);
 		_node_allocator.construct(node, rb_tree_node());
 		// so now node->p, node->left, node->right = NULL, isblack = false, value x
-		// -> have node constructor that constructs value inside to avoid copying...
+		// -> have node constructor that constructs value inside to avoid copying ?
 		_value_allocator.construct(&node->value, value);
 		node->left = _nil;
 		node->right = _nil;
 		node->p = _nil;
-
-		std::cout << "allc node: "; node->__node_info_();
-
 		return (node);
 	}
 
-	// todo : leftmost/rightmost maintainance
+/* ------------------------ rotations: ------------------------------------- */
+	/*
+		X, Y are nodes, a,b, and c subtrees (either nodes, _nil, or branching subtrees)
+		Rotetions are reversible and change the local structure as follows:
+		|                                                   |
+		|       |          right rotate ->        |         |
+		|       X                                 Y         |
+		|      / \         <- left rotate        / \        |
+		|     a   Y                             X   c       |
+		|        / \                           / \          |
+		|       b   c                         a   b         |
+		|                                                   |
+	*/
+
+	/*
+		Right-rotetes a node assuming node->right != _nil
+		and the root's parent is _end_node
+	*/
 	void __rb_left_rotate(node_pointer x) {
 		node_pointer y = x->right;
 		x->right = y->left;
 		if (y->left != _nil)
 			y->left->p = x;
 		y->p = x->p;
-		if (x->p == _end_node) // || null?
+		if (x->p == _end_node)
 			_root = y;
 		else if (x == x->p->left)
 			x->p->left = y;
@@ -190,7 +193,10 @@ public:
 		x->p = y;
 	}
 
-	// todo : leftmost/rightmost maintainance
+	/*
+		Right-rotetes a node assuming node->left != _nil
+		and the root's parent is _end_node
+	*/
 	void __rb_right_rotate(node_pointer x) {
 		node_pointer y = x->left;
 		x->left = y->right;
@@ -207,6 +213,12 @@ public:
 		x->p = y;
 	}
 
+/* ------------------------ insertion: ------------------------------------ */
+
+	/*
+		Inserts nodes following standard binary search tree insertion routine
+		afterwards calling __rb_insert_fixup to restore red-black properties.
+	*/
 	void __rb_insert_node(node_pointer node) {
 		node_pointer y = _nil;
 		node_pointer x = _root;
@@ -218,66 +230,69 @@ public:
 				x = x->right;
 		}
 		node->p = y;
-		if (node->value < y->value)
-			y->left = node;
-		else
-			y->right = node;
-		if (node->p && node->p->p && node->p->p != _end_node) { // if x is at least in second level ?
-			print_tree();
+		if (y == _nil) {
+			_root = node;
+			node->p = _end_node;
+			_end_node->left = _root;
+			_end_node->right = _root;
+			_root->isblack = true;
+		}
+		else {
+			if (node->value < y->value)
+				y->left = node;
+			else
+				y->right = node;
 			__rb_insert_fixup(node);
 		}
 	}
 
+	/*
+		Performs recoloring and rotations to rebalance the tree and restore
+		red-black properties after insertion.
+	*/
 	void __rb_insert_fixup(node_pointer x) {
-		std::cout << "Insert fixup " << std::endl;
 		while (x != _root && !x->p->isblack) {
-			if (x->p == x->p->p->left) { /* CASES A: px is left child of ppx */ std::cout << "CASE A";
+			if (x->p == x->p->p->left) { /* CASES A: px is left child of ppx */
 				node_pointer y = x->p->p->right;
-				if (!y->isblack) { /* CASE A1: uncle is red (& not null) */ std::cout << "1 " << std::endl;
+				if (!y->isblack) { /* CASE 1: uncle is red (& not _nil, same cond because _nil->isblack = true) */
 					x = x->p;
 					x->isblack = true;
 					x = x->p;
 					x->isblack = (x == _root);
 					y->isblack = true;
 				}
-				else /* CASE A2-3: uncle is black or null */ {
-					if (x == x->p->right) { std::cout << "2 " << std::endl; 
+				else { /* CASE 2+3: uncle is black (or _nil) */
+					if (x == x->p->right) {  /* CASE 2: x is right child */
 						x = x->p;
 						__rb_left_rotate(x);
 						print_tree();
 					}
-					std::cout << "3 " << std::endl;
-					x = x->p;
-					x->isblack = true;
-					x = x->p;
-					x->isblack = false;
+					x->p->isblack = true;
+					x->p->p->isblack = false;
+					x = x->p->p;
 					__rb_right_rotate(x);
-					print_tree();
 					break ;
 				}
 			}
-			else { /* CASES B: px is left child of ppx */ std::cout << "CASE B";
+			else { /* CASES B: px is left child of ppx */
 				node_pointer y = x->p->p->left;
-				if (!y->isblack) { std::cout << "1 " << std::endl; // same cond...
+				if (!y->isblack) {/* CASE 1: uncle is red (& not null, same cond because _nil->isblack = true) */
 					x = x->p;
 					x->isblack = true;
 					x = x->p;
 					x->isblack = (x == _root);
 					y->isblack = true;
 				}
-				else /* CASE B2-3: uncle is black or null */ {
-					if (x == x->p->left) { std::cout << "2 " << std::endl;
+				else {  /* CASE 2+3: uncle is black (or _nil) */ 
+					if (x == x->p->left) { /* CASE 2: x is left child */
 						x = x->p;
 						__rb_right_rotate(x);
 						print_tree();
 					}
-					std::cout << "3 " << std::endl;
-					x = x->p;
-					x->isblack = true;
-					x = x->p;
-					x->isblack = false;
+					x->p->isblack = true;
+					x->p->p->isblack = false;
+					x = x->p->p;
 					__rb_left_rotate(x);
-					print_tree();
 					break ;
 				}
 			}
@@ -288,7 +303,7 @@ public:
 
 	/*
 		Recursively reaches all nodes sorted by value and applies function f.
-		-> need to overload if non const function.
+		Function f is a void const function of class rb_tree_node.
 	*/
 	void __rb_tree_inorder_walk(node_pointer subtree_root,
 		typename rb_tree_node::const_void_function_pointer f) const {
@@ -299,6 +314,10 @@ public:
 		}
 	}
 
+	/*
+		Recursively reaches all nodes without repetition and applies function f.
+		Function f is a void non-const function of class rb_tree_node.
+	*/
 	void __rb_tree_branching_walk(node_pointer subtree_root,
 		typename rb_tree_node::void_function_pointer f) {
 		if (subtree_root != _nil) {
@@ -308,8 +327,30 @@ public:
 		}
 	}
 
-/* ======================== LOOKUP ======================================= */
+/* ======================== LOOKUP & DEBUGGING =========================== */
 
+public:
+
+	/*
+		Prints tree (including _nil nodes) horizontally. Example:
+		└──0* 8
+		    ├──1L 3
+		    │     ├──2L ⁙
+		    │     └──2R ⁙
+		    └──1R 99
+		          ├──2L ⁙
+		          └──2R ⁙
+	*/
+	void print_tree() const {
+		__pretty_print("", _root, false, -1);
+		std::cout << std::endl;
+	}
+
+private:
+
+	/*
+		Recursive core of print_tree()
+	*/
 	void __pretty_print(std::string prefix, node_pointer x, bool isleft, int iter) const {
 		++iter;
 		if (x == _nil) {
@@ -342,32 +383,6 @@ public:
 			__pretty_print(prefix + (isleft ? "│     " : "      "), x->left, true, iter);
 			__pretty_print(prefix + (isleft ? "│     " : "      "), x->right, false, iter);
 		}
-	}
-
-public:
-
-	void print_tree() const { // ?
-		// __rb_tree_inorder_walk(_root, &rb_tree_node::print_value);
-		__pretty_print("", _root, false, -1);
-		std::cout << std::endl;
-	}
-
-	void info() const {
-		std::cout << "\033[0;34m";
-		std::cout << "root:" << _root << " ";
-		if (_root != _nil) {
-			std::cout << "root->value:" << _root->value << " ";
-			std::cout << "root->isblack?:" << _root->isblack << " ";
-			std::cout << "root->p:" << _root->p << " ";
-			std::cout << "root->l:" << _root->left << " ";
-			if (_root->left != _nil)
-				std::cout << "," << _root->left->value << " ";
-			std::cout << "root->r:" << _root->right << " ";
-			if (_root->right != _nil)
-				std::cout << "," << _root->right->value << " ";
-		}
-		std::cout << "\033[0m";
-		std::cout << std::endl;
 	}
 
 }; /* RB TREE */

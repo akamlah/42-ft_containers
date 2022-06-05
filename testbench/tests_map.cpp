@@ -54,86 +54,43 @@ void tree_build() {
 	std::cout << CYAN_B"----\t tree_build \t----" << NC << std::endl;
 	// ft::rb_tree<_TestType1__, std::map::value_compare, std::allocator> T;
 	ft::rb_tree<_TestType1__, ft::map<_TestType1__, _TestType2__>::value_compare> T;
-	// T.rb_insert(_TestType1__(3));
-	// T.print_tree();
-	// T.rb_insert(_TestType1__(4));
-	// T.print_tree();
-	// T.rb_insert(_TestType1__(5));
-	// T.print_tree();
-	// T.rb_insert(_TestType1__(6));
-	// T.print_tree();
-	// T.rb_insert(_TestType1__(7));
-	// T.print_tree();
-	// T.rb_insert(_TestType1__(8));
-	// T.print_tree();
-	// T.rb_insert(_TestType1__(9));
-	// T.print_tree();
-	// T.info();
-
-
-	std::cout << "-----------------------" << std::endl;
-	T.info();
-	std::cout << "-----------------------" << std::endl;
-	std::cout << "-----------------------" << std::endl;
 
 	T.rb_insert(_TestType1__(99));
 	// T.print_tree();
-	T.info();
 	std::cout << "-----------------------" << std::endl;
 
 	T.rb_insert(_TestType1__(8));
 	// T.print_tree();
-	T.info();
 	std::cout << "-----------------------" << std::endl;
 
 	T.rb_insert(_TestType1__(3)); // 11
 	// T.print_tree();
-	T.info();
 	std::cout << "-----------------------" << std::endl;
 	T.rb_insert(_TestType1__(128)); // 11
 	// T.print_tree();
-	T.info();
 	std::cout << "-----------------------" << std::endl;
 	T.rb_insert(_TestType1__(11)); // 11
 	// T.print_tree();
-	T.info();
 	std::cout << "-----------------------" << std::endl;
 	T.rb_insert(_TestType1__(2)); // 11
 	// T.print_tree();
-	T.info();
 	std::cout << "-----------------------" << std::endl;
 	T.rb_insert(_TestType1__(3785678)); // 11
 	// T.print_tree();
-	T.info();
 	std::cout << "-----------------------" << std::endl;
 	T.rb_insert(_TestType1__(10)); // 11
 	// T.print_tree();
-	T.info();
 	std::cout << "-----------------------" << std::endl;
 	T.rb_insert(_TestType1__(80)); // 11
 	// T.print_tree();
-	T.info();
 	std::cout << "-----------------------" << std::endl;
 	T.rb_insert(_TestType1__(111)); // 11
 	// T.print_tree();
-	T.info();
 	std::cout << "-----------------------" << std::endl;
 	T.rb_insert(_TestType1__(110)); // 11
-	// T.print_tree();
-	T.info();
+	T.print_tree();
 	std::cout << "-----------------------" << std::endl;
 
-	// T.rb_insert(_TestType1__(7));
-	// T.print_tree();
-	// T.rb_insert(_TestType1__(6));
-	// T.print_tree();
-	// T.rb_insert(_TestType1__(5));
-	// T.print_tree();
-	// T.rb_insert(_TestType1__(4));
-	// T.print_tree();
-	// T.rb_insert(_TestType1__(3));
-	// T.print_tree();
-	// T.info();
 }
 
 
