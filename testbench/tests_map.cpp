@@ -6,7 +6,7 @@
 
 #include "testing.hpp"
 #include "../map.hpp"
-#include "../naive_tree.hpp"
+#include "../__tree.hpp"
 
 class map;
 
@@ -52,8 +52,8 @@ void test_map() {
 
 void tree_build() {
 	std::cout << CYAN_B"----\t tree_build \t----" << NC << std::endl;
-	// ft::rb_tree<_TestType1__, std::map::value_compare, std::allocator> T;
-	ft::rb_tree<_TestType1__, ft::map<_TestType1__, _TestType2__>::value_compare> T;
+	// ft::__rb_tree<_TestType1__, std::map::value_compare, std::allocator> T;
+	ft::__rb_tree<_TestType1__, ft::map<_TestType1__, _TestType2__>::value_compare> T;
 
 	T.rb_insert(_TestType1__(99));
 	// T.print_tree();
@@ -63,32 +63,46 @@ void tree_build() {
 	// T.print_tree();
 	std::cout << "-----------------------" << std::endl;
 
-	T.rb_insert(_TestType1__(3)); // 11
+	T.rb_insert(_TestType1__(3));
 	// T.print_tree();
 	std::cout << "-----------------------" << std::endl;
-	T.rb_insert(_TestType1__(128)); // 11
+
+	T.rb_insert(_TestType1__(128));
 	// T.print_tree();
 	std::cout << "-----------------------" << std::endl;
-	T.rb_insert(_TestType1__(11)); // 11
+
+	T.rb_insert(_TestType1__(11));
 	// T.print_tree();
 	std::cout << "-----------------------" << std::endl;
-	T.rb_insert(_TestType1__(2)); // 11
+
+	T.rb_insert(_TestType1__(2));
 	// T.print_tree();
 	std::cout << "-----------------------" << std::endl;
-	T.rb_insert(_TestType1__(3785678)); // 11
+
+	T.rb_insert(_TestType1__(3785678));
 	// T.print_tree();
 	std::cout << "-----------------------" << std::endl;
-	T.rb_insert(_TestType1__(10)); // 11
+
+	T.rb_insert(_TestType1__(10));
 	// T.print_tree();
 	std::cout << "-----------------------" << std::endl;
-	T.rb_insert(_TestType1__(80)); // 11
+
+	T.rb_insert(_TestType1__(80));
 	// T.print_tree();
 	std::cout << "-----------------------" << std::endl;
-	T.rb_insert(_TestType1__(111)); // 11
+
+	T.rb_insert(_TestType1__(111));
 	// T.print_tree();
 	std::cout << "-----------------------" << std::endl;
-	T.rb_insert(_TestType1__(110)); // 11
+
+	T.rb_insert(_TestType1__(110));
 	T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	std::cout << "-----------------------" << std::endl;
+	std::cout << "MIN: " << T.rb_min(T._root)->value << " " << std::endl;
+	std::cout << "MAX: " << T.rb_max(T._root)->value << " " << std::endl;
+	std::cout << "SEARCH 2: " << T.rb_search(T._root, 2) << " " << std::endl;
 	std::cout << "-----------------------" << std::endl;
 
 }
