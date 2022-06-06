@@ -96,15 +96,81 @@ void tree_build() {
 	std::cout << "-----------------------" << std::endl;
 
 	T.rb_insert(_TestType1__(110));
+	// T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_insert(_TestType1__(70));
+	// T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_insert(_TestType1__(13));
+	// T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_insert(_TestType1__(67));
+	// T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_insert(_TestType1__(49));
 	T.print_tree();
 	std::cout << "-----------------------" << std::endl;
 
+	T.rb_insert(_TestType1__(45));
+	// T.print_tree();
 	std::cout << "-----------------------" << std::endl;
+
+	T.rb_insert(_TestType1__(5476));
+	// T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_insert(_TestType1__(23));
+	// T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_insert(_TestType1__(25));
+	T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_insert(_TestType1__(144));
+	// T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_insert(_TestType1__(143));
+	// T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_insert(_TestType1__(145));
+	// T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_insert(_TestType1__(999));
+	T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+	std::cout << "-----------------------" << std::endl;
+
 	std::cout << "MIN: " << T.rb_min(T._root)->value << " " << std::endl;
 	std::cout << "MAX: " << T.rb_max(T._root)->value << " " << std::endl;
 	std::cout << "SEARCH 2: " << T.rb_search(T._root, 2) << " " << std::endl;
 	std::cout << "-----------------------" << std::endl;
 
+	std::cout << "-----------------------" << std::endl;
+
+
+	T.rb_delete(11);
+	T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_delete(8);
+	T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_delete(111);
+	T.print_tree();
+	std::cout << "-----------------------" << std::endl;
+
+	T.rb_delete(143);
+	T.print_tree();
+	std::cout << "-----------------------" << std::endl;
 }
 
 

@@ -53,7 +53,7 @@ private:
 			// info();
 		}
 		void print_value() const { std::cout << value << std::endl; }
-		void __destroy_node() {
+		void __destroy() {
 			__rb_tree::_value_allocator.destroy(&this->value);
 			__rb_tree::_node_allocator.destroy(this);
 			__rb_tree::_node_allocator.deallocate(this, 1);
@@ -111,7 +111,7 @@ public:
 /* ------------------------ destruction: ---------------------------------- */
 	
 	~__rb_tree() {
-		____rb_tree_branching_walk(_root, &__rb_node::__destroy_node);
+		____rb_tree_branching_walk(_root, &__rb_node::__destroy);
 		_node_allocator.destroy(_end_node);
 		_node_allocator.deallocate(_end_node, 1);
 		_node_allocator.destroy(_nil);
@@ -168,7 +168,6 @@ public:
 		return (x);
 	}
 
-
 /* ======================== MODIFIERS ===================================== */
 
 	/*
@@ -181,6 +180,7 @@ public:
 		node_pointer node = __allocate_rb_node(value);
 		/* node ptr = */ __rb_insert_node(node);
 		// return (iterator to the node, bool true)
+		// if node->vl < leftmost, leftmost = node etc
 	}
 
 	/*
@@ -190,7 +190,7 @@ public:
 		Recoloring and rotation operations might be performed.
 	*/
 	void rb_delete(const_reference value) {
-		node_pointer z = rb_search(value);
+		node_pointer z = rb_search(_root, value);
 		if (z == _nil)
 			return ;
 		__rb_delete(z);
@@ -293,7 +293,7 @@ private:
 	node_pointer __rb_transplant(node_pointer u, node_pointer v) {
 		if (u->p == _end_node)
 			_root = v;
-		else if (u == u->left)
+		else if (u == u->p->left)
 			u->p->left = v;
 		else
 			u->p->right = v;
@@ -339,10 +339,11 @@ private:
 		red-black properties after insertion.
 	*/
 	void __rb_insert_fixup(node_pointer x) {
+		node_pointer y;
 		while (x != _root && !x->p->isblack) {
 		/* CASES A: px is left child of ppx */
 			if (x->p == x->p->p->left) {
-				node_pointer y = x->p->p->right;
+				y = x->p->p->right;
 				/* CASE 1: uncle is red (& not _nil, same cond because _nil->isblack = true) */
 				if (!y->isblack) {
 					x = x->p;
@@ -357,7 +358,6 @@ private:
 					if (x == x->p->right) {
 						x = x->p;
 						__rb_left_rotate(x);
-						print_tree();
 					}
 					/* CASE 3 */
 					x->p->isblack = true;
@@ -369,7 +369,7 @@ private:
 			}
 		/* CASES B: px is left child of ppx */
 			else {
-				node_pointer y = x->p->p->left;
+				y = x->p->p->left;
 				/* CASE 1: uncle is red (& not null, same cond because _nil->isblack = true) */
 				if (!y->isblack) {
 					x = x->p;
@@ -384,7 +384,6 @@ private:
 					if (x == x->p->left) {
 						x = x->p;
 						__rb_right_rotate(x);
-						print_tree();
 					}
 					/* CASE 3 */
 					x->p->isblack = true;
@@ -399,16 +398,142 @@ private:
 
 /* ------------------------ deletion: ----------------------------------- */
 
+	/*
+		Standard binary search tree deletion algorithm + color tmp variables
+		and maintenance of a pointer to the pivot for the fixup routine.
+		Calls fixup function to restore red-black properties.
+		CASE 1 (else): z has empty left subtree
+		CASE 2 (else if): z has non-empty left subtree but empty right subtree
+		CASE 3+4 (else): z has both non-empty left and non-empty right subtrees
+			CASE 3 (if): z->R min was z'successor
+			CASE 4 (else): z->R min is not z's child (i.e. successor)
+			Both converge to a final transplant.
+	*/
 	void __rb_delete(node_pointer z) {
-		/* CASE 1: z has empty left subtree */
-
-		/* CASE 2: z has non-empty left subtree but empty right subtree */
-		/* CASE 3: z has both non-empty left and non-empty right subtrees */
-		__rb_delete_fixup(z);
+		node_pointer tmp_z = z;
+		node_pointer fixup_pivot;
+		bool was_black = z->isblack;
+		if (z->left == _nil) {
+			fixup_pivot = z->right;
+			__rb_transplant(z, z->right);
+		}
+		else if (z->right == _nil) {
+			fixup_pivot = z->left;
+			__rb_transplant(z, z->left);
+		}
+		else {
+			node_pointer y = rb_min(z->right);
+			was_black = y->isblack;
+			fixup_pivot = y->right;
+			if (y->p == z)
+				/* pivot can be _nil, storing p info for fixup */
+				fixup_pivot->p = y;
+			else {
+				__rb_transplant(y, y->right);
+				y->right = z->right;
+				y->right->p = y;
+			}
+			__rb_transplant(z, y);
+			y->left = z->left;
+			y->left->p = y;
+			y->isblack = z->isblack;
+		}
+		tmp_z->__destroy();
+		if (was_black && _root != _nil)
+			__rb_delete_fixup(fixup_pivot);
 	}
 
-	void __rb_delete_fixup(node_pointer z) {
-		(void)z;
+	/*
+		Deletion fixup recoloring and rotation routine to restore
+		red-black properties of the tree.
+	*/
+	void __rb_delete_fixup(node_pointer x) {
+		node_pointer y; /* sibling of x */
+		while (x != _root && x->isblack) {
+		/* CASES A: x is left child, sibling y is right child */
+			if (x == x->p->left) {
+				y = x->p->right;
+				/* CASE 1: sibling y is red. Goes into case 2/3/4. */
+				if (!y->isblack) {
+					y->p->isblack = false;
+					y->isblack = true;
+					__rb_left_rotate(y->p);
+					if (_root == y->left)
+						_root = y;
+					y = y->left->right;
+				}
+				/* CASE 2: y is black and both childern are black */
+				if (y->left->isblack && y->right->isblack) {
+					y->isblack = false;
+					x = y->p;
+					// if (!x->isblack || x == _root) {
+					// 	x->isblack = true;
+					// 	break ;
+					// }
+					// if (y == x->left)
+					// 	y = x->p->right;
+					// else
+					// 	y = x->p->left;
+				}
+				else {
+					/* CASE 3(+4): y is black and only right child is black */
+					if (!y->right->isblack && y->right != _nil) {
+						y->left->isblack = true;
+						y->isblack = false;
+						__rb_right_rotate(y);
+						y = y->p;
+					}
+					/* CASE 4: y is black and only right child is black */
+					y->isblack = x->p->isblack;
+					y->p->isblack = true;
+					y->right->isblack = true;
+					__rb_left_rotate(y->p);
+					break ;
+				}
+			}
+		/* CASES B: x is right child, sibling y is left child */
+			else {
+				y = x->p->left;
+				/* CASE 1: sibling y is red. Goes into case 2/3/4. */
+				if (!y->isblack) {
+					y->p->isblack = false;
+					y->isblack = true;
+					__rb_right_rotate(y->p);
+					if (_root == y->right)
+						_root = y;
+					y = y->right->left;
+				}
+				/* CASE 2: y is black and both childern are black */
+				if (y->left->isblack && y->right->isblack) {
+					y->isblack = false;
+					x = y->p;
+					// if (!x->isblack || x == _root) {
+					// 	x->isblack = true;
+					// 	break ;
+					// }
+					// if (y == x->left)
+					// 	y = x->p->right;
+					// else
+					// 	y = x->p->left;
+				}
+				else {
+					/* CASE 3(+4): y is black and only right child is black */
+					if (y->left->isblack || y->left == _nil) {
+						y->right->isblack = true;
+						y->isblack = false;
+						__rb_left_rotate(y);
+						y = y->p;
+					}
+					/* CASE 4: y is black and only right child is black */
+					y->isblack = y->p->isblack;
+					y->p->isblack = true;
+					y->left->isblack = true;
+					__rb_right_rotate(y->p);
+					break ;
+				}
+			}
+		}
+		x->isblack = true;
 	}
 
 /* ======================== WALKS ======================================= */
@@ -473,6 +598,7 @@ private:
 			std::cout << (isleft ? "L " : "R ");
 			std::cout << "\033[0m";
 			std::cout << "⁙";
+			std::cout << "\033[0;34m" << " " << x << "\033[0m";
 			std::cout << std::endl;
 		}
 		if (x != _nil) {
