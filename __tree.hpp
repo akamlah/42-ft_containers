@@ -83,7 +83,6 @@ public:
 
 /* ======================== ATTRIBUTES ==================================== */
 
-
 // private: // (protected ?)
 
 	static node_allocator_type _node_allocator;
@@ -156,7 +155,7 @@ public:
 		in the passed node. Returns a pointer to the node found or _nil
 		if the tree was empty or no node was found.
 	*/
-	node_pointer rb_search(node_pointer subtree_root, value_type value) {
+	node_pointer rb_search(node_pointer subtree_root, value_type value) const {
 		node_pointer x = subtree_root;
 		while (x != _nil && value != x->value) {
 			if (value < x->value)
@@ -164,8 +163,27 @@ public:
 			else
 				x = x->right;
 		}
-		x->info();
 		return (x);
+	}
+
+	/*
+		SUCCESSOR
+		Returns pointer to the minimum of all values greater than x,
+		or _nil if the tree was empty or the node passed was _nil.
+	*/
+	node_pointer rb_successor(value_type value) const {
+		node_pointer x = rb_search(_root, value);
+		if (x == _nil)
+			return (_nil);
+		if (x->right != _nil)
+			return (rb_min(x->right));
+		node_pointer y = x->p;
+		while (y != _nil && y != _end_node && x == y->right) { /* == if x->value <= y->value */
+			/* go up the tree, unless y found s.t. y = y->p->left*/
+			x = y; /* i.e. y is set to its parent */
+			y = y->p;
+		}
+		return (y);
 	}
 
 /* ======================== MODIFIERS ===================================== */
@@ -466,7 +484,7 @@ private:
 				if (y->left->isblack && y->right->isblack) {
 					y->isblack = false;
 					x = y->p;
-					// if (!x->isblack || x == _root) {
+	/* TEST TODO */	// if (!x->isblack || x == _root) {
 					// 	x->isblack = true;
 					// 	break ;
 					// }
@@ -507,7 +525,7 @@ private:
 				if (y->left->isblack && y->right->isblack) {
 					y->isblack = false;
 					x = y->p;
-					// if (!x->isblack || x == _root) {
+	/* TEST TODO */	// if (!x->isblack || x == _root) {
 					// 	x->isblack = true;
 					// 	break ;
 					// }
@@ -598,7 +616,8 @@ private:
 			std::cout << (isleft ? "L " : "R ");
 			std::cout << "\033[0m";
 			std::cout << "⁙";
-			std::cout << "\033[0;34m" << " " << x << "\033[0m";
+			/* un-/comment to print/not print nil's address */
+				// std::cout << "\033[0;34m" << " " << x << "\033[0m";
 			std::cout << std::endl;
 		}
 		if (x != _nil) {
@@ -616,7 +635,9 @@ private:
 			std::cout << "\033[0m";
 			if (x->isblack == false)
 				std::cout << "\033[0;31m";
-			std::cout << x->value << " " << "\033[0;34m" << x;
+			std::cout << x->value;
+			/* un-/comment to print/not print node's addresses */
+				std::cout << " " << "\033[0;34m" << x;
 			std::cout << "\033[0m" << std::endl;
 			__pretty_print(prefix + (isleft ? "│     " : "      "), x->left, true, iter);
 			__pretty_print(prefix + (isleft ? "│     " : "      "), x->right, false, iter);

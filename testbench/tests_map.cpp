@@ -151,26 +151,32 @@ void tree_build() {
 	std::cout << "MIN: " << T.rb_min(T._root)->value << " " << std::endl;
 	std::cout << "MAX: " << T.rb_max(T._root)->value << " " << std::endl;
 	std::cout << "SEARCH 2: " << T.rb_search(T._root, 2) << " " << std::endl;
+	std::cout << "SUCCESSOR 143: " << T.rb_successor(143) << " " << T.rb_successor(143)->value << " " << std::endl;
+	std::cout << "SUCCESSOR 3785678: " << T.rb_successor(3785678) << " " << T.rb_successor(3785678)->value << " " << std::endl;
+	std::cout << "SUCCESSOR 99: " << T.rb_successor(99) << " " << T.rb_successor(99)->value << " " << std::endl;
+	std::cout << "SUCCESSOR 11: " << T.rb_successor(11) << " " << T.rb_successor(11)->value << " " << std::endl;
 	std::cout << "-----------------------" << std::endl;
 
-	std::cout << "-----------------------" << std::endl;
+	// std::cout << "-----------------------" << std::endl;
 
 
-	T.rb_delete(11);
-	T.print_tree();
-	std::cout << "-----------------------" << std::endl;
+	// T.rb_delete(11);
+	// T.print_tree();
+	// std::cout << "-----------------------" << std::endl;
 
-	T.rb_delete(8);
-	T.print_tree();
-	std::cout << "-----------------------" << std::endl;
+	// T.rb_delete(8);
+	// T.print_tree();
+	// std::cout << "-----------------------" << std::endl;
 
-	T.rb_delete(111);
-	T.print_tree();
-	std::cout << "-----------------------" << std::endl;
+	// T.rb_delete(111);
+	// T.print_tree();
+	// std::cout << "-----------------------" << std::endl;
 
-	T.rb_delete(143);
-	T.print_tree();
-	std::cout << "-----------------------" << std::endl;
+	// T.rb_delete(143);
+	// T.print_tree();
+	// std::cout << "-----------------------" << std::endl;
+	
+
 }
 
 
