@@ -117,8 +117,8 @@ Non-member functions (templates)
 */
 
 template< class Iter >
-class reverse_iterator : public iterator <
-		typename iterator_traits<Iter>::iterator_category,
+class reverse_iterator : public iterator 
+		< typename iterator_traits<Iter>::iterator_category,
 		typename iterator_traits<Iter>::value_type,
 		typename iterator_traits<Iter>::difference_type,
 		typename iterator_traits<Iter>::pointer,

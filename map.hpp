@@ -100,21 +100,25 @@ NON MEMBER FUNCTIONS
 #include <iostream>
 #include <functional>
 
+//TEST ONLY
+#include <__tree>
+
 // ft::
 #include "iterator.hpp"
 #include "type_traits.hpp"
 #include "utility.hpp"
-#include "__tree.hpp"
+#include "__rb_tree.hpp"
 
 /* ------------------------------------------------------------------------ */
 
 namespace ft { /* NAMESPACE FT */
 
-template <  /* MAP */
+template < /* MAP */
 	class Key,
 	class T,
 	class Compare = std::less<Key>,
-	class Allocator = std::allocator<ft::pair<const Key, T> > >
+	// class Allocator = std::allocator<ft::pair<const Key, T> > >
+	class Allocator = std::allocator<std::pair<const Key, T> > >
 class map {
 
 public:
@@ -126,14 +130,15 @@ public:
 	typedef Compare		key_compare;
 	typedef Allocator	allocator_type;
 
-	typedef typename ft::pair<const Key, T>			value_type;
+	// typedef typename ft::pair<const Key, T>				value_type;
+	typedef typename std::pair<const Key, T>				value_type;
 	typedef typename allocator_type::size_type			size_type; // std::size_t
 	typedef typename allocator_type::difference_type	difference_type; // std::ptrdiff_t
 
 	typedef value_type&			reference;
 	typedef const value_type&	const_reference;
 
-	typedef typename allocator_type::pointer		pointer;
+	typedef typename allocator_type::pointer		pointer; // 
 	typedef typename allocator_type::const_pointer	const_pointer;
 
 	// typedef typename 	iterator // bidir. legacy iterator to value_type
@@ -143,19 +148,19 @@ public:
 
 /* ======================== MEMBER CLASSES ================================ */
 
-	/*  VALUE_COMPARE
+	/* 
+		VALUE_COMPARE
 		Function object that compares objects of type ft::map::value_type
-		(key-value pairs) by comparing of the first components of the pairs */
+		(key-value pairs) by comparing of the first components of the pairs
+	*/
 	class value_compare
 		: public std::binary_function<value_type, value_type, bool> {
 
 	public:
 	
 		typedef bool									result_type;
-		typedef typename std::binary_function<
-			value_type, value_type, bool >::value_type	first_argument_type;
-		typedef typename std::binary_function<
-			value_type, value_type, bool>::value_type	second_argument_type;
+		typedef typename std::binary_function< value_type, value_type, bool >::value_type	first_argument_type;
+		typedef typename std::binary_function< value_type, value_type, bool >::value_type	second_argument_type;
 
 	protected:
 
@@ -169,13 +174,17 @@ public:
 
 	};
 
-#if 0
+
 /* ======================== ATTRIBUTES ==================================== */
+
+	typedef ft::__rb_tree<value_type, value_compare, allocator_type> underlying_datastructure_type;
+	// typedef std::__tree<value_type, value_compare, Allocator> underlying_datastructure_type;
 
 private:
 
-	// __tree _base;
+	underlying_datastructure_type _base;
 
+#if 0
 /* ------------------------------------------------------------------------ */
 /* ======================== MEMBER FUNCTIONS ============================== */
 /* ------------------------------------------------------------------------ */
