@@ -104,7 +104,7 @@ NON MEMBER FUNCTIONS
 #include "iterator.hpp"
 #include "type_traits.hpp"
 #include "utility.hpp"
-#include "__tree.hpp"
+#include "__rb_tree.hpp"
 
 /* ------------------------------------------------------------------------ */
 

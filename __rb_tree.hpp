@@ -28,7 +28,8 @@ namespace ft { /* NAMESPACE FT */
 
 template < /* RB TREE */
 	class Value,
-	class Compare
+	class Compare,
+	class Allocator
 > class __rb_tree {
 
 /* ======================== MEMBER TYPES & CLASSES ========================= */
@@ -37,6 +38,10 @@ public:
 
 	typedef Value value_type;
 	typedef Compare compare_type;
+	typedef Allocator value_allocator_type;
+	typedef typename value_allocator_type::pointer			pointer;
+	typedef typename value_allocator_type::reference		reference;
+	typedef typename value_allocator_type::const_reference	const_reference;
 
 private:
 
@@ -71,15 +76,11 @@ private:
 
 public:
 
-	typedef typename std::allocator<__rb_node>				node_allocator_type;
+	// typedef typename std::allocator<Value>					value_allocator_type;
+	typedef typename value_allocator_type::template rebind<__rb_node>::other node_allocator_type;
 	typedef typename node_allocator_type::pointer			node_pointer;
 	typedef typename node_allocator_type::size_type			size_type;
 	typedef typename node_allocator_type::difference_type	difference_type;
-
-	typedef typename std::allocator<Value>					value_allocator_type;
-	typedef typename value_allocator_type::pointer			pointer;
-	typedef typename value_allocator_type::reference		reference;
-	typedef typename value_allocator_type::const_reference	const_reference;
 
 /* ======================== ATTRIBUTES ==================================== */
 
