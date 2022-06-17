@@ -118,73 +118,66 @@ template < /* MAP */
 	class T,
 	class Compare = std::less<Key>,
 	// class Allocator = std::allocator<ft::pair<const Key, T> > >
-	class Allocator = std::allocator<std::pair<const Key, T> > >
+	class Allocator = std::allocator<std::pair<const Key, T> > > // TESTING - UNCOMMENT ALSO IN TYPEDEFS
 class map {
 
 public:
 
 /* ======================== TYPEDEFS ====================================== */
 
+	class value_compare;
+
 	typedef Key			key_type;
 	typedef T			mapped_type;
 	typedef Compare		key_compare;
 	typedef Allocator	allocator_type;
 
-	// typedef typename ft::pair<const Key, T>				value_type;
-	typedef typename std::pair<const Key, T>				value_type;
-	typedef typename allocator_type::size_type			size_type; // std::size_t
-	typedef typename allocator_type::difference_type	difference_type; // std::ptrdiff_t
+	typedef typename allocator_type::size_type			size_type;
+	typedef typename allocator_type::difference_type	difference_type;
 
-	typedef value_type&			reference;
-	typedef const value_type&	const_reference;
-
-	typedef typename allocator_type::pointer		pointer; // 
+	// typedef typename ft::pair<const Key, T>			value_type; // TO SOLVE !
+	typedef typename std::pair<const Key, T>		value_type;
+	typedef value_type&								reference;
+	typedef const value_type&						const_reference;
+	typedef typename allocator_type::pointer		pointer;
 	typedef typename allocator_type::const_pointer	const_pointer;
 
-	// typedef typename 	iterator // bidir. legacy iterator to value_type
-	// typedef typename 	const_iterator
-	// typedef typename 	reverse_iterator
-	// typedef typename 	const_reverse_iterator
+	typedef ft::__rb_tree<value_type, value_compare, allocator_type>	tree_type;
 
-/* ======================== MEMBER CLASSES ================================ */
+	typedef typename tree_type::iterator		iterator;
+	typedef typename tree_type::const_iterator	const_iterator;
+	// typedef typename 						reverse_iterator
+	// typedef typename 						const_reverse_iterator
+
+/* ======================== MEMBER CLASS ================================= */
 
 	/* 
 		VALUE_COMPARE
 		Function object that compares objects of type ft::map::value_type
 		(key-value pairs) by comparing of the first components of the pairs
 	*/
-	class value_compare
-		: public std::binary_function<value_type, value_type, bool> {
-
+	class value_compare { // ???
 	public:
-	
-		typedef bool									result_type;
-		typedef typename std::binary_function< value_type, value_type, bool >::value_type	first_argument_type;
-		typedef typename std::binary_function< value_type, value_type, bool >::value_type	second_argument_type;
-
+		typedef bool result_type;
 	protected:
-
 		key_compare comp;
 
 		value_compare(Compare c) : comp(c) {}
-
 		bool operator()( const value_type& lhs, const value_type& rhs ) const {
 			return (comp(lhs.first, rhs.first));
 		}
-
 	};
 
+	// class iterator {
+
+	// };
 
 /* ======================== ATTRIBUTES ==================================== */
 
-	typedef ft::__rb_tree<value_type, value_compare, allocator_type> underlying_datastructure_type;
-	// typedef std::__tree<value_type, value_compare, Allocator> underlying_datastructure_type;
-
 private:
 
-	underlying_datastructure_type _base;
+	tree_type _tree;
 
-#if 0
 /* ------------------------------------------------------------------------ */
 /* ======================== MEMBER FUNCTIONS ============================== */
 /* ------------------------------------------------------------------------ */
@@ -193,7 +186,7 @@ public:
 
 /* ------------------------ construction: --------------------------------- */
 
-	map();
+	map() {}
 
 	explicit map(const Compare& comp, const Allocator& alloc = Allocator());
 
@@ -205,7 +198,7 @@ public:
 
 /* ------------------------ destruction: ---------------------------------- */
 
-	~map();
+	~map() {}
 
 /* ------------------------ assignment: ---------------------------------- */
 
@@ -227,10 +220,11 @@ public:
 
 /* ------------------------ iterators: ------------------------------------ */
 
-	// iterator begin();
-	// const_iterator begin() const;
-	// iterator end();
-	// const_iterator end() const;
+	iterator begin() { return (iterator(_tree.rb_min())); }
+	const_iterator begin() const;
+	iterator end() { return (iterator(_tree.rb_max())); };
+	const_iterator end() const;
+
 	// reverse_iterator rbegin();
 	// const_reverse_iterator rbegin() const;
 	// reverse_iterator rend();
@@ -246,9 +240,18 @@ public:
 
 /* ------------------------ insertion: ------------------------------------ */
 
-	// ft::pair<iterator, bool> insert( const value_type& value );
+	// ft::pair<iterator, bool> insert( const value_type& value ) {
+	std::pair<iterator, bool> insert( const value_type& value ) {
+		iterator x(_tree.rb_search(value));
+		if (x.get_node_ptr() != _tree.nil())
+			return (std::pair<iterator, bool>(x, false));
+			// return (ft::pair<iterator, bool>(x, false));
+		x = iterator(_tree.rb_insert(value));
+		return (std::pair<iterator, bool>(x, true));
+		// return (ft::pair<iterator, bool>(x, true));
+	}
 	
-	// iterator insert( iterator hint, const value_type& value );
+	iterator insert( iterator hint, const value_type& value );
 	
 	template< class InputIt >
 	void insert( InputIt first, InputIt last );
@@ -257,9 +260,9 @@ public:
 
 	void clear();
 
-	// void erase( iterator pos );
+	void erase( iterator pos );
 
-	// void erase( iterator first, iterator last );
+	void erase( iterator first, iterator last );
 
 	size_type erase( const Key& key );
 
@@ -271,21 +274,21 @@ public:
 
 	size_type count( const Key& key ) const;
 
-	// iterator find( const Key& key );
+	iterator find( const Key& key );
 
-	// const_iterator find( const Key& key ) const;
+	const_iterator find( const Key& key ) const;
 
-	// ft::pair<iterator,iterator> equal_range( const Key& key );
+	ft::pair<iterator,iterator> equal_range( const Key& key );
 
-	// ft::pair<const_iterator,const_iterator> equal_range( const Key& key ) const;
+	ft::pair<const_iterator,const_iterator> equal_range( const Key& key ) const;
 
-	// iterator lower_bound( const Key& key );
+	iterator lower_bound( const Key& key );
 	
-	// const_iterator lower_bound( const Key& key ) const;
+	const_iterator lower_bound( const Key& key ) const;
 
-	// iterator upper_bound( const Key& key );
+	iterator upper_bound( const Key& key );
 
-	// const_iterator upper_bound( const Key& key ) const;
+	const_iterator upper_bound( const Key& key ) const;
 
 /* ======================== OBSERVERS ===================================== */
 
@@ -311,8 +314,6 @@ private:
 		#endif
 		(void)msg1; (void)msg2; (void)address;
 	}
-	
-#endif
 
 }; /* MAP */
 

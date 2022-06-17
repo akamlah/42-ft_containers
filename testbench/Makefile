@@ -64,7 +64,9 @@ HEADER_DEPS = $(CLASS_HPP) $(FT_LIB_LOCATED_HPPS) $(OTHER_HEADERS)
 all: $(EXECUTABLE_NAME)
 
 $(EXECUTABLE_NAME): $(SOURCES) $(HEADER_DEPS)
-	$(CC) $(CFLAGS) -o $(EXECUTABLE_NAME) $(SOURCES) -DSTD=0 -DDBG=0
+	@ echo "\033[38;5;37m =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+	@ $(CC) $(CFLAGS) -o $(EXECUTABLE_NAME) $(SOURCES) -DSTD=0 -DDBG=0
+	@ echo "\033[0m"
 
 .PHONY = clean
 

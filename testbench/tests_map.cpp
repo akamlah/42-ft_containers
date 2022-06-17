@@ -41,14 +41,15 @@ void map_construct();
 
 // #define __PAIR__ ft::pair
 #define __PAIR__ std::pair
-#define __MAP__ std::map
+// #define __MAP__ std::map
+#define __MAP__ ft::map
 /* ------------------------------------------------------------------------ */
 
 // CALL ALL
 void test_map() {
 	std::cout << MAGENTA_B "----\t MAP \t----" << NC << std::endl;
-	// tree_build(); std::cout << std::endl;
-	// std_map_test(); std::cout << std::endl;
+	tree_build(); std::cout << std::endl;
+	std_map_test(); std::cout << std::endl;
 	map_construct(); std::cout << std::endl;
 }
 
@@ -142,8 +143,8 @@ void print_map(__MAP__<Key, Value>& m) {
 	std::cout << "--end:\t";
 	::operator<< <Key, Value> (std::cout, --m.end()); std::cout << std::endl;
 	// this works but end - 1 not (in fact it is bidir, no +- difftype overload)
-	std::cout << "size:\t";
-	std::cout << m.size() << std::endl;
+	// std::cout << "size:\t";
+	// std::cout << m.size() << std::endl;
 	std::cout << "-----------------------" << std::endl;
 	recursive_print_map(m);
 	std::cout << "-----------------------" << std::endl;
@@ -152,38 +153,40 @@ void print_map(__MAP__<Key, Value>& m) {
 void std_map_test() {
 	std::cout << CYAN_B"----\t std_map_test \t----" << NC << std::endl;
 	__MAP__< _TestType1__, std::string > m;
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(99)		, "a" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(99)		, "a"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(8)			, "b" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(8)			, "b"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(3)			, "c" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(3)			, "c"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(128)		, "d" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(128)		, "d"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(11)		, "e" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(11)		, "e"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(2)			, "f" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(2)			, "f"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(3785678)	, "g" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(3785678)	, "g"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(10)		, "h" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(10)		, "h"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(80)		, "i" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(80)		, "i"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(111)		, "j" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(111)		, "j"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(110)		, "k" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(110)		, "k"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(70)		, "l" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(70)		, "l"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(13)		, "m" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(13)		, "m"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(67)		, "n" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(67)		, "n"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(49)		, "o" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(49)		, "o"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(45)		, "p" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(45)		, "p"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(5476)		, "q" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(5476)		, "q"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(23)		, "r" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(23)		, "r"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(25)		, "s" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(25)		, "s"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(144)		, "t" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(144)		, "t"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(143)		, "u" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(143)		, "u"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(145)		, "v" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(145)		, "v"		))	).first)->second) << "\n";
-	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(999)		, "w" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(999)		, "w"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(99)		, "a" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(99)		, "a"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(8)			, "b" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(8)			, "b"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(3)			, "c" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(3)			, "c"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(128)		, "d" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(128)		, "d"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(11)		, "e" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(11)		, "e"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(2)			, "f" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(2)			, "f"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(3785678)	, "g" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(3785678)	, "g"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(10)		, "h" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(10)		, "h"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(80)		, "i" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(80)		, "i"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(111)		, "j" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(111)		, "j"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(110)		, "k" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(110)		, "k"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(70)		, "l" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(70)		, "l"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(13)		, "m" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(13)		, "m"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(67)		, "n" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(67)		, "n"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(49)		, "o" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(49)		, "o"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(45)		, "p" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(45)		, "p"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(5476)		, "q" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(5476)		, "q"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(23)		, "r" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(23)		, "r"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(25)		, "s" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(25)		, "s"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(144)		, "t" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(144)		, "t"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(143)		, "u" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(143)		, "u"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(145)		, "v" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(145)		, "v"		))	).first)->second) << "\n";
+	// std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(999)		, "w" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(999)		, "w"		))	).first)->second) << "\n";
 
-	m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(99)		, "a"		)); // just gets ignored.
-	print_map(m);
+	// m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(99)		, "a"		)); // just gets ignored.
+	// print_map(m);
 
 }
 
 void map_construct() {
 	std::cout << CYAN_B"----\t map_construct \t----" << NC << std::endl;
-	_NS__::map<_TestType1__, _TestType2__> m;
+	ft::map<_TestType1__, _TestType2__> m;
+	m.insert(std::pair< _TestType1__, std::string >(_TestType1__(1), "hi"));
+	print_map(m);
 }
 
 // compiles:
