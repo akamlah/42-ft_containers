@@ -11,8 +11,8 @@ namespace ft { /* NAMESPACE FT */
 template <class NodePointer> NodePointer rb_min(NodePointer x);
 template <class NodePointer> NodePointer rb_max(NodePointer x);
 template <class NodePointer, typename T> NodePointer rb_search(NodePointer x, T value);
-template <class NodePointer, typename T> NodePointer rb_successor(NodePointer x);
-template <class NodePointer, typename T> NodePointer rb_predecessor(NodePointer x);
+template <class NodePointer> NodePointer rb_successor(NodePointer x);
+template <class NodePointer> NodePointer rb_predecessor(NodePointer x);
 template <class NodePointer> void rb_left_rotate(NodePointer& root, NodePointer x);
 template <class NodePointer> void rb_right_rotate(NodePointer& root, NodePointer x);
 template <class NodePointer> NodePointer rb_transplant(NodePointer& root, NodePointer u, NodePointer v);
@@ -20,6 +20,8 @@ template <class NodePointer> void rb_insert(NodePointer& root, NodePointer node)
 template <class NodePointer> void rb_insert_fixup(NodePointer& root, NodePointer x);
 template <class NodePointer> void rb_delete(NodePointer& root, NodePointer z);
 template <class NodePointer> void rb_delete_fixup(NodePointer& root, NodePointer x);
+
+template <class NodePointer> void print_tree(NodePointer root);
 
 
 template <class T, class Compare = typename std::map<int, T>::key_compare, class Allocator = std::allocator<T> >
@@ -44,16 +46,22 @@ struct rb_node { // red black nodes
 	struct rb_node* right;
 	value_type value;
 	bool isblack;
-	rb_node(): parent(NULL), left(NULL), right(NULL), isblack(false) // {}
-		{ std::cout << "deflt node constr." << std::endl; }
-	rb_node(value_type val): parent(NULL), left(NULL), right(NULL), value(val), isblack(false) // {}
-		{ std::cout << "value node constr." << std::endl; }
-	rb_node(const rb_node& other): parent(NULL), left(NULL), right(NULL), value(other.value), isblack(false) // {}
-		{ std::cout << "copy node constr." << std::endl; }
-	virtual ~rb_node() // {}
-		{ std::cout << "node destr." << std::endl; }
+	rb_node(): parent(NULL), left(NULL), right(NULL), isblack(false)
+		{}
+		// { std::cout << "deflt node constr." << std::endl; }
+	rb_node(value_type val): parent(NULL), left(NULL), right(NULL), value(val), isblack(false)
+		{}
+		// { std::cout << "value node constr." << std::endl; }
+	rb_node(const rb_node& other): parent(NULL), left(NULL), right(NULL), value(other.value), isblack(false)
+		{}
+		// { std::cout << "copy node constr." << std::endl; }
+	virtual ~rb_node()
+		{}
+		// { std::cout << "node destr." << std::endl; }
 	rb_node& operator=(const rb_node& other)
-		{ std::cout << "node COPY ASS OP." << std::endl; value = other.value; parent = other.parent; 
+		// { std::cout << "node COPY ASS OP." << std::endl; 
+		{
+			value = other.value; parent = other.parent; 
 			left = other.left; right = other.right; isblack = other.isblack; return (*this); } // ?
 };
 
@@ -79,7 +87,7 @@ rb_tree(): _root(NULL) {}
 ~rb_tree() { _clear(_root); }
 
 node_pointer insert(value_type value) {
-	std::cout << "INSERTING " << value << std::endl;
+	// std::cout << "INSERTING " << value << std::endl;
 	node_pointer x = _new_node(value);
 	rb_insert(_root, x);
 	return (x);
@@ -91,7 +99,10 @@ void erase(const_reference value) {
 	if (z == NULL)
 		return ;
 	node_pointer tmp_z = z;
+
 	rb_delete(_root, z);
+	// __tree_remove(_root, z);
+
 	_node_allocator.destroy(tmp_z);
 	_node_allocator.deallocate(tmp_z, 1);
 }
@@ -115,7 +126,7 @@ node_pointer _new_node(value_type value) {
 // recursively destroys and frees the memory of all nodes of the subtree rooted in x.
 void _clear(node_pointer x) {
 	if (x) {
-		std::cout << x->value << std::endl;
+		// std::cout << "clear | " << x->value << std::endl;
 		_clear(x->left);
 		_clear(x->right);
 		_node_allocator.destroy(x);
@@ -134,44 +145,7 @@ public:
 	            ├──2L ⁙
 	            └──2R ⁙    */
 	void print_tree() const {
-		_pretty_print("", _root, false, -1);
-		std::cout << std::endl;
-	}
-private:
-	void _pretty_print(std::string prefix, node_pointer x, bool isleft, int iter) const {
-		++iter;
-		if (x == NULL) {
-			std::cout << "\033[0;34m"; // blue
-			std::cout << prefix;
-			std::cout << (isleft ? "├──" : "└──");
-			std::cout << iter;
-			std::cout << (isleft ? "L " : "R ");
-			std::cout << "\033[0m"; // no color
-			std::cout << "⁙";
-			std::cout << std::endl;
-		}
-		if (x != NULL) {
-			std::cout << "\033[0;34m"; // blue
-			std::cout << prefix;
-			if (x == _root) {
-				std::cout << "└──";
-				std::cout << iter << "* ";
-			}
-			else {
-				std::cout << (isleft ? "├──" : "└──");
-				std::cout << iter;
-				std::cout << (isleft ? "L " : "R ");
-			}
-			std::cout << "\033[0m"; // no color
-			if (x->isblack == false)
-				std::cout << "\033[0;31m"; // red
-			std::cout << x->value;
-			/* un-/comment to print/not print node's addresses */
-				std::cout << " " << "\033[0;34m" << x; // blue
-			std::cout << "\033[0m" << std::endl; // no color
-			_pretty_print(prefix + (isleft ? "│     " : "      "), x->left, true, iter);
-			_pretty_print(prefix + (isleft ? "│     " : "      "), x->right, false, iter);
-		}
+		::ft::print_tree(_root);
 	}
 }; // RB TREE ======================================================================================================
 
@@ -219,7 +193,7 @@ NodePointer rb_search(NodePointer x, T value) {
 }
 
 // Returns a pointer to the node with the next greater value after x, else NULL.
-template <class NodePointer, typename T>
+template <class NodePointer>
 NodePointer rb_successor(NodePointer x) {
 	if (!x)
 		return (NULL);
@@ -234,7 +208,7 @@ NodePointer rb_successor(NodePointer x) {
 }
 
 // Returns a pointer to the node with the next smallest value before x, else NULL.
-template <class NodePointer, typename T>
+template <class NodePointer>
 NodePointer rb_predecessor(NodePointer x) {
 	if (!x)
 		return (NULL);
@@ -286,7 +260,7 @@ void rb_right_rotate(NodePointer& root, NodePointer x) {
 
 template <class NodePointer>
 NodePointer rb_transplant(NodePointer& root, NodePointer u, NodePointer v) {
-	// std::cout << " u" << u << " v" << v << std::endl; // !
+	std::cout << "TRANSPLANT | u:" << u << " v:" << v << std::endl; // !
 	if (!u->parent)
 		root = v;
 	else if (u == u->parent->left)
@@ -297,6 +271,10 @@ NodePointer rb_transplant(NodePointer& root, NodePointer u, NodePointer v) {
 		v->parent = u->parent;
 	return u;
 }
+
+/* ---------------
+	INSERTION
+--------------- */
 
 template <class NodePointer>
 void rb_insert(NodePointer& root, NodePointer node) {
@@ -382,21 +360,30 @@ void rb_insert_fixup(NodePointer& root, NodePointer x) {
 	}
 }
 
-template <class NodePointer>
+/* ---------------
+	DELETION
+--------------- */
+
+template <class NodePointer> // buggy - to solve. in the meantime use __tree_remove from the STL
 void rb_delete(NodePointer& root, NodePointer z) {
 	NodePointer y = z; // silbling
 	NodePointer x; // moves into node y's original position
 	bool y_was_black = y->isblack;
 	if (!z->left) {
+		// std::cout << "rb_delete | case z-left == null" << std::endl;
 		x = z->right;
 		rb_transplant(root, z, z->right);
 	}
 	else if (!z->right) {
+		// std::cout << "rb_delete | case z-left == null" << std::endl;
 		x = z->left;
 		rb_transplant(root, z, z->left);
 	}
 	else {
-		NodePointer y = rb_min(z->right);
+		// std::cout << "rb_delete | case 2 children" << std::endl;
+
+		y = rb_min(z->right);
+		// std::cout << "min is " << y->value << std::endl;
 		y_was_black = y->isblack;
 		x = y->right;
 
@@ -412,6 +399,7 @@ void rb_delete(NodePointer& root, NodePointer z) {
 			rb_transplant(root, y, y->right);
 			y->right = z->right;
 			y->right->parent = y;
+			// print_tree(root);
 		}
 
 		rb_transplant(root, z, y);
@@ -441,14 +429,14 @@ void rb_delete_fixup(NodePointer& root, NodePointer x) {
 				y->isblack = false;
 				x = y->parent;
 
-				// if (!x->isblack || x == root) {
-				// 	x->isblack = true;
-				// 	break ;
-				// }
-				// if (y == x->left)
-				// 	y = x->parent->right;
-				// else
-				// 	y = x->parent->left;
+				if (!x->isblack || x == root) {
+					x->isblack = true;
+					break ;
+				}
+				if (y == x->left)
+					y = x->parent->right;
+				else
+					y = x->parent->left;
 
 			}
 			else { // CASE 3(+4): y is black and only right child is black
@@ -480,14 +468,14 @@ void rb_delete_fixup(NodePointer& root, NodePointer x) {
 				y->isblack = false;
 				x = y->parent;
 
-				// if (!x->isblack || x == root) {
-				// 	x->isblack = true;
-				// 	break ;
-				// }
-				// if (y == x->left)
-				// 	y = x->parent->right;
-				// else
-				// 	y = x->parent->left;
+				if (!x->isblack || x == root) {
+					x->isblack = true;
+					break ;
+				}
+				if (y == x->left)
+					y = x->parent->right;
+				else
+					y = x->parent->left;
 
 			}
 			else { // CASE 3(+4): y is black and only right child is black
@@ -508,6 +496,171 @@ void rb_delete_fixup(NodePointer& root, NodePointer x) {
 	}
 	if (x)
 		x->isblack = true;
+}
+
+template <class NodePointer>
+void
+__tree_remove(NodePointer root, NodePointer z)
+{
+	NodePointer y = (z->left == NULL || z->right == NULL) ?
+		z : rb_successor<NodePointer>(z);
+	NodePointer x = y->left != NULL ? y->left : y->right;
+	NodePointer w = NULL;
+	if (x != NULL)
+		x->parent = y->parent;
+	if (y && y->parent && y->parent->left == y) {
+		y->parent->left = x;
+		if (y != root)
+			w = y->parent->right;
+		else
+			root = x;
+	}
+	else {
+		y->parent->right = x;
+		w = y->parent->left;
+	}
+	bool removed_black = y->isblack;
+	if (y != z) {
+		y->parent = z->parent;
+		if (z && z->parent && z->parent->left == z)
+			y->parent->left = y;
+		else
+			y->parent->right = y;
+		y->left = z->left;
+		y->left->parent = y;
+		y->right = z->right;
+		if (y->right != NULL)
+			y->right->parent = y;
+		y->isblack = z->isblack;
+		if (root == z)
+			root = y;
+	}
+	if (removed_black && root != NULL) {
+		if (x != NULL)
+			x->isblack = true;
+		else {
+			while (true) {
+				if (!(w && w->parent && w->parent->left == w)) {
+					if (!w->isblack) {
+						w->isblack = true;
+						w->parent->isblack = false;
+						rb_left_rotate(root, w->parent);
+						if (root == w->left)
+							root = w;
+						w = w->left->right;
+					}
+					if ((w->left  == NULL || w->left->isblack) &&
+						(w->right == NULL || w->right->isblack)) {
+						w->isblack = false;
+						x = w->parent;
+						if (x == root || !x->isblack) {
+							x->isblack = true;
+							break;
+						}
+						w = (w && w->parent && w->parent->left == w) ?
+									x->parent->right :
+									x->parent->left;
+					}
+					else {
+						if (w->right == NULL || w->right->isblack) {
+							w->left->isblack = true;
+							w->isblack = false;
+							rb_right_rotate(root, w);
+							w = w->parent;
+						}
+						w->isblack = w->parent->isblack;
+						w->parent->isblack = true;
+						w->right->isblack = true;
+						rb_left_rotate(root, w->parent);
+						break;
+					}
+				}
+				else {
+					if (!w->isblack) {
+						w->isblack = true;
+						w->parent->isblack = false;
+						rb_right_rotate(root, w->parent);
+						if (root == w->right)
+							root = w;
+						w = w->right->left;
+					}
+					if ((w->left  == NULL || w->left->isblack) &&
+						(w->right == NULL || w->right->isblack)) {
+						w->isblack = false;
+						x = w->parent;
+						if (!x->isblack || x == root) {
+							x->isblack = true;
+							break;
+						}
+						w = (x && x->parent && x->parent->left == x) ?
+								   x->parent->right :
+									x->parent->left;
+					}
+					else {
+						if (w->left == NULL || w->left->isblack) {
+							w->right->isblack = true;
+							w->isblack = false;
+							rb_left_rotate(root, w);
+							w = w->parent;
+						}
+						w->isblack = w->parent->isblack;
+						w->parent->isblack = true;
+						w->left->isblack = true;
+						rb_right_rotate(root, w->parent);
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+// PRINT ----------------------------------------------------------------------------------------------
+
+template <class NodePointer>
+static void _pretty_print(std::string prefix, NodePointer x, bool isleft, int iter);
+
+template <class NodePointer>
+void print_tree(NodePointer root) {
+	_pretty_print("", root, false, -1);
+	std::cout << std::endl;
+}
+
+template <class NodePointer>
+static void _pretty_print(std::string prefix, NodePointer x, bool isleft, int iter) {
+	++iter;
+	if (x == NULL) {
+		std::cout << "\033[0;34m"; // blue
+		std::cout << prefix;
+		std::cout << (isleft ? "├──" : "└──");
+		std::cout << iter;
+		std::cout << (isleft ? "L " : "R ");
+		std::cout << "\033[0m"; // no color
+		std::cout << "⁙";
+		std::cout << std::endl;
+	}
+	if (x != NULL) {
+		std::cout << "\033[0;34m"; // blue
+		std::cout << prefix;
+		if (iter == 0) {
+			std::cout << "└──";
+			std::cout << iter << "* ";
+		}
+		else {
+			std::cout << (isleft ? "├──" : "└──");
+			std::cout << iter;
+			std::cout << (isleft ? "L " : "R ");
+		}
+		std::cout << "\033[0m"; // no color
+		if (x->isblack == false)
+			std::cout << "\033[0;31m"; // red
+		std::cout << x->value;
+		/* un-/comment to print/not print node's addresses */
+			std::cout << " " << "\033[0;34m" << x; // blue
+		std::cout << "\033[0m" << std::endl; // no color
+		_pretty_print(prefix + (isleft ? "│     " : "      "), x->left, true, iter);
+		_pretty_print(prefix + (isleft ? "│     " : "      "), x->right, false, iter);
+	}
 }
 
 // -----------------------------------------------------------------------------------------------------------------
