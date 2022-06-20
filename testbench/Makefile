@@ -39,8 +39,8 @@ FT_LIB_TEMPLATES = \
 	utility.hpp \
 	vector.hpp \
 	stack.hpp \
-	map.hpp \
-	__rb_tree.hpp \
+	rb_tree.hpp \
+	# map.hpp 
 
 OTHER_HEADERS = \
 	ANSIpalette.h \
