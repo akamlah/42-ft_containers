@@ -1,5 +1,12 @@
+
+/* ************************************************************************ */
+/* ------------------------------- CONTENTS ----------------------------------
+--------------------------------------------------------------------------- */
+
 #ifndef FT_RB_TREE
 # define FT_RB_TREE
+
+#include "iterator.hpp"
 // leaves point to null.
 // root s.t. p = 0
 // node pointer algorithms separately.
@@ -7,147 +14,347 @@
 
 namespace ft { /* NAMESPACE FT */
 
-// tree node algorithms
-template <class NodePointer> NodePointer rb_min(NodePointer x);
-template <class NodePointer> NodePointer rb_max(NodePointer x);
-template <class NodePointer, typename T> NodePointer rb_search(NodePointer x, T value);
-template <class NodePointer> NodePointer rb_successor(NodePointer x);
-template <class NodePointer> NodePointer rb_predecessor(NodePointer x);
-template <class NodePointer> void rb_left_rotate(NodePointer& root, NodePointer x);
-template <class NodePointer> void rb_right_rotate(NodePointer& root, NodePointer x);
-template <class NodePointer> NodePointer rb_transplant(NodePointer& root, NodePointer u, NodePointer v);
-template <class NodePointer> void rb_insert(NodePointer& root, NodePointer node);
-template <class NodePointer> void rb_insert_fixup(NodePointer& root, NodePointer x);
-template <class NodePointer> void rb_delete(NodePointer& root, NodePointer z);
-template <class NodePointer> void rb_delete_fixup(NodePointer& root, NodePointer x);
 
-template <class NodePointer> void print_tree(NodePointer root);
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+------------------------
+	RED BLACK TREE
+------------------------
+Red-black tree datastructure implementation.
+The parent of the root is a node colled "_end_node"
+The leaves are implemented as nodes called "_NIL", for convenience in
+dealing with boundary conditions.
+So all last nodes point to _NIL.
+The end node is red.
+Root and _NIL are black.
+*/
 
-
-template <class T, class Compare = typename std::map<int, T>::key_compare, class Allocator = std::allocator<T> >
-class rb_tree { // red black tree ==============================================================================
-
-// member types, member classes, attributes. -------------------------------------------------------------------
+template <	class T,
+			class Compare = typename std::map<int, T>::key_compare,
+			class Allocator = std::allocator<T> > // ?????????????? or free here and pass in map?
+class rb_tree { 
 
 public:
 
-typedef T			value_type;
-typedef Compare		compare_type;
-typedef Allocator	value_allocator_type;
+typedef T												value_type;
+typedef Compare											compare_type;
+typedef Allocator										value_allocator_type;
 typedef typename value_allocator_type::pointer			pointer;
 typedef typename value_allocator_type::reference		reference;
 typedef typename value_allocator_type::const_reference	const_reference;
 
 private:
 
-struct rb_node { // red black nodes
-	struct rb_node* parent;
-	struct rb_node* left;
-	struct rb_node* right;
+class rb_node;
+friend class rb_node; // because access to _NIL, pvt attribute of tree classes, is needed
+
+class rb_node {
+public:
+	rb_node* parent;
+	rb_node* left;
+	rb_node* right;
 	value_type value;
 	bool isblack;
-	rb_node(): parent(NULL), left(NULL), right(NULL), isblack(false)
-		{}
-		// { std::cout << "deflt node constr." << std::endl; }
-	rb_node(value_type val): parent(NULL), left(NULL), right(NULL), value(val), isblack(false)
-		{}
-		// { std::cout << "value node constr." << std::endl; }
-	rb_node(const rb_node& other): parent(NULL), left(NULL), right(NULL), value(other.value), isblack(false)
-		{}
-		// { std::cout << "copy node constr." << std::endl; }
-	virtual ~rb_node()
-		{}
-		// { std::cout << "node destr." << std::endl; }
-	rb_node& operator=(const rb_node& other)
-		// { std::cout << "node COPY ASS OP." << std::endl; 
-		{
-			value = other.value; parent = other.parent; 
-			left = other.left; right = other.right; isblack = other.isblack; return (*this); } // ?
+	rb_node(): parent(NULL), left(NULL), right(NULL), value(), isblack(true) {}
+	rb_node(value_type val): parent(_NIL), left(_NIL), right(_NIL), value(val), isblack(false) {}
+	rb_node(const rb_node& other): parent(_NIL), left(_NIL), right(_NIL), value(other.value), isblack(false) {}
+	virtual ~rb_node() {}
+	void print_value() const { std::cout << value << std::endl; }
+	void __destroy() { rb_tree::_node_allocator.destroy(this); rb_tree::_node_allocator.deallocate(this, 1); }
 };
 
 public:
 
-typedef typename value_allocator_type::template rebind<rb_node>::other node_allocator_type;
-typedef typename node_allocator_type::pointer			node_pointer;
-typedef typename node_allocator_type::size_type			size_type;
-typedef typename node_allocator_type::difference_type	difference_type;
+typedef typename value_allocator_type::template rebind<rb_node>::other	node_allocator_type;
+typedef typename node_allocator_type::pointer							node_pointer;
+typedef typename node_allocator_type::size_type							size_type;
+typedef typename node_allocator_type::difference_type					difference_type;
+
+// class rb_iterator;
+// friend class rb_iterator; // also because access to _NIL and other functions needed. ?
+
+class rb_iterator {
+public:
+	typedef bidirectional_iterator_tag				iterator_category;
+	typedef typename rb_tree::value_type			value_type;
+	typedef typename rb_tree::difference_type		difference_type;
+	typedef typename rb_tree::reference				reference;
+	typedef typename rb_tree::pointer				pointer;
+private:
+	node_pointer _base;
+public:
+	rb_iterator(): _base(_NIL) {}
+	rb_iterator(const node_pointer& x): _base(x) {}
+	node_pointer get_base() const { return(_base); }
+	reference operator*() const { return(_base->value); }
+	pointer operator->() const { return (std::addressof(operator*())); }
+	rb_iterator& operator++() { _base = rb_successor(_base); return(*this); }
+	rb_iterator& operator--() { _base = rb_predecessor(_base); return(*this); }
+	rb_iterator operator++(int) { node_pointer old = _base; _base = rb_successor(_base); return(rb_iterator(old)); }
+	rb_iterator operator--(int) { node_pointer old = _base; _base = rb_predecessor(_base); return(rb_iterator(old)); }
+};
+
+// class rb_const_iterator {
+// public:
+// 	typedef bidirectional_iterator_tag				iterator_category;
+// 	typedef typename rb_tree::value_type			value_type;
+// 	typedef typename rb_tree::difference_type		difference_type;
+// 	typedef typename rb_tree::reference				reference;
+// 	typedef typename rb_tree::pointer				pointer;
+// private:
+// 	rb_iterator _non_const_ite;
+// public:
+// 	rb_const_iterator(): _non_const_ite() {}
+// 	rb_const_iterator(const node_pointer& x): _non_const_ite(x) {}
+// 	node_pointer get_base() const { return(_non_const_ite.get_base()); }
+// 	reference operator*() const { return(_non_const_ite.get_base()->value); }
+// 	pointer operator->() const { return (std::addressof(operator*())); }
+// 	rb_const_iterator& operator++() { _base = rb_successor(_base); return(*this); }
+// 	rb_const_iterator& operator--() { _base = rb_predecessor(_base); return(*this); }
+// 	rb_const_iterator operator++(int) { node_pointer old = _base; _base = rb_successor(_base); return(rb_const_iterator(old)); }
+// 	rb_const_iterator operator--(int) { node_pointer old = _base; _base = rb_predecessor(_base); return(rb_const_iterator(old)); }
+// };
+
+typedef rb_iterator			iterator;
+// typedef rb_const_iterator	const_iterator;
+
+// attributes - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 private:
 
 static node_allocator_type	_node_allocator;
 static value_allocator_type	_value_allocator;
-node_pointer _root;
+static node_pointer			_NIL;
+static size_type			_nb_trees;
 
-// member functions -----------------------------------------------------------------------------------------------
+node_pointer	_end_node;
+node_pointer	_root;
+size_type		_size;
 
-public: // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// publilc member functions - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-rb_tree(): _root(NULL) {}
+public:
 
-~rb_tree() { _clear(_root); }
+rb_tree(): _end_node(_new_node()), _root(_NIL), _size(0) {
+	++_nb_trees;
+	_end_node->isblack = false;
+}
 
-node_pointer insert(value_type value) {
-	// std::cout << "INSERTING " << value << std::endl;
+~rb_tree() {
+	_clear(_root);
+	_end_node->__destroy();
+	if (_nb_trees == 1)
+		_NIL->__destroy();
+	--_nb_trees;
+}
+
+// accessors - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+bool empty() const { return (_root == _NIL); }
+size_type size() const { return (_size); }
+node_pointer min() const { return (rb_min(_root)); }
+node_pointer max() const { return (rb_max(_root)); }
+node_pointer search(value_type value) const { return (_search(_root, value)); }
+
+iterator begin() const {return(iterator(min())); }
+// iterator end() const { return(iterator(_detatched_node)); } // ? 
+
+node_pointer successor(value_type value) const { return (rb_successor(search(value))); }
+node_pointer predecessor(value_type value) const { return (rb_predecessor(search(value))); }
+
+// modifiers - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+/*
+	INSERT VALUE
+	Allocates a node containing the value given and inserts it ito the
+	tree. Recoloring and rotation operations might be performed.
+	Returns [...]
+*/
+node_pointer insert(value_type value) { // or iterator as return ?? -> then change also map insert
 	node_pointer x = _new_node(value);
-	rb_insert(_root, x);
+	_tree_insert(x);
+	++_size;
 	return (x);
 }
 
+/*
+	DELETE VALUE
+	Seraches for a node containing the value given and removes it from
+	the tree. Does nothing if the value was not found.
+	Recoloring and rotation operations might be performed.
+*/
 void erase(const_reference value) {
-	std::cout << "DELETING " << value << std::endl;
-	node_pointer z = rb_search(_root, value);
-	if (z == NULL)
+	node_pointer z = search(value);
+	if (!z || z == _NIL)
 		return ;
 	node_pointer tmp_z = z;
-
-	rb_delete(_root, z);
-	// __tree_remove(_root, z);
-
-	_node_allocator.destroy(tmp_z);
-	_node_allocator.deallocate(tmp_z, 1);
+	_tree_delete(z);
+	tmp_z->__destroy();
+	--_size;
 }
 
-bool empty() const { return (_root == NULL); }
-// node_pointer root() const { return (_root); }
-node_pointer min() const { return (rb_min(_root)); }
-node_pointer max() const { return (rb_max(_root)); }
-node_pointer search(value_type value) const { return (rb_search(_root, value)); }
-node_pointer successor(value_type value) const { return (rb_successor<node_pointer, value_type>(search(value))); }
-node_pointer predecessor(value_type value) const { return (rb_predecessor<node_pointer, value_type>(search(value))); }
+// lookup - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-private: // internal structure/ memory management  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*
+	Prints tree (including _NIL nodes) horizontally. Example:
+	└──0* 8
+		├──1L 3
+		│     ├──2L ⁙
+		│     └──2R ⁙
+		└──1R 99
+			├──2L ⁙
+			└──2R ⁙
+*/
+void print_tree() const {
+	__pretty_print("", _root, false, -1);
+	std::cout << std::endl;
+}
 
+// internal structure/ memory management  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+private:
+
+// uses parametric constructor of node -> color == red, ptrs init to _NIL
 node_pointer _new_node(value_type value) {
 	node_pointer x = _node_allocator.allocate(1);
 	_node_allocator.construct(x, value);
 	return (x);
 }
 
+// uses dflt constr of node -> color == black, ptrs init to NULL
+node_pointer _new_node() {
+	node_pointer x = _node_allocator.allocate(1);
+	_node_allocator.construct(x);
+	return (x);
+}
+
+// uses dflt constr of node -> color == black, ptrs init to NULL
+static node_pointer _generate_nil_node() {
+	node_pointer x = _node_allocator.allocate(1);
+	_node_allocator.construct(x);
+	return (x);
+}
+
 // recursively destroys and frees the memory of all nodes of the subtree rooted in x.
 void _clear(node_pointer x) {
-	if (x) {
+	if (x != _NIL) {
 		// std::cout << "clear | " << x->value << std::endl;
 		_clear(x->left);
 		_clear(x->right);
-		_node_allocator.destroy(x);
-		_node_allocator.deallocate(x, 1);
+		x->__destroy();
+	}
+	_size = 0;
+}
+
+// (algorithms at end of file)
+node_pointer _search(node_pointer x, value_type value) const;
+void _right_rotate(node_pointer x);
+void _left_rotate(node_pointer x);
+void _transplant(node_pointer u, node_pointer v);
+void _tree_insert(node_pointer node);
+void _tree_insert_fixup(node_pointer node);
+void _tree_delete(node_pointer z);
+void _tree_delete_fixup(node_pointer x);
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// NON_MEMBER FUNCTIONS ('friend' for access to _NIL, in order to be used by iterators as well)
+
+/*
+	MAX
+	Returns pointer to node with maximum value or _NIL if the tree
+	is empty or the node passed was _NIL.
+*/
+friend node_pointer rb_max(node_pointer x) {
+	while (x != _NIL && x->right != _NIL)
+		x = x->right;
+	return (x);
+}
+
+/*
+	MIN
+	Returns pointer to node with minimum value or _NIL if the tree
+	is empty or the node passed was _NIL.
+*/
+friend node_pointer rb_min(node_pointer x) {
+	while (x != _NIL && x->left != _NIL)
+		x = x->left;
+	return (x);
+}
+
+/*
+	SUCCESSOR
+	Returns a pointer to the node with the next greater value after x, else NULL.
+	'y->parent != NULL' checks that y != _end_node indirectly
+*/
+friend node_pointer rb_successor(node_pointer x) {
+	if (x == _NIL)
+		return (_NIL);
+	if (x->right != _NIL)
+		return (rb_min(x->right));
+	node_pointer y = x->parent;
+	while (y != _NIL && y->parent != NULL && x == y->right) {
+		x = y;
+		y = y->parent;
+	}
+	return (y);
+}
+
+/*
+	PREDECESSOR
+	Returns a pointer to the node with the next smallest value before x, else NULL.
+	'y->parent != NULL' checks that y != _end_node indirectly
+*/
+friend node_pointer rb_predecessor(node_pointer x) {
+	if (x == _NIL)
+		return (_NIL);
+	if (x->left != _NIL)
+		return (rb_max(x->left));
+	node_pointer y = x->parent;
+	while (y != _NIL && y->parent != NULL && x == y->left) {
+		x = y;
+		y = y->parent;
+	}
+	return (y);
+}
+
+// debugging print function - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+/* Recursive core of print_tree() */
+void __pretty_print(std::string prefix, node_pointer x, bool isleft, int iter) const {
+	++iter;
+	if (x == _NIL) {
+		std::cout << "\033[0;34m";
+		std::cout << prefix;
+		std::cout << (isleft ? "├──" : "└──");
+		std::cout << iter;
+		std::cout << (isleft ? "L " : "R ");
+		std::cout << "\033[0m";
+		std::cout << "⁙";
+		std::cout << "\033[0;34m" << " " << x << "\033[0m";
+		std::cout << std::endl;
+	}
+	if (x != _NIL) {
+		std::cout << "\033[0;34m";
+		std::cout << prefix;
+		if (x == _root) {
+			std::cout << "└──";
+			std::cout << iter << "* ";
+		}
+		else {
+			std::cout << (isleft ? "├──" : "└──");
+			std::cout << iter;
+			std::cout << (isleft ? "L " : "R ");
+		}
+		std::cout << "\033[0m";
+		if (x->isblack == false)
+			std::cout << "\033[0;31m";
+		std::cout << x->value << " " << "\033[0;34m" << x;
+		std::cout << "\033[0m" << std::endl;
+		__pretty_print(prefix + (isleft ? "│     " : "      "), x->left, true, iter);
+		__pretty_print(prefix + (isleft ? "│     " : "      "), x->right, false, iter);
 	}
 }
 
-// fancy print function ----------------------------------------------------------------------------------
-public:
-	/* Prints tree (including NULL leaves) horizontally. Example:
-	└──0* 8
-	    ├──1L 3
-	    │     ├──2L ⁙
-	    │     └──2R ⁙
-	    └──1R 99
-	            ├──2L ⁙
-	            └──2R ⁙    */
-	void print_tree() const {
-		::ft::print_tree(_root);
-	}
-}; // RB TREE ======================================================================================================
+}; // RB TREE ===========================================================================================
 
 // static tree node allocator attribute definition:
 template <class Value, class Compare, class Allocator>
@@ -159,31 +366,31 @@ template <class Value, class Compare, class Allocator>
 	typename rb_tree<Value, Compare, Allocator>::value_allocator_type
 	rb_tree<Value, Compare, Allocator>::_value_allocator;
 
+// static tree nil attribute definition:
+template <class Value, class Compare, class Allocator>
+	typename rb_tree<Value, Compare, Allocator>::node_pointer
+		rb_tree<Value, Compare, Allocator>::_NIL = _generate_nil_node();
 
-// instance indipendent tree node ALGORITHMS ======================================================================
+// static tree instance counter _nb_trees attribute definition:
+template <class Value, class Compare, class Allocator>
+	typename rb_tree<Value, Compare, Allocator>::size_type
+		rb_tree<Value, Compare, Allocator>::_nb_trees = 0;
 
-// queries - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// tree node ALGORITHMS (member functions) ==============================================================
 
-// Returns min of subtree rooted in x, NULL if x was NULL.
-template <class NodePointer>
-NodePointer rb_min(NodePointer x) {
-	while (x && x->left)
-		x = x->left;
-	return (x);
-}
+/*
+	-----------
+	SEARCH
+	-----------
 
-// Returns max of subtree rooted in x, NULL if x was NULL.
-template <class NodePointer>
-NodePointer rb_max(NodePointer x) {
-	while (x && x->right)
-		x = x->right;
-	return (x);
-}
-
-// Returns pointer to node containing value 'value' in subtree<T> rooted in x, else NULL.
-template <class NodePointer, typename T>
-NodePointer rb_search(NodePointer x, T value) {
-	while (x && value != x->value) {
+	Searches for a node containing the value given in a (sub-)tree rooted
+	in the passed node. Returns a pointer to the node found or _NIL
+	if the tree was empty or no node was found.
+*/
+template <class Value, class Compare, class Allocator>
+typename rb_tree<Value, Compare, Allocator>::
+node_pointer rb_tree<Value, Compare, Allocator>::_search(node_pointer x, value_type value) const {
+	while (x != _NIL && value != x->value) {
 		if (value < x->value)
 			x = x->left;
 		else
@@ -192,47 +399,34 @@ NodePointer rb_search(NodePointer x, T value) {
 	return (x);
 }
 
-// Returns a pointer to the node with the next greater value after x, else NULL.
-template <class NodePointer>
-NodePointer rb_successor(NodePointer x) {
-	if (!x)
-		return (NULL);
-	if (x->right)
-		return (rb_min(x->right));
-	NodePointer y = x->parent;
-	while (y && x == y->right) {
-		x = y;
-		y = y->parent;
-	}
-	return (y);
-}
+/* ---------------
+	ROTATIONS
+------------------
+X, Y are nodes, a,b, and c subtrees (either nodes, _NIL, or branching subtrees)
+Rotations are reversible and change the local structure as follows:
+|                                                      |
+|       |          right rotate X ->         |         |
+|       X                                    Y         |
+|      / \         <- left rotate Y         / \        |
+|     a   Y                                X   c       |
+|        / \                              / \          |
+|       b   c                            a   b         |
+|                                                      |
+*/
 
-// Returns a pointer to the node with the next smallest value before x, else NULL.
-template <class NodePointer>
-NodePointer rb_predecessor(NodePointer x) {
-	if (!x)
-		return (NULL);
-	if (x->left)
-		return (rb_max(x->left));
-	NodePointer y = x->parent;
-	while (y && x == y->left) {
-		x = y;
-		y = y->parent;
-	}
-	return (y);
-}
-
-// modeifiers - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <class NodePointer>
-void rb_left_rotate(NodePointer& root, NodePointer x) {
-	NodePointer y = x->right;
+/*
+	Right-rotates a node assuming node->right != _NIL
+	and the root's parent is _end_node
+*/
+template <class Value, class Compare, class Allocator>
+void rb_tree<Value, Compare, Allocator>::_left_rotate(node_pointer x) {
+	node_pointer y = x->right;
 	x->right = y->left;
-	if (y->left != NULL)
+	if (y->left != _NIL)
 		y->left->parent = x;
 	y->parent = x->parent;
-	if (x->parent == NULL)
-		root = y;
+	if (x->parent == _end_node)
+		_root = y;
 	else if (x == x->parent->left)
 		x->parent->left = y;
 	else
@@ -241,15 +435,19 @@ void rb_left_rotate(NodePointer& root, NodePointer x) {
 	x->parent = y;
 }
 
-template <class NodePointer>
-void rb_right_rotate(NodePointer& root, NodePointer x) {
-	NodePointer y = x->left;
+/*
+	Right-rotates a node assuming node->left != _NIL
+	and the root's parent is _end_node
+*/
+template <class Value, class Compare, class Allocator>
+void rb_tree<Value, Compare, Allocator>:: _right_rotate(node_pointer x) {
+	node_pointer y = x->left;
 	x->left = y->right;
-	if (y->right != NULL)
+	if (y->right != _NIL)
 		y->right->parent = x;
 	y->parent = x->parent;
-	if (x->parent == NULL)
-		root = y;
+	if (x->parent == _end_node)
+		_root = y;
 	else if (x == x->parent->right)
 		x->parent->right = y;
 	else
@@ -258,29 +456,37 @@ void rb_right_rotate(NodePointer& root, NodePointer x) {
 	x->parent = y;
 }
 
-template <class NodePointer>
-NodePointer rb_transplant(NodePointer& root, NodePointer u, NodePointer v) {
-	std::cout << "TRANSPLANT | u:" << u << " v:" << v << std::endl; // !
-	if (!u->parent)
-		root = v;
+/* ---------------
+	TRANSPLANT
+--------------- */
+
+/*
+	Replaces subtree rooted at node u with subtree rooted at node v.
+	Does not update v->left and v->right.
+*/
+template <class Value, class Compare, class Allocator>
+void rb_tree<Value, Compare, Allocator>::_transplant(node_pointer u, node_pointer v) {
+	if (u->parent == _end_node)
+		_root = v;
 	else if (u == u->parent->left)
 		u->parent->left = v;
 	else
 		u->parent->right = v;
-	if (v)
-		v->parent = u->parent;
-	return u;
+	v->parent = u->parent;
 }
 
 /* ---------------
 	INSERTION
 --------------- */
-
-template <class NodePointer>
-void rb_insert(NodePointer& root, NodePointer node) {
-	NodePointer y = NULL;
-	NodePointer x = root;
-	while (x != NULL) {
+/*
+	Inserts nodes following standard binary search tree insertion routine
+	afterwards calling _tree_insert_fixup to restore red-black properties.
+*/
+template <class Value, class Compare, class Allocator>
+void rb_tree<Value, Compare, Allocator>::_tree_insert(node_pointer node) {
+	node_pointer y = _NIL;
+	node_pointer x = _root;
+	while (x != _NIL) {
 		y = x;
 		if (node->value < x->value)
 			x = x->left;
@@ -288,72 +494,80 @@ void rb_insert(NodePointer& root, NodePointer node) {
 			x = x->right;
 	}
 	node->parent = y;
-	if (y == NULL) {
-		root = node;
-		root->isblack = true;
+	if (y == _NIL) {
+		_root = node;
+		node->parent = _end_node;
+		_end_node->left = _root;
+		_end_node->right = _root;
+		_root->isblack = true;
 	}
 	else {
 		if (node->value < y->value)
 			y->left = node;
 		else
 			y->right = node;
-		rb_insert_fixup(root, node);
+		_tree_insert_fixup(node);
 	}
 }
 
-template <class NodePointer>
-void rb_insert_fixup(NodePointer& root, NodePointer x) {
-	NodePointer y;
-	while (x != root && x->parent && !x->parent->isblack ) {
+/*
+	Performs recoloring and rotations to rebalance the tree and restore
+	red-black properties after insertion.
+*/
+template <class Value, class Compare, class Allocator>
+void rb_tree<Value, Compare, Allocator>::_tree_insert_fixup(node_pointer x) {
+	node_pointer y;
+	while (x != _root && !x->parent->isblack) {
 	/* CASES A: px is left child of ppx */
 		if (x->parent == x->parent->parent->left) {
 			y = x->parent->parent->right;
-			/* CASE 1: uncle is red (& not NULL, same cond because NULL->isblack = true) */
-			if (y && !y->isblack) {
+			/* CASE 1: uncle is red (& not _NIL, same cond because _NIL->isblack = true) */
+			std::cout << x << std::endl;
+			if (!y->isblack) {
 				x = x->parent;
 				x->isblack = true;
 				x = x->parent;
-				x->isblack = (x == root);
+				x->isblack = (x == _root);
 				y->isblack = true;
 			}
-			/* CASE 2+3: uncle is black (or NULL) */
+			/* CASE 2+3: uncle is black (or _NIL) */
 			else {
 				/* CASE 2: x is right child */
 				if (x == x->parent->right) {
 					x = x->parent;
-					rb_left_rotate(root, x);
+					_left_rotate(x);
 				}
 				/* CASE 3 */
 				x->parent->isblack = true;
 				x->parent->parent->isblack = false;
 				x = x->parent->parent;
-				rb_right_rotate(root, x);
+				_right_rotate(x);
 				break ;
 			}
 		}
 	/* CASES B: px is left child of ppx */
 		else {
 			y = x->parent->parent->left;
-			/* CASE 1: uncle is red (& not null, same cond because NULL->isblack = true) */
-			if (y && !y->isblack) {
+			/* CASE 1: uncle is red (& not null, same cond because _NIL->isblack = true) */
+			if (!y->isblack) {
 				x = x->parent;
 				x->isblack = true;
 				x = x->parent;
-				x->isblack = (x == root);
+				x->isblack = (x == _root);
 				y->isblack = true;
 			}
-			/* CASE 2+3: uncle is black (or NULL) */ 
+			/* CASE 2+3: uncle is black (or _NIL) */ 
 			else {
 				/* CASE 2: x is left child */
 				if (x == x->parent->left) {
 					x = x->parent;
-					rb_right_rotate(root, x);
+					_right_rotate(x);
 				}
 				/* CASE 3 */
 				x->parent->isblack = true;
 				x->parent->parent->isblack = false;
 				x = x->parent->parent;
-				rb_left_rotate(root, x);
+				_left_rotate(x);
 				break ;
 			}
 		}
@@ -363,308 +577,146 @@ void rb_insert_fixup(NodePointer& root, NodePointer x) {
 /* ---------------
 	DELETION
 --------------- */
-
-template <class NodePointer> // buggy - to solve. in the meantime use __tree_remove from the STL
-void rb_delete(NodePointer& root, NodePointer z) {
-	NodePointer y = z; // silbling
-	NodePointer x; // moves into node y's original position
-	bool y_was_black = y->isblack;
-	if (!z->left) {
-		// std::cout << "rb_delete | case z-left == null" << std::endl;
-		x = z->right;
-		rb_transplant(root, z, z->right);
+/*
+	Standard binary search tree deletion algorithm + color tmp variables
+	and maintenance of a pointer to the pivot for the fixup routine.
+	Calls fixup function to restore red-black properties.
+	CASE 1 (else): z has empty left subtree
+	CASE 2 (else if): z has non-empty left subtree but empty right subtree
+	CASE 3+4 (else): z has both non-empty left and non-empty right subtrees
+		CASE 3 (if): z->R min was z'successor
+		CASE 4 (else): z->R min is not z's child (i.e. successor)
+		Both converge to a final transplant.
+*/
+template <class Value, class Compare, class Allocator>
+void rb_tree<Value, Compare, Allocator>::_tree_delete(node_pointer z) {
+	node_pointer fixup_pivot;
+	bool was_black = z->isblack;
+	if (z->left == _NIL) {
+		fixup_pivot = z->right;
+		_transplant(z, z->right);
 	}
-	else if (!z->right) {
-		// std::cout << "rb_delete | case z-left == null" << std::endl;
-		x = z->left;
-		rb_transplant(root, z, z->left);
+	else if (z->right == _NIL) {
+		fixup_pivot = z->left;
+		_transplant(z, z->left);
 	}
 	else {
-		// std::cout << "rb_delete | case 2 children" << std::endl;
-
-		y = rb_min(z->right);
-		// std::cout << "min is " << y->value << std::endl;
-		y_was_black = y->isblack;
-		x = y->right;
-
-		// if (y->parent == z)
-		// 	x->parent = y; // x could be null -> segv
-		// else {
-		// 	rb_transplant(root, y, y->right);
-		// 	y->right = z->right;
-		// 	y->right->parent = y;
-		// }
-
-		if (y->parent != z) {
-			rb_transplant(root, y, y->right);
+		node_pointer y = rb_min(z->right);
+		was_black = y->isblack;
+		fixup_pivot = y->right;
+		if (y->parent == z)
+			/* pivot can be _NIL, storing p info for fixup */
+			fixup_pivot->parent = y;
+		else {
+			_transplant(y, y->right);
 			y->right = z->right;
 			y->right->parent = y;
-			// print_tree(root);
 		}
-
-		rb_transplant(root, z, y);
+		_transplant(z, y);
 		y->left = z->left;
 		y->left->parent = y;
 		y->isblack = z->isblack;
 	}
-	if (y_was_black)
-		rb_delete_fixup(root, x);
+	if (was_black && _root != _NIL)
+		_tree_delete_fixup(fixup_pivot);
 }
 
-template <class NodePointer>
-void rb_delete_fixup(NodePointer& root, NodePointer x) {
-	NodePointer y; // sibling of x
-	while (x != root && x && x->isblack) { // CASES A: x is left child, sibling y is right child
+/*
+	Deletion fixup recoloring and rotation routine to restore
+	red-black properties of the tree.
+*/
+template <class Value, class Compare, class Allocator>
+void rb_tree<Value, Compare, Allocator>::_tree_delete_fixup(node_pointer x) {
+	node_pointer y; /* sibling of x */
+	while (x != _root && x->isblack) {
+	/* CASES A: x is left child, sibling y is right child */
 		if (x == x->parent->left) {
 			y = x->parent->right;
-			if (y && !y->isblack) { // CASE 1: sibling y is red. Goes into case 2/3/4.
+			/* CASE 1: sibling y is red. Goes into case 2/3/4. */
+			if (!y->isblack) {
 				y->parent->isblack = false;
 				y->isblack = true;
-				rb_left_rotate(root, y->parent);
-				if (root == y->left)
-					root = y;
+				_left_rotate(y->parent);
+				if (_root == y->left)
+					_root = y;
 				y = y->left->right;
 			}
-			if (y->left->isblack && y->right->isblack) { // CASE 2: y is black and both childern are black
+			/* CASE 2: y is black and both childern are black */
+			if (y->left->isblack && y->right->isblack) {
 				y->isblack = false;
 				x = y->parent;
-
-				if (!x->isblack || x == root) {
-					x->isblack = true;
-					break ;
-				}
-				if (y == x->left)
-					y = x->parent->right;
-				else
-					y = x->parent->left;
-
+				// if (x == _NIL->isblack || x == _root) {
+				// 	x->isblack = true;
+				// 	break ;
+				// }
+				// if (y == x->left)
+				// 	y = x->parent->right;
+				// else
+				// 	y = x->parent->left;
 			}
-			else { // CASE 3(+4): y is black and only right child is black
-				if (!y->right->isblack && y->right != NULL) {
+			else {
+				/* CASE 3(+4): y is black and only right child is black */
+				if (!y->right->isblack && y->right != _NIL) {
 					y->left->isblack = true;
 					y->isblack = false;
-					rb_right_rotate(root, y);
+					_right_rotate(y);
 					y = y->parent;
 				}
-				// CASE 4: y is black and only right child is black
+				/* CASE 4: y is black and only right child is black */
 				y->isblack = x->parent->isblack;
 				y->parent->isblack = true;
 				y->right->isblack = true;
-				rb_left_rotate(root, y->parent);
+				_left_rotate(y->parent);
 				break ;
 			}
 		}
-		else { // CASES B: x is right child, sibling y is left child
+	/* CASES B: x is right child, sibling y is left child */
+		else {
 			y = x->parent->left;
-			if (y && !y->isblack) { // CASE 1: sibling y is red. Goes into case 2/3/4.
+			/* CASE 1: sibling y is red. Goes into case 2/3/4. */
+			if (!y->isblack) {
 				y->parent->isblack = false;
 				y->isblack = true;
-				rb_right_rotate(root, y->parent);
-				if (root == y->right)
-					root = y;
+				_right_rotate(y->parent);
+				if (_root == y->right)
+					_root = y;
 				y = y->right->left;
 			}
-			if (y->left->isblack && y->right->isblack) { // CASE 2: y is black and both childern are black
+			/* CASE 2: y is black and both childern are black */
+			if (y->left->isblack && y->right->isblack) {
 				y->isblack = false;
 				x = y->parent;
-
-				if (!x->isblack || x == root) {
-					x->isblack = true;
-					break ;
-				}
-				if (y == x->left)
-					y = x->parent->right;
-				else
-					y = x->parent->left;
-
+				// if (x == _NIL->isblack || x == _root) {
+				// 	x->isblack = true;
+				// 	break ;
+				// }
+				// if (y == x->left)
+				// 	y = x->parent->right;
+				// else
+				// 	y = x->parent->left;
 			}
-			else { // CASE 3(+4): y is black and only right child is black
-				if (y->left && y->right /* ? */ && y->left->isblack) {
+			else {
+				/* CASE 3(+4): y is black and only right child is black */
+				if (y->left->isblack || y->left == _NIL) {
 					y->right->isblack = true;
 					y->isblack = false;
-					rb_left_rotate(root, y);
+					_left_rotate(y);
 					y = y->parent;
 				}
-				// CASE 4: y is black and only right child is black
+				/* CASE 4: y is black and only right child is black */
 				y->isblack = y->parent->isblack;
 				y->parent->isblack = true;
 				y->left->isblack = true;
-				rb_right_rotate(root, y->parent);
+				_right_rotate(y->parent);
 				break ;
 			}
 		}
 	}
-	if (x)
-		x->isblack = true;
+	x->isblack = true;
 }
 
-template <class NodePointer>
-void
-__tree_remove(NodePointer root, NodePointer z)
-{
-	NodePointer y = (z->left == NULL || z->right == NULL) ?
-		z : rb_successor<NodePointer>(z);
-	NodePointer x = y->left != NULL ? y->left : y->right;
-	NodePointer w = NULL;
-	if (x != NULL)
-		x->parent = y->parent;
-	if (y && y->parent && y->parent->left == y) {
-		y->parent->left = x;
-		if (y != root)
-			w = y->parent->right;
-		else
-			root = x;
-	}
-	else {
-		y->parent->right = x;
-		w = y->parent->left;
-	}
-	bool removed_black = y->isblack;
-	if (y != z) {
-		y->parent = z->parent;
-		if (z && z->parent && z->parent->left == z)
-			y->parent->left = y;
-		else
-			y->parent->right = y;
-		y->left = z->left;
-		y->left->parent = y;
-		y->right = z->right;
-		if (y->right != NULL)
-			y->right->parent = y;
-		y->isblack = z->isblack;
-		if (root == z)
-			root = y;
-	}
-	if (removed_black && root != NULL) {
-		if (x != NULL)
-			x->isblack = true;
-		else {
-			while (true) {
-				if (!(w && w->parent && w->parent->left == w)) {
-					if (!w->isblack) {
-						w->isblack = true;
-						w->parent->isblack = false;
-						rb_left_rotate(root, w->parent);
-						if (root == w->left)
-							root = w;
-						w = w->left->right;
-					}
-					if ((w->left  == NULL || w->left->isblack) &&
-						(w->right == NULL || w->right->isblack)) {
-						w->isblack = false;
-						x = w->parent;
-						if (x == root || !x->isblack) {
-							x->isblack = true;
-							break;
-						}
-						w = (w && w->parent && w->parent->left == w) ?
-									x->parent->right :
-									x->parent->left;
-					}
-					else {
-						if (w->right == NULL || w->right->isblack) {
-							w->left->isblack = true;
-							w->isblack = false;
-							rb_right_rotate(root, w);
-							w = w->parent;
-						}
-						w->isblack = w->parent->isblack;
-						w->parent->isblack = true;
-						w->right->isblack = true;
-						rb_left_rotate(root, w->parent);
-						break;
-					}
-				}
-				else {
-					if (!w->isblack) {
-						w->isblack = true;
-						w->parent->isblack = false;
-						rb_right_rotate(root, w->parent);
-						if (root == w->right)
-							root = w;
-						w = w->right->left;
-					}
-					if ((w->left  == NULL || w->left->isblack) &&
-						(w->right == NULL || w->right->isblack)) {
-						w->isblack = false;
-						x = w->parent;
-						if (!x->isblack || x == root) {
-							x->isblack = true;
-							break;
-						}
-						w = (x && x->parent && x->parent->left == x) ?
-								   x->parent->right :
-									x->parent->left;
-					}
-					else {
-						if (w->left == NULL || w->left->isblack) {
-							w->right->isblack = true;
-							w->isblack = false;
-							rb_left_rotate(root, w);
-							w = w->parent;
-						}
-						w->isblack = w->parent->isblack;
-						w->parent->isblack = true;
-						w->left->isblack = true;
-						rb_right_rotate(root, w->parent);
-						break;
-					}
-				}
-			}
-		}
-	}
-}
+} /* NAMESPACE FT end ------------------------------------------------------*/
 
-// PRINT ----------------------------------------------------------------------------------------------
+#endif // _FTRB_TREE_HPP_
 
-template <class NodePointer>
-static void _pretty_print(std::string prefix, NodePointer x, bool isleft, int iter);
-
-template <class NodePointer>
-void print_tree(NodePointer root) {
-	_pretty_print("", root, false, -1);
-	std::cout << std::endl;
-}
-
-template <class NodePointer>
-static void _pretty_print(std::string prefix, NodePointer x, bool isleft, int iter) {
-	++iter;
-	if (x == NULL) {
-		std::cout << "\033[0;34m"; // blue
-		std::cout << prefix;
-		std::cout << (isleft ? "├──" : "└──");
-		std::cout << iter;
-		std::cout << (isleft ? "L " : "R ");
-		std::cout << "\033[0m"; // no color
-		std::cout << "⁙";
-		std::cout << std::endl;
-	}
-	if (x != NULL) {
-		std::cout << "\033[0;34m"; // blue
-		std::cout << prefix;
-		if (iter == 0) {
-			std::cout << "└──";
-			std::cout << iter << "* ";
-		}
-		else {
-			std::cout << (isleft ? "├──" : "└──");
-			std::cout << iter;
-			std::cout << (isleft ? "L " : "R ");
-		}
-		std::cout << "\033[0m"; // no color
-		if (x->isblack == false)
-			std::cout << "\033[0;31m"; // red
-		std::cout << x->value;
-		/* un-/comment to print/not print node's addresses */
-			std::cout << " " << "\033[0;34m" << x; // blue
-		std::cout << "\033[0m" << std::endl; // no color
-		_pretty_print(prefix + (isleft ? "│     " : "      "), x->left, true, iter);
-		_pretty_print(prefix + (isleft ? "│     " : "      "), x->right, false, iter);
-	}
-}
-
-// -----------------------------------------------------------------------------------------------------------------
-
-} /* NAMESPACE FT */
-
-#endif // FT_RB_TREE
+#undef DBG_ME
