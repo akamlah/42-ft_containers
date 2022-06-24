@@ -217,10 +217,12 @@ void std_map_test() {
 	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(280)		, "i" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(280)		, "i"		))	).first)->second) << "\n";
 	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(223)		, "r" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(223)		, "r"		))	).first)->second) << "\n";
 	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(225)		, "s" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(225)		, "s"		))	).first)->second) << "\n";
-
-	// m.erase(var1);
-
 	m.print();
+
+	std::cout << "-----------------------" << std::endl;
+	m.erase(_TestType1__(12));
+	// m.print();
+	std::cout << "-----------------------" << std::endl;
 // 	m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(99)		, "a"		)); // just gets ignored.
 // 	print_map(m);
 	(void)m;

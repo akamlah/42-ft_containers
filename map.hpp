@@ -178,7 +178,7 @@ public:
 	// typedef typename std::pair<const Key, T>		value_type;
 	typedef typename ft::pair<const Key, T>		value_type; // has overload << for debugging 
 
-	class value_compare {
+	class value_compare { // hacky ...
 		public:
 		// value_compare() { std::cout << "comp constr" << std::endl; }
 		bool operator()( const value_type& lhs, const value_type& rhs ) const {
@@ -187,7 +187,7 @@ public:
 		}
 	};
 
-	value_compare _comp; // ???
+	// value_compare _comp; // ???
 
 	typedef Key			key_type;
 	typedef T			mapped_type;
@@ -227,7 +227,7 @@ void print() const { _tree.print_tree(); } // DEBUGGING - REMOVE ?
 
 /* ------------------------ construction: --------------------------------- */
 
-map(): _tree(_comp) {}
+map() {}//: _tree(_comp)
 
 // 	explicit map(const Compare& comp, const Allocator& alloc = Allocator());
 
@@ -279,13 +279,13 @@ iterator begin() { return (iterator(_tree.begin())); }
 	ft::pair<iterator, bool> insert( const value_type& value ) {
 	// std::pair<iterator, bool> insert( const value_type& value ) {
 		tree_iterator x(_tree.search(value)); // UGLY !! replace with FIND()
-		if (x.get_base_ptr() != _tree.NIL()) // UGLY!! make map ite wrap this ! // regarding nil: other solution is make search return NULL if x == NIL.
+		if (x != _tree.NIL()) // UGLY!! make map ite wrap this ! // regarding nil: other solution is make search return NULL if x == NIL.
 		{
 			// return(std::make_pair(iterator(x), false));
 			return(ft::make_pair(iterator(x), false));
 		}
 		// return (std::make_pair(iterator(tree_iterator(_tree.insert(value))), true)); // change std::make_pair
-		return (ft::make_pair(iterator(tree_iterator(_tree.insert(value))), true)); // change std::make_pair
+		return (ft::make_pair(iterator(_tree.insert(value)), true)); // change std::make_pair
 	}
 
 // 	iterator insert( iterator hint, const value_type& value );
@@ -295,7 +295,7 @@ iterator begin() { return (iterator(_tree.begin())); }
 
 // /* ------------------------ deletion -------------------------------------- */
 
-// 	void clear();
+void clear() { _tree.clear(); }
 
 void erase( iterator pos ) {
 	_tree.erase(pos.get_tree_ite());
@@ -303,7 +303,14 @@ void erase( iterator pos ) {
 
 // 	void erase( iterator first, iterator last );
 
-size_type erase( const Key& key );
+size_type erase( const Key& key ) {
+	iterator x = _key_search(key);
+	if (x == _tree.NIL())
+		std::cout << " FOUND: NIL" << std::endl; // this is why i'd prefer to make search return NULL if return nil -> so map does not need nil access
+	else
+		std::cout << " FOUND: " << *x << std::endl;
+	return (0); // todo
+}
 
 // /*  ----------------------- swap: ----------------------------------------- */
 
@@ -315,7 +322,14 @@ size_type erase( const Key& key );
 
 iterator find( const Key& key );
 
+
+private:
 // 	const_iterator find( const Key& key ) const;
+iterator _key_search(const Key& key) const {
+	for ()
+}
+public:
+
 
 // 	ft::pair<iterator,iterator> equal_range( const Key& key );
 
