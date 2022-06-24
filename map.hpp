@@ -102,6 +102,7 @@ NON MEMBER FUNCTIONS
 
 //TEST ONLY
 #include <__tree> // REMOVE
+#include <map> // REMOVE
 
 // ft::
 #include "iterator.hpp"
@@ -111,38 +112,43 @@ NON MEMBER FUNCTIONS
 
 namespace ft { /* NAMESPACE FT */
 
+// template<class,class,class> class rb_tree;
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-// template <class TreeIterator>
-// class map_iterator {
-// 	typedef TreeIterator							tree_ite_type;
-// 	typedef bidirectional_iterator_tag				iterator_category;
-// 	typedef typename tree_ite_type::value_type		value_type; // PAIR
-// 	typedef typename tree_ite_type::difference_type	difference_type;
-// 	typedef typename tree_ite_type::reference		reference;
-// 	typedef typename tree_ite_type::pointer			pointer;
-// 	typedef typename tree_ite_type::node_pointer	node_pointer;
-// private:
-// 	tree_ite_type	_tree_ite;
-// public:
-// 	map_iterator(const tree_ite_type& tree_ite): _tree_ite(tree_ite) {}
-// 	map_iterator(const map_iterator& other): _tree_ite(other._tree_ite) {}
-// 	tree_ite_type get_tree_ite() const { return(_tree_ite); }
-// 	map_iterator& operator=(const map_iterator& other) { _tree_ite = other._tree_ite; return(*this); }
+template <class TreeIterator>
+class map_iterator {
+	typedef TreeIterator							tree_ite_type;
+	typedef bidirectional_iterator_tag				iterator_category;
+	typedef typename tree_ite_type::value_type		value_type; // PAIR
+	typedef typename tree_ite_type::difference_type	difference_type;
+	typedef typename tree_ite_type::reference		reference;
+	typedef typename tree_ite_type::pointer			pointer;
+	typedef typename tree_ite_type::node_pointer	node_pointer;
+private:
+	tree_ite_type	_tree_ite;
+public:
+	map_iterator(const tree_ite_type& tree_ite): _tree_ite(tree_ite) {}
+	map_iterator(const map_iterator& other): _tree_ite(other._tree_ite) {}
 
-// 	reference operator*() const { return(*_tree_ite); } // ???????????????????????????????????????????
-// 	pointer operator->() const { return (std::addressof(operator*())); }
+	map_iterator(void* pointer_to_node): _tree_ite(pointer_to_node) {} // ???? 
 
-// 	map_iterator& operator++() { ++_tree_ite; return (*this); }
-// 	map_iterator& operator--() { --_tree_ite; return (*this); }
-// 	map_iterator operator++(int) { tree_ite_type old = _tree_ite; ++_tree_ite; return(map_iterator(old)); }
-// 	map_iterator operator--(int) { tree_ite_type old = _tree_ite; --_tree_ite; return(map_iterator(old)); }
+	tree_ite_type get_tree_ite() const { return(_tree_ite); }
+	map_iterator& operator=(const map_iterator& other) { _tree_ite = other._tree_ite; return(*this); }
+
+	reference operator*() const { return(*_tree_ite); } // ???
+	pointer operator->() const { return (std::addressof(operator*())); }
+
+	map_iterator& operator++() { ++_tree_ite; return (*this); }
+	map_iterator& operator--() { --_tree_ite; return (*this); }
+	map_iterator operator++(int) { tree_ite_type old = _tree_ite; ++_tree_ite; return(map_iterator(old)); }
+	map_iterator operator--(int) { tree_ite_type old = _tree_ite; --_tree_ite; return(map_iterator(old)); }
 	
-// 	friend bool operator==(const map_iterator& lhs, const map_iterator& rhs)
-// 		{ return(lhs.get_tree_ite() == rhs.get_tree_ite()); }
-// 	friend bool operator!=(const map_iterator& lhs, const map_iterator& rhs)
-// 		{ return(!(lhs == rhs)); }
-// };
+	friend bool operator==(const map_iterator& lhs, const map_iterator& rhs)
+		{ return(lhs.get_tree_ite() == rhs.get_tree_ite()); }
+	friend bool operator!=(const map_iterator& lhs, const map_iterator& rhs)
+		{ return(!(lhs == rhs)); }
+};
 
 // template <class TreeConstIterator>
 // class map_const_iterator {
@@ -162,14 +168,26 @@ namespace ft { /* NAMESPACE FT */
 template < /* MAP */
 	class Key,
 	class T,
-	class Compare = std::less<Key>,
-	// class Allocator = std::allocator<ft::pair<const Key, T> > >
-	class Allocator = std::allocator<std::pair<const Key, T> > > // TESTING - UNCOMMENT ALSO IN TYPEDEFS
+	class Compare = std::less<Key>, // TOD OWN 
+	class Allocator = std::allocator<ft::pair<const Key, T> > >
+	// class Allocator = std::allocator<std::pair<const Key, T> > > // std pair for TESTING - UNCOMMENT ALSO IN TYPEDEFS
 class map {
 
 public:
 
-	class value_compare;
+	// typedef typename std::pair<const Key, T>		value_type;
+	typedef typename ft::pair<const Key, T>		value_type; // has overload << for debugging 
+
+	class value_compare {
+		public:
+		// value_compare() { std::cout << "comp constr" << std::endl; }
+		bool operator()( const value_type& lhs, const value_type& rhs ) const {
+			std::cout << "comparing " << std::endl;
+			return (key_compare()(lhs.first, rhs.first));
+		}
+	};
+
+	value_compare _comp; // ???
 
 	typedef Key			key_type;
 	typedef T			mapped_type;
@@ -179,55 +197,37 @@ public:
 	typedef typename allocator_type::size_type			size_type;
 	typedef typename allocator_type::difference_type	difference_type;
 
-	// typedef typename ft::pair<const Key, T>			value_type; // TO SOLVE !
-	typedef typename std::pair<const Key, T>		value_type;
 	typedef value_type&								reference;
 	typedef const value_type&						const_reference;
 	typedef typename allocator_type::pointer		pointer;
 	typedef typename allocator_type::const_pointer	const_pointer;
 
-	typedef ft::rb_tree<value_type, value_compare, allocator_type>	tree_type;
+	typedef ft::rb_tree<value_type, value_compare, allocator_type>	tree_type; // ???? 
 
-	// typedef typename tree_type::iterator			tree_iterator;
-	// typedef map_iterator<tree_iterator>				iterator;
+	typedef typename tree_type::iterator			tree_iterator;
+	typedef map_iterator<tree_iterator>				iterator;
+
 	// typedef map_const_iterator<typename tree_type::const_iterator>	const_iterator;
 	// typedef typename 						reverse_iterator
 	// typedef typename 						const_reverse_iterator
 
-/* ======================== MEMBER CLASS ================================= */
-
-// 	/* 
-// 		VALUE_COMPARE
-// 		Function object that compares objects of type ft::map::value_type
-// 		(key-value pairs) by comparing of the first components of the pairs
-// 	*/
-// 	class value_compare { // ???
-// 	public:
-// 		typedef bool result_type;
-// 	protected:
-// 		key_compare comp;
-
-// 		value_compare(Compare c) : comp(c) {}
-// 		bool operator()( const value_type& lhs, const value_type& rhs ) const {
-// 			return (comp(lhs.first, rhs.first));
-// 		}
-// 	};
-
 // /* ======================== ATTRIBUTES ==================================== */
 
-// private:
+private:
 
-// 	tree_type _tree;
+tree_type _tree;
 
-// /* ------------------------------------------------------------------------ */
-// /* ======================== MEMBER FUNCTIONS ============================== */
-// /* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ */
+/* ======================== MEMBER FUNCTIONS ============================== */
+/* ------------------------------------------------------------------------ */
 
-// public:
+public:
 
-// /* ------------------------ construction: --------------------------------- */
+void print() const { _tree.print_tree(); } // DEBUGGING - REMOVE ?
 
-// 	map() {}
+/* ------------------------ construction: --------------------------------- */
+
+map(): _tree(_comp) {}
 
 // 	explicit map(const Compare& comp, const Allocator& alloc = Allocator());
 
@@ -239,7 +239,7 @@ public:
 
 // /* ------------------------ destruction: ---------------------------------- */
 
-// 	~map() {}
+~map() {}
 
 // /* ------------------------ assignment: ---------------------------------- */
 
@@ -247,8 +247,9 @@ public:
 
 // /* ======================== ACCESSORS ===================================== */
 
-// 	bool empty() const;
-// 	size_type size() const { return(_tree.size());}
+bool empty() const { return (_tree.empty()); }
+size_type size() const { return(_tree.size()); }
+
 // 	size_type max_size() const;
 
 // 	allocator_type get_allocator() const;
@@ -257,7 +258,8 @@ public:
 // 	const T& at( const Key& key ) const;
 // 	T& operator[]( const Key& key );
 
-// 	iterator begin() { return (iterator(_tree.begin())); }
+iterator begin() { return (iterator(_tree.begin())); }
+
 // 	const_iterator begin() const;
 // 	iterator end() { return (iterator(_tree.end())); }; // ?????????????????
 // 	const_iterator end() const;
@@ -267,19 +269,24 @@ public:
 // 	// reverse_iterator rend();
 // 	// const_reverse_iterator rend() const;
 
-// /* ======================== MODIFIERS ===================================== */
+/* ======================== MODIFIERS ===================================== */
 
-// /* ------------------------ insertion: ------------------------------------ */
+/* ------------------------ insertion: ------------------------------------ */
 
-// // Returns a pair consisting of an iterator to the inserted element (or to the 
-// // element that prevented the insertion) and a bool denoting whether the insertion took place.
-// 	// ft::pair<iterator, bool> insert( const value_type& value ) {
-// 	std::pair<iterator, bool> insert( const value_type& value ) {
-// 		tree_iterator x(_tree.search(value));
-// 		if (x.get_node_ptr() != NULL)
-// 			return(std::make_pair(iterator(x), false));
-// 		return (std::make_pair(iterator(tree_iterator(_tree.insert(value))), true)); // change std::make_pair
-// 	}
+// Returns a pair consisting of an iterator to the inserted element (or to the 
+// element that prevented the insertion) and a bool denoting whether the insertion took place.
+
+	ft::pair<iterator, bool> insert( const value_type& value ) {
+	// std::pair<iterator, bool> insert( const value_type& value ) {
+		tree_iterator x(_tree.search(value)); // UGLY !! replace with FIND()
+		if (x.get_base_ptr() != _tree.NIL()) // UGLY!! make map ite wrap this ! // regarding nil: other solution is make search return NULL if x == NIL.
+		{
+			// return(std::make_pair(iterator(x), false));
+			return(ft::make_pair(iterator(x), false));
+		}
+		// return (std::make_pair(iterator(tree_iterator(_tree.insert(value))), true)); // change std::make_pair
+		return (ft::make_pair(iterator(tree_iterator(_tree.insert(value))), true)); // change std::make_pair
+	}
 
 // 	iterator insert( iterator hint, const value_type& value );
 
@@ -290,11 +297,13 @@ public:
 
 // 	void clear();
 
-// 	void erase( iterator pos );
+void erase( iterator pos ) {
+	_tree.erase(pos.get_tree_ite());
+}
 
 // 	void erase( iterator first, iterator last );
 
-// 	size_type erase( const Key& key );
+size_type erase( const Key& key );
 
 // /*  ----------------------- swap: ----------------------------------------- */
 
@@ -304,7 +313,7 @@ public:
 
 // 	size_type count( const Key& key ) const;
 
-// 	iterator find( const Key& key );
+iterator find( const Key& key );
 
 // 	const_iterator find( const Key& key ) const;
 

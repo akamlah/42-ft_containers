@@ -29,16 +29,19 @@ Root and _NIL are black.
 */
 
 template <	class T,
-			class Compare = typename std::map<int, T>::key_compare,
+			class Compare,
+			// class Compare = typename std::map<>::key_compare,
+			// class Compare = std::less<T>, // test with this for integers or objects holding ints
 			class Allocator = std::allocator<T> > // ?????????????? or free here and pass in map?
-class rb_tree { 
+class rb_tree {
 
 public:
 
 typedef T												value_type;
-typedef Compare											compare_type;
+typedef Compare											value_compare;
 typedef Allocator										value_allocator_type;
 typedef typename value_allocator_type::pointer			pointer;
+typedef typename value_allocator_type::const_pointer	const_pointer;
 typedef typename value_allocator_type::reference		reference;
 typedef typename value_allocator_type::const_reference	const_reference;
 
@@ -58,7 +61,6 @@ public:
 	rb_node(value_type val): parent(_NIL), left(_NIL), right(_NIL), value(val), isblack(false) {}
 	rb_node(const rb_node& other): parent(_NIL), left(_NIL), right(_NIL), value(other.value), isblack(false) {}
 	virtual ~rb_node() {}
-	void print_value() const { std::cout << value << std::endl; }
 	void __destroy() { rb_tree::_node_allocator.destroy(this); rb_tree::_node_allocator.deallocate(this, 1); }
 };
 
@@ -71,6 +73,7 @@ typedef typename node_allocator_type::difference_type					difference_type;
 
 // class rb_iterator;
 // friend class rb_iterator; // also because access to _NIL and other functions needed. ?
+// template <class, class, class, class> friend class map; // needed ???
 
 class rb_iterator {
 public:
@@ -79,62 +82,86 @@ public:
 	typedef typename rb_tree::difference_type		difference_type;
 	typedef typename rb_tree::reference				reference;
 	typedef typename rb_tree::pointer				pointer;
+
+	typedef typename rb_tree::node_pointer			node_pointer; // ??? ugly ...
 private:
-	node_pointer _base;
+	node_pointer _base_ptr;
 public:
-	rb_iterator(): _base(_NIL) {}
-	rb_iterator(const node_pointer& x): _base(x) {}
-	node_pointer get_base() const { return(_base); }
-	reference operator*() const { return(_base->value); }
+	rb_iterator(): _base_ptr(_NIL) {}
+	rb_iterator(const node_pointer& x): _base_ptr(x) {}
+	node_pointer get_base_ptr() const { return(_base_ptr); }
+	reference operator*() const { return(_base_ptr->value); }
 	pointer operator->() const { return (std::addressof(operator*())); }
-	rb_iterator& operator++() { _base = rb_successor(_base); return(*this); }
-	rb_iterator& operator--() { _base = rb_predecessor(_base); return(*this); }
-	rb_iterator operator++(int) { node_pointer old = _base; _base = rb_successor(_base); return(rb_iterator(old)); }
-	rb_iterator operator--(int) { node_pointer old = _base; _base = rb_predecessor(_base); return(rb_iterator(old)); }
+	rb_iterator& operator++() { _base_ptr = rb_successor(_base_ptr); return(*this); }
+	rb_iterator& operator--() { _base_ptr = rb_predecessor(_base_ptr); return(*this); }
+	rb_iterator operator++(int) { node_pointer old = _base_ptr; ++*this; return(rb_iterator(old)); }
+	rb_iterator operator--(int) { node_pointer old = _base_ptr; --*this; return(rb_iterator(old)); }
+
+	friend bool operator==(const rb_iterator& lhs, const rb_iterator& rhs)
+		{ return(lhs->get_base_ptr() == rhs->get_base_ptr()); }
+	friend bool operator!=(const rb_iterator& lhs, const rb_iterator& rhs)
+		{ return(!(lhs == rhs)); }
 };
 
-// class rb_const_iterator {
-// public:
-// 	typedef bidirectional_iterator_tag				iterator_category;
-// 	typedef typename rb_tree::value_type			value_type;
-// 	typedef typename rb_tree::difference_type		difference_type;
-// 	typedef typename rb_tree::reference				reference;
-// 	typedef typename rb_tree::pointer				pointer;
-// private:
-// 	rb_iterator _non_const_ite;
-// public:
-// 	rb_const_iterator(): _non_const_ite() {}
-// 	rb_const_iterator(const node_pointer& x): _non_const_ite(x) {}
-// 	node_pointer get_base() const { return(_non_const_ite.get_base()); }
-// 	reference operator*() const { return(_non_const_ite.get_base()->value); }
-// 	pointer operator->() const { return (std::addressof(operator*())); }
-// 	rb_const_iterator& operator++() { _base = rb_successor(_base); return(*this); }
-// 	rb_const_iterator& operator--() { _base = rb_predecessor(_base); return(*this); }
-// 	rb_const_iterator operator++(int) { node_pointer old = _base; _base = rb_successor(_base); return(rb_const_iterator(old)); }
-// 	rb_const_iterator operator--(int) { node_pointer old = _base; _base = rb_predecessor(_base); return(rb_const_iterator(old)); }
-// };
+	template <class, class, class, class> class map;
+	template <class, class, class, class> friend class map; // needed ???
+
+class rb_const_iterator {
+public:
+	typedef bidirectional_iterator_tag				iterator_category;
+	typedef typename rb_tree::value_type			value_type;
+	typedef typename rb_tree::difference_type		difference_type;
+	typedef typename rb_tree::const_reference		const_reference; // ! wrong
+	typedef typename rb_tree::const_pointer			const_pointer; // ! wrong
+private:
+	rb_iterator _base_ite;
+public:
+	rb_const_iterator(): _base_ite() {}
+	rb_const_iterator(const node_pointer& x): _base_ite(x) {}
+	node_pointer get_base_ite() const { return(_base_ite); }
+	node_pointer get_base_ptr() const { return(_base_ite.get_base_ptr()); }
+	const_reference operator*() const { return(get_base_ptr()->value); }  // ????
+	const_pointer operator->() const { return (std::addressof(operator*())); }  // ????
+	rb_const_iterator& operator++() { _base_ite = rb_successor(_base_ite); return(*this); }
+	rb_const_iterator& operator--() { _base_ite = rb_predecessor(_base_ite); return(*this); }
+	rb_const_iterator operator++(int) { node_pointer old = _base_ite; ++*this; return(rb_const_iterator(old)); }
+	rb_const_iterator operator--(int) { node_pointer old = _base_ite; --*this; return(rb_const_iterator(old)); }
+
+	friend bool operator==(const rb_const_iterator& lhs, const rb_const_iterator& rhs)
+		{ return(lhs->get_base_ptr() == rhs->get_base_ptr()); }
+	friend bool operator!=(const rb_const_iterator& lhs, const rb_const_iterator& rhs)
+		{ return(!(lhs == rhs)); }
+};
 
 typedef rb_iterator			iterator;
-// typedef rb_const_iterator	const_iterator;
+typedef rb_const_iterator	const_iterator;
 
 // attributes - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-private:
-
+protected:
 static node_allocator_type	_node_allocator;
 static value_allocator_type	_value_allocator;
 static node_pointer			_NIL;
-static size_type			_nb_trees;
-
 node_pointer	_end_node;
+
+private:
+static size_type			_nb_trees;
 node_pointer	_root;
 size_type		_size;
+
+// public:
+value_compare _comp;
 
 // publilc member functions - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 public:
 
-rb_tree(): _end_node(_new_node()), _root(_NIL), _size(0) {
+rb_tree(): _end_node(_new_node()), _root(_NIL), _size(0) { //, _comp(Compare) {
+	++_nb_trees;
+	_end_node->isblack = false;
+}
+
+rb_tree(value_compare c): _end_node(_new_node()), _root(_NIL), _size(0), _comp(c) {
 	++_nb_trees;
 	_end_node->isblack = false;
 }
@@ -150,13 +177,16 @@ rb_tree(): _end_node(_new_node()), _root(_NIL), _size(0) {
 // accessors - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 bool empty() const { return (_root == _NIL); }
+node_pointer NIL() const { return (_NIL); }
 size_type size() const { return (_size); }
-node_pointer min() const { return (rb_min(_root)); }
-node_pointer max() const { return (rb_max(_root)); }
+node_pointer min() const { return (empty() ? NULL : rb_min(_root)); }
+node_pointer max() const { return (empty() ? NULL : rb_max(_root)); }
 node_pointer search(value_type value) const { return (_search(_root, value)); }
 
-iterator begin() const {return(iterator(min())); }
-// iterator end() const { return(iterator(_detatched_node)); } // ? 
+iterator begin() {return(iterator(min())); }
+const_iterator begin() const {return(const_iterator(begin())); }
+iterator end() { return(iterator()); } // ? 
+const_iterator end() const { return(const_iterator()); } // ? 
 
 node_pointer successor(value_type value) const { return (rb_successor(search(value))); }
 node_pointer predecessor(value_type value) const { return (rb_predecessor(search(value))); }
@@ -170,6 +200,7 @@ node_pointer predecessor(value_type value) const { return (rb_predecessor(search
 	Returns [...]
 */
 node_pointer insert(value_type value) { // or iterator as return ?? -> then change also map insert
+	std::cout << "inserting "<< std::endl;
 	node_pointer x = _new_node(value);
 	_tree_insert(x);
 	++_size;
@@ -184,6 +215,16 @@ node_pointer insert(value_type value) { // or iterator as return ?? -> then chan
 */
 void erase(const_reference value) {
 	node_pointer z = search(value);
+	if (!z || z == _NIL)
+		return ;
+	node_pointer tmp_z = z;
+	_tree_delete(z);
+	tmp_z->__destroy();
+	--_size;
+}
+
+void erase(iterator pos) { // compact these two later ^^
+	node_pointer z = pos.get_base_ptr();
 	if (!z || z == _NIL)
 		return ;
 	node_pointer tmp_z = z;
@@ -237,12 +278,21 @@ static node_pointer _generate_nil_node() {
 // recursively destroys and frees the memory of all nodes of the subtree rooted in x.
 void _clear(node_pointer x) {
 	if (x != _NIL) {
-		// std::cout << "clear | " << x->value << std::endl;
 		_clear(x->left);
 		_clear(x->right);
 		x->__destroy();
 	}
 	_size = 0;
+}
+
+bool _tree_compare(value_type& val1, value_type& val2) const {
+	// std::cout << "using _tree_compare" << std::endl;
+	// if (x < y)
+	// if (_comp.operator()(val1, val2)) // ??? works though ..
+	if (_comp(val1, val2)) // ??? works though ..
+	// if (_comp.compare_me(val1, val2)) // ??? works though .. // TEST ONLY !!
+		return (true);
+	return (false);
 }
 
 // (algorithms at end of file)
@@ -348,6 +398,7 @@ void __pretty_print(std::string prefix, node_pointer x, bool isleft, int iter) c
 		if (x->isblack == false)
 			std::cout << "\033[0;31m";
 		std::cout << x->value << " " << "\033[0;34m" << x;
+		// std::cout << x; // if no << overload
 		std::cout << "\033[0m" << std::endl;
 		__pretty_print(prefix + (isleft ? "│     " : "      "), x->left, true, iter);
 		__pretty_print(prefix + (isleft ? "│     " : "      "), x->right, false, iter);
@@ -390,8 +441,14 @@ template <class Value, class Compare, class Allocator>
 template <class Value, class Compare, class Allocator>
 typename rb_tree<Value, Compare, Allocator>::
 node_pointer rb_tree<Value, Compare, Allocator>::_search(node_pointer x, value_type value) const {
+	// std::cout << "search "<< std::endl;
 	while (x != _NIL && value != x->value) {
-		if (value < x->value)
+		// std::cout << "search while"<< std::endl;
+		// if (value < x->value)
+		// bool cmp = _tree_compare(value, x->value);
+		// std::cout << "bool cmp !!! " << cmp << std::endl;
+		// if (cmp)
+		if (_tree_compare(value, x->value))
 			x = x->left;
 		else
 			x = x->right;
@@ -488,7 +545,10 @@ void rb_tree<Value, Compare, Allocator>::_tree_insert(node_pointer node) {
 	node_pointer x = _root;
 	while (x != _NIL) {
 		y = x;
-		if (node->value < x->value)
+		// if (node->value < x->value)
+		// if (value_compare()(node->value, x->value))
+		// if (_comp()(node->value, x->value))
+		if (_tree_compare(node->value, x->value))
 			x = x->left;
 		else
 			x = x->right;
@@ -502,7 +562,8 @@ void rb_tree<Value, Compare, Allocator>::_tree_insert(node_pointer node) {
 		_root->isblack = true;
 	}
 	else {
-		if (node->value < y->value)
+		// if (node->value < y->value)
+		if (_tree_compare(node->value, y->value))
 			y->left = node;
 		else
 			y->right = node;
