@@ -11,7 +11,7 @@
 
 #include <map>
 
-// void tree_build();
+void tree_build();
 // void map_build();
 void std_map_test();
 
@@ -45,7 +45,7 @@ void std_map_test();
 // CALL ALL
 void test_map() {
 	std::cout << MAGENTA_B "----\t MAP \t----" << NC << std::endl;
-	// tree_build(); std::cout << std::endl;
+	tree_build(); std::cout << std::endl;
 	// map_build(); std::cout << std::endl;
 	std_map_test(); std::cout << std::endl;
 }
@@ -219,10 +219,10 @@ void std_map_test() {
 	std::cout <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(225)		, "s" ))	).first)->first) << "\t" <<	( ((m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(225)		, "s"		))	).first)->second) << "\n";
 	m.print();
 
-	std::cout << "-----------------------" << std::endl;
-	m.erase(_TestType1__(12));
-	// m.print();
-	std::cout << "-----------------------" << std::endl;
+	std::cout << "---------- testing erase -------------" << std::endl;
+	m.erase(_TestType1__(495679340));
+	m.print();
+	std::cout << "--------------===============---------" << std::endl;
 // 	m.insert(__PAIR__< _TestType1__, std::string >(	_TestType1__(99)		, "a"		)); // just gets ignored.
 // 	print_map(m);
 	(void)m;
@@ -316,9 +316,9 @@ void tree_build() {
 	--it;
 	std::cout << *it << std::endl;
 
-	// // it = T.end();
-	// // --it;
-	// // std::cout << *it << std::endl;
+	it = T.end();
+	--it;
+	std::cout << *it << std::endl;
 	// std::cout << "-----------------------" << std::endl;
 	(void)it;
 }

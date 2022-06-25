@@ -128,12 +128,14 @@ class map_iterator {
 private:
 	tree_ite_type	_tree_ite;
 public:
+	map_iterator(): _tree_ite() {}
+	map_iterator(void* ptr): _tree_ite(static_cast<node_pointer>(ptr)) {} // UGLY af !
 	map_iterator(const tree_ite_type& tree_ite): _tree_ite(tree_ite) {}
 	map_iterator(const map_iterator& other): _tree_ite(other._tree_ite) {}
 
-	map_iterator(void* pointer_to_node): _tree_ite(pointer_to_node) {} // ???? 
-
 	tree_ite_type get_tree_ite() const { return(_tree_ite); }
+	void* get_base_ptr() const { return(_tree_ite.get_base_ptr()); } // UGLY af !
+
 	map_iterator& operator=(const map_iterator& other) { _tree_ite = other._tree_ite; return(*this); }
 
 	reference operator*() const { return(*_tree_ite); } // ???
@@ -216,6 +218,7 @@ public:
 private:
 
 tree_type _tree;
+// static allocator_type _allocator; // if so, manage constructor differently
 
 /* ------------------------------------------------------------------------ */
 /* ======================== MEMBER FUNCTIONS ============================== */
@@ -227,9 +230,10 @@ void print() const { _tree.print_tree(); } // DEBUGGING - REMOVE ?
 
 /* ------------------------ construction: --------------------------------- */
 
-map() {}//: _tree(_comp)
+map() {} //: _tree(_comp) {}
 
-// 	explicit map(const Compare& comp, const Allocator& alloc = Allocator());
+explicit map(const Compare& comp, const Allocator& alloc = Allocator())
+	: _tree(comp, alloc) {} // ?
 
 // 	template< class InputIt >
 // 	map(InputIt first, InputIt last, const Compare& comp = Compare(),
@@ -240,6 +244,8 @@ map() {}//: _tree(_comp)
 // /* ------------------------ destruction: ---------------------------------- */
 
 ~map() {}
+
+// /* tmp: */ iterator max() const { return(iterator(tree_iterator(_tree.max()))); }
 
 // /* ------------------------ assignment: ---------------------------------- */
 
@@ -259,10 +265,9 @@ size_type size() const { return(_tree.size()); }
 // 	T& operator[]( const Key& key );
 
 iterator begin() { return (iterator(_tree.begin())); }
-
-// 	const_iterator begin() const;
-// 	iterator end() { return (iterator(_tree.end())); }; // ?????????????????
-// 	const_iterator end() const;
+// const_iterator begin() const { return (iterator(_tree.begin())); }
+iterator end() { return (iterator(_tree.end())); }
+// const_iterator end() const { return (iterator(_tree.end())); }
 
 // 	// reverse_iterator rbegin();
 // 	// const_reverse_iterator rbegin() const;
@@ -276,17 +281,12 @@ iterator begin() { return (iterator(_tree.begin())); }
 // Returns a pair consisting of an iterator to the inserted element (or to the 
 // element that prevented the insertion) and a bool denoting whether the insertion took place.
 
-	ft::pair<iterator, bool> insert( const value_type& value ) {
-	// std::pair<iterator, bool> insert( const value_type& value ) {
-		tree_iterator x(_tree.search(value)); // UGLY !! replace with FIND()
-		if (x != _tree.NIL()) // UGLY!! make map ite wrap this ! // regarding nil: other solution is make search return NULL if x == NIL.
-		{
-			// return(std::make_pair(iterator(x), false));
-			return(ft::make_pair(iterator(x), false));
-		}
-		// return (std::make_pair(iterator(tree_iterator(_tree.insert(value))), true)); // change std::make_pair
-		return (ft::make_pair(iterator(_tree.insert(value)), true)); // change std::make_pair
-	}
+ft::pair<iterator, bool> insert( const value_type& value ) {
+	iterator x = find(value.first);
+	if (x.get_base_ptr() != NULL)
+		return(ft::make_pair(x, false));
+	return (ft::make_pair(iterator(_tree.insert(value)), true)); // change std::make_pair
+}
 
 // 	iterator insert( iterator hint, const value_type& value );
 
@@ -304,11 +304,9 @@ void erase( iterator pos ) {
 // 	void erase( iterator first, iterator last );
 
 size_type erase( const Key& key ) {
-	iterator x = _key_search(key);
-	if (x == _tree.NIL())
-		std::cout << " FOUND: NIL" << std::endl; // this is why i'd prefer to make search return NULL if return nil -> so map does not need nil access
-	else
-		std::cout << " FOUND: " << *x << std::endl;
+	iterator x = find(key);
+	if (x.get_base_ptr() != NULL)
+		_tree.erase(x.get_tree_ite());
 	return (0); // todo
 }
 
@@ -320,16 +318,14 @@ size_type erase( const Key& key ) {
 
 // 	size_type count( const Key& key ) const;
 
-iterator find( const Key& key );
-
-
-private:
-// 	const_iterator find( const Key& key ) const;
-iterator _key_search(const Key& key) const {
-	for ()
+iterator find( const Key& key ) {
+	if (!empty())
+		for (iterator x = begin(); x != end(); x++) {
+			if (x->first == key)
+				return (x);
+		}
+	return (iterator(NULL));
 }
-public:
-
 
 // 	ft::pair<iterator,iterator> equal_range( const Key& key );
 

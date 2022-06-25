@@ -14,8 +14,9 @@
 
 namespace ft { /* NAMESPACE FT */
 
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ------------------------
 	RED BLACK TREE
 ------------------------
@@ -28,6 +29,8 @@ The end node is red.
 Root and _NIL are black.
 */
 
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 template <	class T,
 			class Compare,
 			// class Compare = typename std::map<>::key_compare,
@@ -35,7 +38,7 @@ template <	class T,
 			class Allocator = std::allocator<T> > // ?????????????? or free here and pass in map?
 class rb_tree {
 
-// types/ classes - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// types/ classes - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 public:
 
@@ -52,6 +55,8 @@ private:
 // class rb_node;
 // friend class rb_node; // because access to _NIL, pvt attribute of tree classes, is needed
 
+// ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
+
 class rb_node {
 public:
 	rb_node* parent;
@@ -59,13 +64,17 @@ public:
 	rb_node* right;
 	value_type value;
 	bool isblack;
-	rb_node(): parent(NULL), left(NULL), right(NULL), value(), isblack(true) {}
+	rb_node(bool isblack = false): parent(NULL), left(NULL), right(NULL), value(), isblack(isblack) {}
 	rb_node(value_type val): parent(_NIL), left(_NIL), right(_NIL), value(val), isblack(false) {}
-	rb_node(const rb_node& other): parent(_NIL), left(_NIL), right(_NIL), value(other.value), isblack(false) {}
-	// virtual ~rb_node() {} // not needed
-	void __destroy() { rb_tree::_node_allocator.destroy(this); rb_tree::_node_allocator.deallocate(this, 1); }
+	rb_node(const rb_node& other)
+		: parent(_NIL), left(_NIL), right(_NIL), value(other.value), isblack(false) {}
+	// virtual ~rb_node() {} // not needed ?
+	void __destroy()
+		{ rb_tree::_node_allocator.destroy(this); rb_tree::_node_allocator.deallocate(this, 1); }
 	// hacky ^^
 };
+
+// ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
 
 public:
 
@@ -77,6 +86,10 @@ typedef typename node_allocator_type::difference_type					difference_type;
 // class rb_iterator;
 // friend class rb_iterator; // also because access to _NIL and other functions needed. ?
 // template <class, class, class, class> friend class map; // needed ???
+	// template <class, class, class, class> class map;
+	// template <class, class, class, class> friend class map; // needed ???
+
+// ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
 
 class rb_iterator {
 public:
@@ -92,11 +105,25 @@ private:
 public:
 	rb_iterator(): _base_ptr(_NIL) {}
 	rb_iterator(const node_pointer& x): _base_ptr(x) {}
+
 	node_pointer get_base_ptr() const { return(_base_ptr); }
 	reference operator*() const { return(_base_ptr->value); }
 	pointer operator->() const { return (std::addressof(operator*())); }
-	rb_iterator& operator++() { _base_ptr = rb_successor(_base_ptr); return(*this); }
-	rb_iterator& operator--() { _base_ptr = rb_predecessor(_base_ptr); return(*this); }
+
+	// returning _end_node as if it was max()->left, even though they are not linked.
+	rb_iterator& operator++() {
+		node_pointer tmp = rb_successor(_base_ptr);
+		_base_ptr = (_base_ptr != _NIL && tmp == _NIL) ? _end_node : tmp;
+		return(*this);
+	}
+
+	// to ensure that --end() == max(), two cases considered
+	// rb_max(_end_node->left) should be == max(_root)
+	rb_iterator& operator--() {
+		_base_ptr = (_base_ptr == _end_node) ? rb_max(_end_node->left) : rb_predecessor(_base_ptr);
+		return(*this);
+	}
+
 	rb_iterator operator++(int) { node_pointer old = _base_ptr; ++*this; return(rb_iterator(old)); }
 	rb_iterator operator--(int) { node_pointer old = _base_ptr; --*this; return(rb_iterator(old)); }
 
@@ -106,8 +133,7 @@ public:
 		{ return(!(lhs == rhs)); }
 };
 
-	template <class, class, class, class> class map;
-	template <class, class, class, class> friend class map; // needed ???
+// ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
 
 class rb_const_iterator {
 public:
@@ -124,56 +150,60 @@ public:
 	node_pointer get_base_ite() const { return(_base_ite); }
 	node_pointer get_base_ptr() const { return(_base_ite.get_base_ptr()); }
 	const_reference operator*() const { return(get_base_ptr()->value); }  // ????
-
-	// const_pointer operator->() const { return (std::addressof(operator*())); }  // ????
 	const_pointer operator->() const { return (std::addressof(operator*())); }  // ???? 'pointer to node ->'
-
-	rb_const_iterator& operator++() { _base_ite = rb_successor(_base_ite); return(*this); }
-	rb_const_iterator& operator--() { _base_ite = rb_predecessor(_base_ite); return(*this); }
-	rb_const_iterator operator++(int) { node_pointer old = _base_ite; ++*this; return(rb_const_iterator(old)); }
-	rb_const_iterator operator--(int) { node_pointer old = _base_ite; --*this; return(rb_const_iterator(old)); }
-
+	rb_const_iterator& operator++() { ++_base_ite; return(*this); }
+	rb_const_iterator& operator--() { --_base_ite; return(*this); }
+	rb_const_iterator operator++(int)
+		{ node_pointer old = _base_ite; ++*this; return(rb_const_iterator(old)); }
+	rb_const_iterator operator--(int)
+		{ node_pointer old = _base_ite; --*this; return(rb_const_iterator(old)); }
 	friend bool operator==(const rb_const_iterator& lhs, const rb_const_iterator& rhs)
 		{ return(lhs.get_base_ptr() == rhs.get_base_ptr()); }
 	friend bool operator!=(const rb_const_iterator& lhs, const rb_const_iterator& rhs)
 		{ return(!(lhs == rhs)); }
 };
 
+// ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
+
 typedef rb_iterator			iterator;
 typedef rb_const_iterator	const_iterator;
 
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 // attributes - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 protected: // ?
 static node_allocator_type	_node_allocator;
 static value_allocator_type	_value_allocator;
 static node_pointer			_NIL;
+static node_pointer			_end_node;
 
 private:
 static size_type	_nb_trees;
-node_pointer		_end_node;
 node_pointer		_root;
 size_type			_size;
 value_compare		_comp; // ? needed ?
 
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 // publilc member functions - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 public:
 
-rb_tree(): _end_node(_new_node()), _root(_NIL), _size(0) { //, _comp(Compare) {
+rb_tree(): _root(_NIL), _size(0) { //, _comp(Compare) {
 	++_nb_trees;
-	_end_node->isblack = false;
 }
 
-rb_tree(value_compare c): _end_node(_new_node()), _root(_NIL), _size(0), _comp(c) {
+explicit rb_tree(const Compare& c, const Allocator& alloc = Allocator()) // ?
+	: _root(_NIL), _size(0), _comp(c) {
+	_value_allocator = alloc;
 	++_nb_trees;
-	_end_node->isblack = false;
 }
 
 ~rb_tree() {
 	_clear(_root);
-	_end_node->__destroy();
 	if (_nb_trees == 1)
+		_end_node->__destroy();
 		_NIL->__destroy();
 	--_nb_trees;
 }
@@ -186,14 +216,16 @@ rb_tree(value_compare c): _end_node(_new_node()), _root(_NIL), _size(0), _comp(c
 bool empty() const { return (_root == _NIL); }
 iterator NIL() const { return (iterator(_NIL)); }
 size_type size() const { return (_size); }
+
 node_pointer min() const { return (empty() ? NULL : rb_min(_root)); }
 node_pointer max() const { return (empty() ? NULL : rb_max(_root)); }
+
 node_pointer search(value_type value) const { return (_search(_root, value)); }
 
 iterator begin() {return(iterator(min())); }
 const_iterator begin() const {return(const_iterator(begin())); }
-iterator end() { return(iterator()); } // ? 
-const_iterator end() const { return(const_iterator()); } // ? 
+iterator end() { return(iterator(_end_node)); }
+const_iterator end() const { return(const_iterator(end())); }
 
 node_pointer successor(value_type value) const { return (rb_successor(search(value))); }
 node_pointer predecessor(value_type value) const { return (rb_predecessor(search(value))); }
@@ -216,28 +248,28 @@ iterator insert(value_type value) { // or iterator as return ?? -> then change a
 
 /*
 	DELETE VALUE
-	Seraches for a node containing the value given and removes it from
-	the tree. Does nothing if the value was not found.
-	Recoloring and rotation operations might be performed.
+
+	Seraches (in value overload) for a node containing the value given
+	and removes it from the tree. Does nothing if the value was not found.
+	Recoloring and rotation operations might be performed by _tree_delete()
 */
-void erase(const_reference value) {
-	node_pointer z = search(value);
-	if (!z || z == _NIL)
-		return ;
+void erase(node_pointer z) {
 	node_pointer tmp_z = z;
 	_tree_delete(z);
 	tmp_z->__destroy();
 	--_size;
 }
 
-void erase(iterator pos) { // compact these two later ^^
-	node_pointer z = pos.get_base_ptr();
+void erase(const_reference value) { //  necessary ?
+	node_pointer z = search(value);
 	if (!z || z == _NIL)
 		return ;
-	node_pointer tmp_z = z;
-	_tree_delete(z);
-	tmp_z->__destroy();
-	--_size;
+	erase(z);
+}
+
+void erase(iterator pos) { // needed in map
+	node_pointer z = pos.get_base_ptr();
+	erase(z);
 }
 
 // lookup - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -257,8 +289,8 @@ void print_tree() const {
 	std::cout << std::endl;
 }
 
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 // internal structure/ memory management  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 private:
 
 // uses parametric constructor of node -> color == red, ptrs init to _NIL
@@ -268,17 +300,10 @@ node_pointer _new_node(value_type value) {
 	return (x);
 }
 
-// uses dflt constr of node -> color == black, ptrs init to NULL
-node_pointer _new_node() {
+// uses dflt constr of node -> ptrs init to NULL, not _NIL. Used for _end_node & _NIL itself.
+static node_pointer _new_node(bool isblack) {
 	node_pointer x = _node_allocator.allocate(1);
-	_node_allocator.construct(x);
-	return (x);
-}
-
-// uses dflt constr of node -> color == black, ptrs init to NULL
-static node_pointer _generate_nil_node() {
-	node_pointer x = _node_allocator.allocate(1);
-	_node_allocator.construct(x);
+	_node_allocator.construct(x, isblack);
 	return (x);
 }
 
@@ -294,17 +319,28 @@ void _clear(node_pointer x) {
 
 // usage of value_compare as modular function for more control
 bool _tree_compare(value_type& val1, value_type& val2) const {
-	// std::cout << "using _tree_compare" << std::endl;
-	// if (x < y)
-	// if (_comp.operator()(val1, val2)) // ??? works though ..
-	if (_comp(val1, val2)) // ??? works though ..
-	// if (_comp.compare_me(val1, val2)) // ??? works though .. // TEST ONLY !!
+	if (_comp(val1, val2))
 		return (true);
 	return (false);
 }
 
-// (algorithms at end of file)
-node_pointer _search(node_pointer x, value_type value) const;
+/*
+	SEARCH
+	Searches for a node containing the value given in a (sub-)tree rooted
+	in the passed node. Returns a pointer to the node found or _NIL
+	if the tree was empty or no node was found.
+*/
+node_pointer _search(node_pointer x, value_type value) const {
+	while (x != _NIL && value != x->value) {
+		if (_tree_compare(value, x->value))
+			x = x->left;
+		else
+			x = x->right;
+	}
+	return (x == _NIL ? NULL : x);
+}
+
+// (algorithms at end of file - these are member functions)
 void _right_rotate(node_pointer x);
 void _left_rotate(node_pointer x);
 void _transplant(node_pointer u, node_pointer v);
@@ -353,7 +389,7 @@ friend node_pointer rb_successor(node_pointer x) {
 		x = y;
 		y = y->parent;
 	}
-	return (y);
+	return (y == _end_node ? _NIL : y);
 }
 
 /*
@@ -371,7 +407,7 @@ friend node_pointer rb_predecessor(node_pointer x) {
 		x = y;
 		y = y->parent;
 	}
-	return (y);
+	return (y == _end_node ? _NIL : y);
 }
 
 // debugging print function - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -428,7 +464,12 @@ template <class Value, class Compare, class Allocator>
 // static tree nil attribute definition:
 template <class Value, class Compare, class Allocator>
 	typename rb_tree<Value, Compare, Allocator>::node_pointer
-		rb_tree<Value, Compare, Allocator>::_NIL = _generate_nil_node();
+		rb_tree<Value, Compare, Allocator>::_NIL = _new_node(true);
+
+// static tree nil attribute definition:
+template <class Value, class Compare, class Allocator>
+	typename rb_tree<Value, Compare, Allocator>::node_pointer
+		rb_tree<Value, Compare, Allocator>::_end_node = _new_node(false);
 
 // static tree instance counter _nb_trees attribute definition:
 template <class Value, class Compare, class Allocator>
@@ -436,33 +477,6 @@ template <class Value, class Compare, class Allocator>
 		rb_tree<Value, Compare, Allocator>::_nb_trees = 0;
 
 // tree node ALGORITHMS (member functions) ==============================================================
-
-/*
-	-----------
-	SEARCH
-	-----------
-
-	Searches for a node containing the value given in a (sub-)tree rooted
-	in the passed node. Returns a pointer to the node found or _NIL
-	if the tree was empty or no node was found.
-*/
-template <class Value, class Compare, class Allocator>
-typename rb_tree<Value, Compare, Allocator>::
-node_pointer rb_tree<Value, Compare, Allocator>::_search(node_pointer x, value_type value) const {
-	// std::cout << "search "<< std::endl;
-	while (x != _NIL && value != x->value) {
-		// std::cout << "search while"<< std::endl;
-		// if (value < x->value)
-		// bool cmp = _tree_compare(value, x->value);
-		// std::cout << "bool cmp !!! " << cmp << std::endl;
-		// if (cmp)
-		if (_tree_compare(value, x->value))
-			x = x->left;
-		else
-			x = x->right;
-	}
-	return (x);
-}
 
 /* ---------------
 	ROTATIONS
@@ -553,13 +567,7 @@ void rb_tree<Value, Compare, Allocator>::_tree_insert(node_pointer node) {
 	node_pointer x = _root;
 	while (x != _NIL) {
 		y = x;
-		// if (node->value < x->value)
-		// if (value_compare()(node->value, x->value))
-		// if (_comp()(node->value, x->value))
-		if (_tree_compare(node->value, x->value))
-			x = x->left;
-		else
-			x = x->right;
+		x = (_tree_compare(node->value, x->value)) ? x->left : x->right;
 	}
 	node->parent = y;
 	if (y == _NIL) {
@@ -570,7 +578,6 @@ void rb_tree<Value, Compare, Allocator>::_tree_insert(node_pointer node) {
 		_root->isblack = true;
 	}
 	else {
-		// if (node->value < y->value)
 		if (_tree_compare(node->value, y->value))
 			y->left = node;
 		else
@@ -591,7 +598,6 @@ void rb_tree<Value, Compare, Allocator>::_tree_insert_fixup(node_pointer x) {
 		if (x->parent == x->parent->parent->left) {
 			y = x->parent->parent->right;
 			/* CASE 1: uncle is red (& not _NIL, same cond because _NIL->isblack = true) */
-			std::cout << x << std::endl;
 			if (!y->isblack) {
 				x = x->parent;
 				x->isblack = true;
