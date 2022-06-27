@@ -69,7 +69,7 @@ template<
 /* make pair */
 template< class T1, class T2 >
 ft::pair< T1, T2 > make_pair(T1 t, T2 u) {
-	std::cout << "make pair" << std::endl; // !
+	// std::cout << "make pair" << std::endl; // !
 	return (ft::pair< T1, T2 >(t, u));
 }
 
@@ -85,13 +85,13 @@ std::ostream& operator<<(std::ostream& o, const typename ft::pair< T1, T2 >& pai
 
 template< class T1, class T2 >
 bool operator==( const typename ft::pair<T1,T2>& lhs, const typename ft::pair<T1,T2>& rhs ) {
-	std::cout << "pair== " << std::endl; // !
+	// std::cout << "pair== " << std::endl; // !
 	return (lhs.first == rhs.first && lhs.second == rhs.second);
 }
 
 template< class T1, class T2 >
 bool operator!=( const typename ft::pair<T1,T2>& lhs, const typename ft::pair<T1,T2>& rhs ) {
-	std::cout << "pair!= " << std::endl; // !
+	// std::cout << "pair!= " << std::endl; // !
 	return (!(lhs == rhs));
 }
 
