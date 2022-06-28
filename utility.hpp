@@ -34,7 +34,12 @@ std::tuple with two elements. */
 template<
 	class T1,
 	class T2
-> struct pair {
+> struct pair
+
+//  : public std::pair<T1, T2> {};
+// #if 0
+
+{
 
 	typedef T1 first_type;
 	typedef T2 second_type;
@@ -115,6 +120,8 @@ template< class T1, class T2 >
 bool operator>=( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs ) {
 	return (!(lhs < rhs));
 }
+
+// #endif // ('#if 0')
 
 // ft::pair
 /* ------------------------------------------------------------------------ */
