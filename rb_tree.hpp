@@ -78,17 +78,17 @@ public:
 
 public:
 
+// template <class, class, class, class> class map;
+template <class, class, class, class> friend class map; // needed ???
+
 typedef typename value_allocator_type::template rebind<rb_node>::other	node_allocator_type;
 typedef typename node_allocator_type::pointer							node_pointer;
 typedef typename node_allocator_type::const_pointer						const_node_pointer;
 typedef typename node_allocator_type::size_type							size_type;
 typedef typename node_allocator_type::difference_type					difference_type;
 
-// class rb_iterator;
-// friend class rb_iterator; // also because access to _NIL and other functions needed. ?
-// template <class, class, class, class> friend class map; // needed ???
-	// template <class, class, class, class> class map;
-// template <class, class, class, class> friend class map; // needed ???
+class rb_iterator;
+friend class rb_iterator; // also because access to _NIL and other functions needed. ?
 
 // ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
 
@@ -116,15 +116,53 @@ public:
 
 	// returning _end_node as if it was max()->left, even though they are not linked.
 	rb_iterator& operator++() {
-		node_pointer tmp = rb_successor(_base_ptr);
-		_base_ptr = (_base_ptr != _NIL && tmp == _NIL) ? end_node(_base_ptr) : tmp;
+		// std::cout << "++ope tree ite. _base_ptr = " << _base_ptr << std::endl;
+		if (_base_ptr != _NIL && _base_ptr && _base_ptr->right && _base_ptr->right != _NIL)
+			_base_ptr = rb_min(_base_ptr->right);
+		else {
+			node_pointer y = _base_ptr->parent;
+		// std::cout << "++ope tree ite. y is = " << y << std::endl;
+			while (y != _NIL && y->parent != NULL && _base_ptr == y->right) {
+				_base_ptr = y;
+				y = y->parent;
+			}
+			_base_ptr = y;
+		}
+		// std::cout << "++ope tree ite. end_node(_base_ptr) = " << end_node(_base_ptr) << std::endl;
+		// node_pointer tmp = rb_successor(_base_ptr);
+		// if (tmp == _end_node)
+		// _base_ptr = (_base_ptr != _NIL && tmp == _NIL) ? end_node(_base_ptr) : tmp;
+		// std::cout << "++ope tree ite. _base_ptr after = " << _base_ptr << std::endl;
 		return(*this);
 	}
 
 	// to ensure that --end() == max(), two cases considered
 	// rb_max(_end_node->left) should be == max(_root)
 	rb_iterator& operator--() {
-		_base_ptr = (_base_ptr->parent == NULL) ? rb_max(_base_ptr->left) : rb_predecessor(_base_ptr);
+
+		// std::cout << "--treeite. base_ptr before = " << _base_ptr <<std::endl;
+
+		if (_base_ptr != _NIL && _base_ptr && _base_ptr->left && _base_ptr->left != _NIL)
+			_base_ptr = rb_max(_base_ptr->left);
+		else {
+
+			node_pointer y = _base_ptr->parent;
+					// std::cout << "++ope tree ite. y is = " << y << std::endl;
+			while (y != _NIL && y->parent != NULL && y->parent != _NIL && _base_ptr == y->left) {
+				_base_ptr = y;
+				y = y->parent;
+			}
+			if (y->parent == NULL)
+			_base_ptr = _NIL;
+			else
+			_base_ptr = y;
+		}
+
+		// if (_base_ptr == _NIL)
+		// if (_base_ptr == _NIL)
+		// 	return (*this);
+		// _base_ptr = (_base_ptr->parent == NULL) ? rb_max(end_node(_base_ptr)->left) : rb_predecessor(_base_ptr);
+		// std::cout << "--treeite. base_ptr after = " << _base_ptr <<std::endl;
 		return(*this);
 	}
 
@@ -145,7 +183,7 @@ public:
 	typedef bidirectional_iterator_tag				iterator_category;
 	typedef typename rb_tree::value_type			value_type;
 	typedef typename rb_tree::difference_type		difference_type;
-	typedef typename rb_tree::reference				reference; // ! wrong ?
+	typedef typename rb_tree::const_reference				reference; // ! wrong ?
 	typedef typename rb_tree::const_pointer			pointer; // ! wrong ?
 private:
 	rb_iterator _base_ite;
@@ -155,8 +193,8 @@ public:
 	rb_const_iterator(const rb_iterator& nc_it): _base_ite(nc_it) {} // ?
 	rb_iterator get_base_ite() const { return(_base_ite); }
 	node_pointer get_base_ptr() const { return(_base_ite.get_base_ptr()); }
-	reference operator*() const { return(get_base_ptr()->value); }  // ????
-	pointer operator->() const { return (std::addressof(operator*())); }  // ???? 'pointer to node ->'
+	reference operator*() const { return(get_base_ptr()->value); } // ????
+	pointer operator->() const { return (std::addressof(operator*())); } // ???? 'pointer to node ->'
 	rb_const_iterator& operator++() { ++_base_ite; return(*this); }
 	rb_const_iterator& operator--() { --_base_ite; return(*this); }
 	rb_const_iterator operator++(int)
@@ -173,7 +211,6 @@ public:
 
 typedef rb_iterator			iterator;
 typedef rb_const_iterator	const_iterator;
-
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 // attributes - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -198,12 +235,15 @@ public:
 rb_tree(): _end_node(_new_node(false)), _size(0) { //, _comp(Compare) {
 	_end_node->left = _NIL;
 	++_nb_trees;
+		// std::cout << "TRE CONSTR. end node: " << _end_node << " nil: " << _NIL << std::endl;
+
 }
 
 /* explicit ? */ rb_tree(const Compare& c, const Allocator& alloc = Allocator()) // ?
 	: _root(_NIL), _size(0), _comp(c) {
 	_value_allocator = alloc;
 	++_nb_trees;
+	// std::cout << "TRE CONSTR. end node: " << _end_node << " nil: " << _NIL << std::endl;
 }
 
 rb_tree(const rb_tree& other): _end_node(_new_node(false)), _size(0), _comp(other._comp) {
@@ -212,15 +252,17 @@ rb_tree(const rb_tree& other): _end_node(_new_node(false)), _size(0), _comp(othe
 	for (const_iterator it = other.begin(); it != other.end(); it++) {
 		insert(*it);
 	}
+		// std::cout << "TRE CONSTR. end node: " << _end_node << " nil: " << _NIL << std::endl;
+
 }
 
-~rb_tree() {
+virtual ~rb_tree() {
 	if (!empty())
 		_clear(_root);
 	_end_node->__destroy();
 	--_nb_trees;
-	if (_nb_trees == 0)
-		_NIL->__destroy();
+	// if (_nb_trees == 0)
+	// 	_NIL->__destroy();
 }
 
 rb_tree& operator=(const rb_tree& other) {
@@ -250,9 +292,9 @@ static node_pointer end_node(node_pointer x) {
 node_pointer min() const { return (empty() ? NULL : rb_min(_root)); }
 node_pointer max() const { return (empty() ? NULL : rb_max(_root)); }
 
-iterator begin() {return(iterator(min())); }
+iterator begin() {return(empty() ? end() : iterator(min())); }
 iterator end() { return(iterator(_end_node)); }
-const_iterator begin() const { return(const_iterator(min())); }
+const_iterator begin() const { return(empty() ? end() : const_iterator(min())); }
 const_iterator end() const { return(const_iterator(_end_node)); }
 
 node_pointer search(value_type value) const { return (_search(_root, value)); }
@@ -300,31 +342,35 @@ iterator insert(value_type value) { // or iterator as return ?? -> then change a
 	Recoloring and rotation operations might be performed by _tree_delete()
 */
 void erase(node_pointer z) {
-	// if (search(z->value) == _NIL)
-	// 	return ;
-	node_pointer tmp_z = z;
+	if (!z || z == _NIL || z == _end_node)
+		return ;
+	node_pointer tmp = z;
 	_tree_delete(z);
-	tmp_z->__destroy();
-	--_size;
-	if (size()) {
-		_end_node->left = _root;
-		_root->parent = _end_node;
-	}
-	else {
-		_end_node->left = _NIL;
-	}
+	tmp->__destroy();
+
 }
 
-void erase(const_reference value) { //  necessary ?
+void erase(const_reference value) {
 	node_pointer z = search(value);
-	if (!z || z == _NIL)
-		return ;
 	erase(z);
 }
 
-void erase(iterator pos) { // needed in map
+void erase(iterator pos) {
 	node_pointer z = pos.get_base_ptr();
 	erase(z);
+}
+
+void erase(iterator first, iterator last) {
+	iterator it = first;
+	while (it != last) {
+		node_pointer z = it.get_base_ptr();
+		node_pointer tmp = z;
+		++it;
+		if (!z || z == _NIL || z == _end_node)
+			break ;
+		_tree_delete(z);
+		tmp->__destroy();
+	}
 }
 
 // lookup - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -436,7 +482,7 @@ friend node_pointer rb_min(node_pointer x) {
 friend node_pointer rb_successor(node_pointer x) {
 	if (x == _NIL)
 		return (_NIL);
-	if (x->right != _NIL)
+	if (x->right && x->right != _NIL)
 		return (rb_min(x->right));
 	node_pointer y = x->parent;
 	while (y != _NIL && y->parent != NULL && x == y->right) {
@@ -454,7 +500,7 @@ friend node_pointer rb_successor(node_pointer x) {
 friend node_pointer rb_predecessor(node_pointer x) {
 	if (x == _NIL)
 		return (_NIL);
-	if (x->left != _NIL)
+	if (x->left && x->left != _NIL)
 		return (rb_max(x->left));
 	node_pointer y = x->parent;
 	while (y != _NIL && y->parent != NULL && x == y->left) {
@@ -553,13 +599,17 @@ Rotations are reversible and change the local structure as follows:
 */
 template <class Value, class Compare, class Allocator>
 void rb_tree<Value, Compare, Allocator>::_left_rotate(node_pointer x) {
+	if (x == _end_node)
+		std::cout << "sfghsjBBBBBBBBJShadAJKbfbbnkll LEFT!!!!!!!!!!!" << std::endl;
 	node_pointer y = x->right;
 	x->right = y->left;
 	if (y->left != _NIL)
 		y->left->parent = x;
 	y->parent = x->parent;
-	if (x->parent == _end_node)
+	if (x->parent == _end_node) {
 		_root = y;
+		_end_node->left = y;
+	}
 	else if (x == x->parent->left)
 		x->parent->left = y;
 	else
@@ -574,13 +624,17 @@ void rb_tree<Value, Compare, Allocator>::_left_rotate(node_pointer x) {
 */
 template <class Value, class Compare, class Allocator>
 void rb_tree<Value, Compare, Allocator>:: _right_rotate(node_pointer x) {
+	if (x == _end_node)
+		std::cout << "hufceujajjaaaaaAAAAAAAAAAAA!!!!!!!!!!!" << std::endl;
 	node_pointer y = x->left;
 	x->left = y->right;
 	if (y->right != _NIL)
 		y->right->parent = x;
 	y->parent = x->parent;
-	if (x->parent == _end_node)
+	if (x->parent == _end_node) {
 		_root = y;
+		_end_node->left = y;
+	}
 	else if (x == x->parent->right)
 		x->parent->right = y;
 	else
@@ -599,8 +653,16 @@ void rb_tree<Value, Compare, Allocator>:: _right_rotate(node_pointer x) {
 */
 template <class Value, class Compare, class Allocator>
 void rb_tree<Value, Compare, Allocator>::_transplant(node_pointer u, node_pointer v) {
-	if (u->parent == _end_node)
+		if (u == _end_node)
+		std::cout << "hufceujajjaaaaaAAAAAAA UUUUUUUU !!!!!!!!!!!" << std::endl;
+			if (v == _end_node)
+		std::cout << "hufceujajjaaaaaA VVVVVVVVVVVV !!!!!!!!!!!" << std::endl;
+	if (u->parent == _end_node) {
 		_root = v;
+		_end_node->left = v;
+	}
+	// else if (u->parent == _NIL)
+	// 	_end_node = v;
 	else if (u == u->parent->left)
 		u->parent->left = v;
 	else
@@ -628,7 +690,7 @@ void rb_tree<Value, Compare, Allocator>::_tree_insert(node_pointer node) {
 		_root = node;
 		node->parent = _end_node;
 		_end_node->left = _root;
-		_end_node->right = _root;
+		// _end_node->right = _root;
 		_root->isblack = true;
 	}
 	else {
@@ -719,23 +781,25 @@ void rb_tree<Value, Compare, Allocator>::_tree_insert_fixup(node_pointer x) {
 */
 template <class Value, class Compare, class Allocator>
 void rb_tree<Value, Compare, Allocator>::_tree_delete(node_pointer z) {
-	node_pointer fixup_pivot;
-	bool was_black = z->isblack;
+	// node_pointer tmp_z = z;
+	node_pointer x;
+	node_pointer y = z;
+	bool was_black = y->isblack;
 	if (z->left == _NIL) {
-		fixup_pivot = z->right;
+		x = z->right;
 		_transplant(z, z->right);
 	}
 	else if (z->right == _NIL) {
-		fixup_pivot = z->left;
+		x = z->left;
 		_transplant(z, z->left);
 	}
 	else {
-		node_pointer y = rb_min(z->right);
+		y = rb_min(z->right);
 		was_black = y->isblack;
-		fixup_pivot = y->right;
+		x = y->right;
 		if (y->parent == z)
 			/* pivot can be _NIL, storing p info for fixup */
-			fixup_pivot->parent = y;
+			x->parent = y;
 		else {
 			_transplant(y, y->right);
 			y->right = z->right;
@@ -746,8 +810,17 @@ void rb_tree<Value, Compare, Allocator>::_tree_delete(node_pointer z) {
 		y->left->parent = y;
 		y->isblack = z->isblack;
 	}
-	if (was_black && _root != _NIL)
-		_tree_delete_fixup(fixup_pivot);
+	// tmp_z->__destroy();
+	--_size;
+	if (_size > 0) {
+		_end_node->left = _root;
+		_root->parent = _end_node;
+	}
+	else {
+		_end_node->left = _NIL;
+	}
+	if (was_black)
+		_tree_delete_fixup(x);
 }
 
 /*
@@ -758,90 +831,66 @@ template <class Value, class Compare, class Allocator>
 void rb_tree<Value, Compare, Allocator>::_tree_delete_fixup(node_pointer x) {
 	node_pointer y; /* sibling of x */
 	while (x != _root && x->isblack) {
-	/* CASES A: x is left child, sibling y is right child */
 		if (x == x->parent->left) {
 			y = x->parent->right;
-			/* CASE 1: sibling y is red. Goes into case 2/3/4. */
-			if (!y->isblack) {
+			if (!y->isblack && y != _end_node) {
 				y->parent->isblack = false;
 				y->isblack = true;
-				_left_rotate(y->parent);
-				if (_root == y->left)
-					_root = y;
-				y = y->left->right;
+				_left_rotate(x->parent);
+				y = x->parent->right;
 			}
-			/* CASE 2: y is black and both childern are black */
-			if (y->left->isblack && y->right->isblack) {
+			if ((y->left == _NIL || y->left->isblack) && (y->right == _NIL || y->right->isblack)) {
 				y->isblack = false;
-				x = y->parent;
-				// if (x == _NIL->isblack || x == _root) {
-				// 	x->isblack = true;
-				// 	break ;
-				// }
-				// if (y == x->left)
-				// 	y = x->parent->right;
-				// else
-				// 	y = x->parent->left;
+				x = x->parent;
 			}
 			else {
-				/* CASE 3(+4): y is black and only right child is black */
-				if (!y->right->isblack && y->right != _NIL) {
+				if (y->right->isblack) {
 					y->left->isblack = true;
 					y->isblack = false;
 					_right_rotate(y);
-					y = y->parent;
+					y = x->parent->right;
 				}
-				/* CASE 4: y is black and only right child is black */
 				y->isblack = x->parent->isblack;
 				y->parent->isblack = true;
 				y->right->isblack = true;
-				_left_rotate(y->parent);
-				break ;
+				_left_rotate(x->parent);
+				x = _root;
+				_end_node->left = x;
+				x->parent = _end_node;
 			}
 		}
-	/* CASES B: x is right child, sibling y is left child */
 		else {
 			y = x->parent->left;
-			/* CASE 1: sibling y is red. Goes into case 2/3/4. */
-			if (!y->isblack) {
+			if (!y->isblack && y != _end_node) {
 				y->parent->isblack = false;
 				y->isblack = true;
-				_right_rotate(y->parent);
-				if (_root == y->right)
-					_root = y;
-				y = y->right->left;
+				_right_rotate(x->parent);
+				y = x->parent->left;
 			}
-			/* CASE 2: y is black and both childern are black */
-			if (y->left->isblack && y->right->isblack) {
+			if ((y->left == _NIL || y->left->isblack) && (y->right == _NIL || y->right->isblack)) {
 				y->isblack = false;
-				x = y->parent;
-				// if (x == _NIL->isblack || x == _root) {
-				// 	x->isblack = true;
-				// 	break ;
-				// }
-				// if (y == x->left)
-				// 	y = x->parent->right;
-				// else
-				// 	y = x->parent->left;
+				x = x->parent;
 			}
 			else {
-				/* CASE 3(+4): y is black and only right child is black */
-				if (y->left->isblack || y->left == _NIL) {
+				if (y->left->isblack) {
 					y->right->isblack = true;
 					y->isblack = false;
 					_left_rotate(y);
-					y = y->parent;
+					y = x->parent->left;
 				}
-				/* CASE 4: y is black and only right child is black */
-				y->isblack = y->parent->isblack;
+				y->isblack = x->parent->isblack;
 				y->parent->isblack = true;
 				y->left->isblack = true;
-				_right_rotate(y->parent);
-				break ;
+				_right_rotate(x->parent);
+				x = _root;
+				_end_node->left = x;
+				x->parent = _end_node;
 			}
 		}
 	}
 	x->isblack = true;
+	_end_node->left = _root;
+	_root->parent = _end_node;
 }
 
 } /* NAMESPACE FT end ------------------------------------------------------*/

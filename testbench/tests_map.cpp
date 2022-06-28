@@ -16,6 +16,7 @@
 void map_build();
 void tree_build();
 void map_empty();
+void map_erase();
 
 /* ************************************************************************ */
 // UTILS:
@@ -53,6 +54,7 @@ void test_map() {
 
 	map_build(); std::cout << std::endl;
 	map_empty(); std::cout << std::endl;
+	map_erase(); std::cout << std::endl;
 }
 
 /* ************************************************************************ */
@@ -296,6 +298,9 @@ void tree_build() {
 	std::cout << "-----------------------" << std::endl;
 	T.erase(143);
 	T.print_tree();
+	std::cout << "------------erase root: -----------" << std::endl;
+	T.erase(99);
+	T.print_tree();
 	std::cout << "-----------------------" << std::endl;
 
 	std::cout << "----------- ITER ------------" << std::endl;
@@ -338,6 +343,8 @@ void	is_empty(T const &mp)
 
 void		map_empty(void)
 {
+	std::cout << CYAN_B"----\t map_empty \t----" << NC << std::endl;
+
 	std::list<T3> lst;
 	unsigned int lst_size = 7;
 	for (unsigned int i = 0; i < lst_size; ++i)
@@ -366,5 +373,120 @@ void		map_empty(void)
 	mp2.clear();
 	is_empty(mp2);
 	// printSize(mp2);
+}
+
+
+
+#define Tt1 int
+#define Tt2 std::string
+#define TESTED_NAMESPACE _NS__
+#define _pair __PAIR__
+typedef _pair<const Tt1, Tt2> Tt3;
+
+static int iter = 0;
+
+
+template <typename T>
+std::string	printPair(const T &iterator, bool nl = true, std::ostream &o = std::cout)
+{
+	o << "key: " << iterator->first << " | value: " << iterator->second;
+	if (nl)
+		o << std::endl;
+	return ("");
+}
+
+template <typename T_MAP>
+void	printSize(T_MAP const &mp, bool print_content = 1)
+{
+	std::cout << "size: " << mp.size() << std::endl;
+	std::cout << "max_size: " << mp.max_size() << std::endl;
+	if (print_content)
+	{
+		typename T_MAP::const_iterator it = mp.begin(), ite = mp.end();
+		std::cout << std::endl << "Content is:" << std::endl;
+		for (; it != ite; ++it)
+			std::cout << "- " << printPair(it, false) << std::endl;
+	}
+	std::cout << "###############################################" << std::endl;
+}
+
+template <typename T1, typename T2>
+void	printReverse(TESTED_NAMESPACE::map<T1, T2> &mp)
+{
+	typename TESTED_NAMESPACE::map<T1, T2>::iterator it = mp.end(), ite = mp.begin();
+
+	std::cout << "printReverse:" << std::endl;
+	while (it != ite) {
+		it--;
+		std::cout << "-> " << printPair(it, false) << std::endl;
+	}
+	std::cout << "_______________________________________________" << std::endl;
+}
+
+template <typename MAP, typename U>
+void	ft_erase(MAP &mp, U param)
+{
+	std::cout << "\t-- [" << iter++ << "] --" << std::endl;
+	// std::cout << "param: " << printPair(param) << std::endl;
+	mp.erase(param);
+	printSize(mp);
+}
+
+template <typename MAP, typename U, typename V>
+void	ft_erase(MAP &mp, U param, V param2)
+{
+	std::cout << "\t-- [" << iter++ << "] --" << std::endl;
+	// std::cout << "param: " << printPair(param) << "param2: " << printPair(param2) << std::endl;
+	mp.erase(param, param2);
+	printSize(mp);
+}
+
+void		map_erase(void)
+{
+	std::cout << CYAN_B"----\t map_erase \t----" << NC << std::endl;
+
+	std::list<Tt3> lst;
+	unsigned int lst_size = 10;
+	for (unsigned int i = 0; i < lst_size; ++i)
+		lst.push_back(Tt3(i, std::string((lst_size - i), i + 65)));
+	TESTED_NAMESPACE::map<Tt1, Tt2> mp(lst.begin(), lst.end());
+	printSize(mp);
+
+	std::cout << "\nERASE 1" << std::endl;
+	ft_erase(mp, ++mp.begin());
+
+	std::cout << "\nERASE 2" << std::endl;
+	ft_erase(mp, mp.begin());
+	std::cout << "\nERASE 3" << std::endl;
+	ft_erase(mp, --mp.end());
+
+	std::cout << "\nERASE 4" << std::endl;
+	mp.print();
+	ft_erase(mp, mp.begin(), ++(++(++mp.begin())));
+	mp.print();
+
+	std::cout << "\nERASE 5" << std::endl;
+	ft_erase(mp, --(--(--mp.end())), --mp.end());
+	mp.print();
+
+	mp[10] = "Hello";
+	mp[11] = "Hi there";
+	printSize(mp);
+	std::cout << "\nERASE 6" << std::endl;
+	mp.print();
+	std::cout << "\n now erase 6" << std::endl;
+	ft_erase(mp, --(--(--mp.end())), mp.end());
+	mp.print();
+
+	mp[12] = "ONE";
+	mp[13] = "TWO";
+	mp[14] = "THREE";
+	mp[15] = "FOUR";
+	printSize(mp);
+	std::cout << "\nERASE 7" << std::endl;
+	mp.print();
+	std::cout << "\n now erase 7" << std::endl;
+	ft_erase(mp, mp.begin(), mp.end());
+	mp.print();
 }
 #undef __PAIR__

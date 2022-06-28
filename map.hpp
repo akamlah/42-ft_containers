@@ -122,7 +122,7 @@ template < /* MAP */
 	class Compare = std::less<Key>, // TODO 
 	class Allocator = std::allocator<ft::pair<const Key, T> > >
 class map {
-
+// template<class, class, class > friend class rb_tree;
 public:
 
 	typedef typename ft::pair<const Key, T>				value_type; // has overload << for debugging 
@@ -168,10 +168,14 @@ public:
 		map_iterator(const map_iterator& other): _tree_ite(other._tree_ite) {}
 		tree_iterator get_tree_ite() const { return(_tree_ite); }
 		map_iterator& operator=(const map_iterator& other) { _tree_ite = other._tree_ite; return(*this); }
-		reference operator*() const { return(*_tree_ite); } // ???
+		reference operator*() const { return(*_tree_ite); }
 		pointer operator->() const { return(std::addressof(*_tree_ite)); }
-		map_iterator& operator++() { ++_tree_ite; return (*this); }
-		map_iterator& operator--() { --_tree_ite; return (*this); }
+		map_iterator& operator++() { ++_tree_ite; return (*this); 
+		// std::cout << "++mapite" <<std::endl;
+		}
+		map_iterator& operator--() { --_tree_ite; return (*this); 
+		// std::cout << "--mapite" <<std::endl;
+		}
 		map_iterator operator++(int) { tree_iterator old = _tree_ite; ++_tree_ite; return(map_iterator(old)); }
 		map_iterator operator--(int) { tree_iterator old = _tree_ite; --_tree_ite; return(map_iterator(old)); }
 		friend bool operator==(const map_iterator& lhs, const map_iterator& rhs)
@@ -196,15 +200,10 @@ public:
 		map_const_iterator(const map_const_iterator& other): _nc_ite(other._nc_ite) {}
 		map_const_iterator(const tree_const_iterator& const_tree_ite): _nc_ite(iterator(const_tree_ite.get_base_ite())) {}
 		map_const_iterator(const iterator& nc_ite): _nc_ite(nc_ite) {}
-
 		tree_const_iterator get_tree_ite() const { return(_nc_ite.get_tree_ite()); }
 		map_const_iterator& operator=(const map_const_iterator& other) { _nc_ite = other._nc_ite; return(*this); }
-		reference operator*() const { return((_nc_ite.get_tree_ite()).get_base_ptr()); } // ???
-
-		pointer operator->() const 
-		{ return(std::addressof(*_nc_ite)); }
-		// {return std::pointer_traits<pointer>::pointer_to(*);} //
-
+		reference operator*() const { return((_nc_ite.get_tree_ite()).get_base_ptr()->value); }
+		pointer operator->() const { return(std::addressof(*_nc_ite)); }
 		map_const_iterator& operator++() { ++_nc_ite; return (*this); }
 		map_const_iterator& operator--() { --_nc_ite; return (*this); }
 		map_const_iterator operator++(int) { iterator old = _nc_ite; ++_nc_ite; return(map_const_iterator(old)); }
@@ -290,8 +289,10 @@ const T& at( const Key& key ) const {
 	return (x->second);
 }
 
-T& operator[]( const Key& key ) {
+T& operator[](const Key& key) {
 	iterator x = find(key);
+	if (x == end())
+		return (insert(ft::pair<Key, T>(key, T()))).first->second; // really ? okay...
 	return (x->second);
 }
 
@@ -346,22 +347,32 @@ void clear() { if (!empty()) { _tree.clear(); } }
 
 // Removes the element at pos.
 void erase( iterator pos ) {
-	_tree.erase(pos.get_tree_ite());
+	// std::cout << "MAP delete pos" << std::endl;
+	if (pos != end() && pos.get_tree_ite().get_base_ptr() != _tree._NIL)
+		_tree.erase(pos.get_tree_ite());
 }
 
 // Removes the elements in the range [first; last), which must be a valid range in *this
 void erase( iterator first, iterator last ) {
-	for (iterator cont_ite = first; cont_ite != last; cont_ite++) {
-		_tree.erase(*cont_ite);
-	}
+	// std::cout << "MAP range delete" << std::endl;
+	_tree.erase(first.get_tree_ite(), last.get_tree_ite());
+	// for (iterator cont_ite = first; cont_ite != last; cont_ite++) {
+	// 	typename tree_type::node_pointer x = cont_ite.get_tree_ite().get_base_ptr();
+	// 	if (cont_ite == end() || x == _tree._NIL ) {
+	// 		std::cout << "breaaaaaaaakkkkkkKKKKKKKKKKKKKKKKk aaaaaaaa !!!!!! " << std::endl;
+	// 		break ;
+	// 	}
+	// 	if (x != _tree._NIL)
+	// 	_tree.erase(x);
+	// }
 }
-
 
 // Removes the element (if one exists) with the key equivalent to key.
 // Returns the number of elements removed (0 or 1).
 size_type erase( const Key& key ) {
+	// std::cout << "MAP delete key - count" << std::endl;
 	iterator x = find(key);
-	if (x != end()) {
+	if (x != end() && x.get_tree_ite().get_base_ptr() != _tree._NIL) {
 		_tree.erase(x.get_tree_ite());
 		return (1);
 	}
