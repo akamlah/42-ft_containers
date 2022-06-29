@@ -53,10 +53,10 @@ protected:
 
 public:
 
-	// stack(): c() { __dbg_funcid(__PRETTY_FUNCTION__); } // default
-	// virtual ~stack() { __dbg_funcid(__PRETTY_FUNCTION__); } // default
-	explicit stack(const Container& cont = Container()): c(cont) { __dbg_funcid(__PRETTY_FUNCTION__); }
-	stack(const stack& other): c(other.c) { __dbg_funcid(__PRETTY_FUNCTION__); }
+	stack(): c() {}
+	explicit stack(const Container& cont = Container()): c(cont) {}
+	stack(const stack& other): c(other.c) {}
+	virtual ~stack() {}
 
 	stack& operator=( const stack& other ) { c = other.c; return (*this); }
 
@@ -75,15 +75,6 @@ public:
 	template< class __T, class __Container >
 	friend bool operator<( const ft::stack<__T,__Container>& lhs,
 		const stack<__T,__Container>& rhs );
-
-private:
-
-	void __dbg_funcid(const char * msg) const {
-		#if DBG
-			std::cout << "\033[38;5;128m" << msg << "\033[0m" << std::endl; 
-		#endif
-		(void)msg;
-	}
 
 }; // STACK --------------------------------------------------------------- */
 

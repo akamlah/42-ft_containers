@@ -4,113 +4,6 @@
 /*																			*/
 /* ************************************************************************ */
 
-/* ------------------------------- CONTENTS ----------------------------------
-- TYPEDEFS
-	value_type              T
-	allocator_type          Allocator
-	size_type               Unsigned integer type (usually std::size_t)
-	difference_type	Signed  integer type (usually std::ptrdiff_t)
-	reference               value_type&
-	const_reference         const value_type&
-	pointer                 Allocator::pointer
-	const_pointer           Allocator::const_pointer
-	iterator                LegacyRandomAccessIterator and LegacyContiguousIterator
-							to value_type
-	const_iterator          LegacyRandomAccessIterator and LegacyContiguousIterator
-							to const value_type
-	reverse_iterator        std::reverse_iterator<iterator>
-	const_reverse_iterator  std::reverse_iterator<const_iterator>
-
-- ATTRIBUTES
-	static allocator _allocator;
-	ierator start;
-	iterator end;
-
-- MEMBER FUNCTIONS
-CONSTRUCTION
-	vector();
-	explicit vector( const Allocator& alloc );
-	explicit vector( size_type n, const T& value = T(), \
-		const Allocator& alloc = Allocator());
-	template< class const_iterator >
-		vector( const_iterator first, const_iterator last, \
-			const Allocator& alloc = Allocator() );
-	vector( const vector& other );
-DESTRUCTION
-	~vector();
-ASSIGNMENTS
-	vector& operator=( const vector& other );
-	void assign( size_type n, const T& value );
-	template< class const_iterator >
-		void assign( const_iterator first, const_iterator last );
-ACCESSORS
- -	allocator:
-		allocator_type get_allocator() const;
- -	elements:
-		reference at( size_type pos );
-		const_reference at( size_type pos ) const;
-		reference operator[]( size_type pos );
-		const_reference operator[]( size_type pos ) const;
-		reference front();
-		const_reference front() const;
-		reference back();
-		const_reference back() const;
-		T* data();
-		const T* data() const;
- -	iterators:
-		iterator begin();
-		const_iterator begin() const;
-		iterator end();
-		const_iterator end() const;
-		reverse_iterator rbegin();
-		const_reverse_iterator rbegin() const;
-		reverse_iterator rend();
-		const_reverse_iterator rend() const;
- -	capacity:
-		bool empty() const;
-		size_type size() const;
-		size_type max_size() const;
-		void reserve( size_type new_cap ); // setter for cpacity
-		size_type capacity() const;
-MODIFIERS
- -	deletion
-		void clear();
-		iterator erase( iterator pos );
-		iterator erase( iterator first, iterator last );
-		void pop_back();
- -	insertion:
-		void push_back( const T& value );
-		iterator insert( iterator pos, const T& value );
-		void insert( iterator pos, size_type n, const T& value );
-		template< class const_iterator >
-			void insert( iterator pos, const_iterator first, const_iterator last );
- -	resize:
-		void resize( size_type n, T value = T() );
- - 	swap:
-		void swap( vector& other );
-
-- NON MEMBER FUNCTIONS
-operator==,!=,<,<=,>,>=,<=>
-	template< class T, class Alloc >
-	bool operator==(const ft::vector<T, Alloc>& lhs, const std::vector<T>& rhs);
-	template< class T, class Alloc >
-	bool operator!=(const ft::vector<T, Alloc>& lhs, const ft::vector<T>& rhs);
-	template< class T, class Alloc >
-	bool operator<(const ft::vector<T, Alloc>& lhs, const ft::vector<T>& rhs);
-	template< class T, class Alloc >
-	bool operator<=(const ft::vector<T, Alloc>& lhs, const ft::vector<T>& rhs);
-	template< class T, class Alloc >
-	bool operator>(const ft::vector<T, Alloc>& lhs, const ft::vector<T>& rhs);
-	template< class T, class Alloc >
-	bool operator>=(const ft::vector<T, Alloc>& lhs, const ft::vector<T>& rh );
-
-std::swap specialization
-	template< class T, class Alloc >
-	void swap( std::vector<T,Alloc>& lhs,
-			std::vector<T,Alloc>& rhs );
---------------------------------------------------------------------------- */
-
-// have a __config header for this: ?
 #ifndef __FT_VECTOR_HPP_
 # define __FT_VECTOR_HPP_
 
@@ -123,6 +16,7 @@ std::swap specialization
 // ft::
 #include "iterator.hpp"
 #include "type_traits.hpp"
+#include "algorithm.hpp"
 #include "utility.hpp"
 
 #ifndef _THROWS_OUT_OF_RANGE
@@ -138,7 +32,6 @@ std::swap specialization
 #endif
 
 #ifndef __IS_INTEGRAL
-// # define __IS_INTEGRAL std::is_integral
 # define __IS_INTEGRAL ft::is_integral
 #endif
 
@@ -187,21 +80,12 @@ public:
 
 /* ------------------------ construction: --------------------------------- */
 
-	vector() {
-		__dbg_funcid(__PRETTY_FUNCTION__);
-		__allocate_empty_vector(0);
-	}
+	vector() { __allocate_empty_vector(0); }
 
-	// protect ALLOC argument ?
-	explicit vector( const Alloc& alloc): _allocator(alloc) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
-		// assert(is_same< typename allocator_type::value_type, value_type >::value);
-		__allocate_empty_vector(0);
-	}
+	explicit vector( const Alloc& alloc): _allocator(alloc) { __allocate_empty_vector(0); }
 	
 	explicit vector(size_type n, const T& value = T(), \
 		const Alloc&alloc = allocator_type()): _allocator(alloc) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		__allocate_empty_vector(n);
 		for (size_type i = 0; i < n; i++)
 			_allocator.construct(_begin + i, value);
@@ -210,9 +94,7 @@ public:
 
 	template< typename InputIter>
 	vector(const InputIter first, const InputIter last, const Alloc&alloc = allocator_type(),
-		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0)
-		: _allocator(alloc) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
+		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) : _allocator(alloc) {
 		size_type range = std::distance(first, last);
 		__allocate_empty_vector(range);
 		for (InputIter it = first; it != last; it++) {
@@ -221,7 +103,6 @@ public:
 	}
 
 	vector(const vector& other) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		__allocate_empty_vector(other.size());
 		for (const_iterator it = other.begin(); it != other.end(); it++) {
 			_allocator.construct(_end_size++, *it);
@@ -231,7 +112,6 @@ public:
 /* ------------------------ destruction: ---------------------------------- */
 
 	~vector() {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		clear();
 		_allocator.deallocate(_begin, capacity());
 		_end_capacity = NULL;
@@ -242,7 +122,6 @@ public:
 /* ------------------------ assignment: ---------------------------------- */
 
 	vector& operator=(const vector& other) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		clear();
 		if (other.capacity() != capacity())
 			__resize_empty_vector(other.capacity());
@@ -253,7 +132,6 @@ public:
 	}
 
 	void assign(size_type n, const T& value) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		clear();
 		if (n > capacity())
 			__resize_empty_vector(n);
@@ -264,7 +142,6 @@ public:
 	template< typename InputIter >
 	void assign(const InputIter first, const InputIter last,
 		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		clear();
 		size_type range = std::distance(first, last);
 		if (range > capacity())
@@ -284,7 +161,6 @@ public:
 	bool empty() const { return (begin() == end()); }
 
 	void reserve(size_type new_cap) _THROWS_LENGTH_ERROR {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		if (new_cap > max_size())
 			throw std::length_error("Invalid capacity");
 		if (new_cap > capacity()) {
@@ -299,14 +175,12 @@ public:
 /* ------------------------ elements: ------------------------------------- */
 
 	reference at( size_type pos ) _THROWS_OUT_OF_RANGE {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		if (pos < 0 || pos >= size())
 			std::__throw_out_of_range("index out of vector range");
 		return (*(_begin + pos));
 	}
 
 	const_reference at( size_type pos ) const _THROWS_OUT_OF_RANGE {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		if (pos < 0 || pos >= size())
 			std::__throw_out_of_range("index out of vector range");
 		return (*(_begin + pos));
@@ -346,7 +220,6 @@ public:
 	template< typename InputIter >
 	InputIter erase(InputIter pos,
 		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		if (!__iterator_is_in_range(pos) || pos == _end_size)
 			return (pos);
 		InputIter curr = pos;
@@ -362,7 +235,6 @@ public:
 	template< typename InputIter >
 	InputIter erase(InputIter first, InputIter last,
 		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		iterator curr = first;
 		iterator remaining = last;
 		bool destroy_curr = true;
@@ -405,7 +277,7 @@ public:
 	template< typename InputIter >
 	InputIter insert(InputIter pos, const T& value,
 		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
+		
 		if (pos == _end_size) {
 			push_back(value);
 			return (_end_size - 1);
@@ -434,7 +306,6 @@ public:
 	template< typename InputIter >
 	void insert(InputIter pos, size_type n, const T& value,
 		typename enable_if<!__IS_INTEGRAL<InputIter>::value, bool>::type* = 0) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		size_type new_cap = size() + n;
 		if (new_cap < capacity())
 			new_cap = capacity();
@@ -464,7 +335,6 @@ public:
 	void insert(IterVect pos, const InterCont2 first, const InterCont2 last,
 		typename enable_if<!__IS_INTEGRAL<IterVect>::value, bool>::type* = 0,
 		typename enable_if<!__IS_INTEGRAL<InterCont2>::value, bool>::type* = 0) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		size_type range = std::distance(first, last);
 		size_type new_cap = size() + range;
 		if (new_cap < capacity())
@@ -494,7 +364,6 @@ public:
 /* ------------------------ resize: --------------------------------------- */
 
 	void resize(size_type n, T value = T()) {
-		__dbg_funcid(__PRETTY_FUNCTION__);
 		if (n == size())
 			return ;
 		if (n > size()) {
@@ -574,15 +443,6 @@ private:
 		return (false);
 	}
 
-	void __dbg_funcid(const char * msg) const {
-		#if DBG
-			std::cout << "\033[38;5;227m";
-			std::cout << msg;
-			std::cout << "\033[0m";
-			std::cout << std::endl;
-		#endif
-		(void)msg;
-	}
 }; /* vector */
 
 /* - NON MEMBER FUNCTIONS ------------------------------------------------- */
@@ -592,7 +452,7 @@ template< class T, class Alloc >
 bool operator==(const ft::vector<T, Alloc>& lhs,
 				const ft::vector<T, Alloc>& rhs) {
 	return (lhs.size() == rhs.size()
-		&& std::equal(lhs.begin(), lhs.end(), rhs.begin()));
+		&& ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 }
 
 template< class T, class Alloc >
@@ -604,38 +464,34 @@ bool operator!=(const ft::vector<T, Alloc>& lhs,
 template< class T, class Alloc >
 bool operator<(const ft::vector<T, Alloc>& lhs,
 				const ft::vector<T, Alloc>& rhs) {
-	return (std::lexicographical_compare(lhs.begin(), lhs.end(),
+	return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
 		rhs.begin(), rhs.end()));
 }
 
 template< class T, class Alloc >
 bool operator<=(const ft::vector<T, Alloc>& lhs,
 				const ft::vector<T, Alloc>& rhs) {
-	return (std::lexicographical_compare(lhs.begin(), lhs.end(),
+	return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
 		rhs.begin(), rhs.end()) || lhs == rhs);
 }
 
 template< class T, class Alloc >
 bool operator>(const ft::vector<T, Alloc>& lhs,
 				const ft::vector<T, Alloc>& rhs) {
-	return (std::lexicographical_compare(rhs.begin(), rhs.end(),
+	return (ft::lexicographical_compare(rhs.begin(), rhs.end(),
 		lhs.begin(), lhs.end()) && rhs != lhs);
 }
 
 template< class T, class Alloc >
 bool operator>=(const ft::vector<T, Alloc>& lhs,
 				const ft::vector<T, Alloc>& rhs) {
-	return (std::lexicographical_compare(rhs.begin(), rhs.end(),
+	return (ft::lexicographical_compare(rhs.begin(), rhs.end(),
 		lhs.begin(), lhs.end()) || rhs == lhs);
 }
-
-// std::swap specialization
-// 	template< class T, class Alloc >
-// 	void swap( std::vector<T,Alloc>& lhs,
-// 			std::vector<T,Alloc>& rhs );
 
 /* - end VECTOR ----------------------------------------------------------- */
 // #undef vector
 
 } /* NAMESPACE FT end ------------------------------------------------------*/
+
 #endif // __FT_VECTOR_HPP_

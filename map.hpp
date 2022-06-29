@@ -8,7 +8,7 @@
 # define __FT_MAP_HPP_
 
 // std::
-#include <iostream> // REMOVE
+#include <iostream> // FOR DBG PRINT
 
 // ft::
 #include "iterator.hpp"
@@ -17,14 +17,14 @@
 #include "utility.hpp"
 #include "rb_tree.hpp"
 
-// #include <algorithm>
-
 namespace ft { /* NAMESPACE FT */
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
 template < /* MAP */
 	class Key,
 	class T,
-	class Compare = std::less<Key>, // TODO
+	class Compare = std::less<Key>,
 	class Allocator = std::allocator<ft::pair<const Key, T> > >
 class map {
 public:
@@ -45,13 +45,10 @@ public:
 
 // ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
 
-	class value_compare {
-		private:
-		public:
+	struct value_compare {
 		key_compare _c;
 		value_compare(): _c() {}
 		value_compare(const key_compare& c): _c(c) {}
-		// key_compare& get_key_compare() const { return (_c); }
 		bool operator()( const value_type& lhs, const value_type& rhs ) const {
 			return (_c(lhs.first, rhs.first));
 		}
@@ -59,11 +56,15 @@ public:
 
 // ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
 
+protected:
+
 	typedef ft::rb_tree<value_type, value_compare, allocator_type>	tree_type;
-	typedef typename tree_type::iterator			tree_iterator;
-	typedef typename tree_type::const_iterator		tree_const_iterator;
+	typedef typename tree_type::iterator							tree_iterator;
+	typedef typename tree_type::const_iterator						tree_const_iterator;
 
 // ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
+
+protected:
 
 	class map_iterator {
 	public:
@@ -72,7 +73,7 @@ public:
 		typedef typename tree_iterator::difference_type	difference_type;
 		typedef typename tree_iterator::reference		reference;
 		typedef typename tree_iterator::pointer			pointer;
-	private:
+	protected:
 		tree_iterator	_tree_ite;
 	public:
 		map_iterator(): _tree_ite() {}
@@ -81,7 +82,7 @@ public:
 		tree_iterator get_tree_ite() const { return(_tree_ite); }
 		map_iterator& operator=(const map_iterator& other) { _tree_ite = other._tree_ite; return(*this); }
 		reference operator*() const { return(*_tree_ite); }
-		pointer operator->() const { return(std::addressof(*_tree_ite)); }
+		pointer operator->() const { return(&(*_tree_ite)); }
 		map_iterator& operator++() { ++_tree_ite; return (*this); }
 		map_iterator& operator--() { --_tree_ite; return (*this); }
 		map_iterator operator++(int) { tree_iterator old = _tree_ite; ++_tree_ite; return(map_iterator(old)); }
@@ -94,12 +95,13 @@ public:
 
 // ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
 
+public:
+
 	typedef map_iterator	iterator;
 
 // ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
 
-	// class map_const_iterator;
-	// friend class map_const_iterator;
+protected:
 
 	class map_const_iterator {
 	public:
@@ -108,7 +110,7 @@ public:
 		typedef typename tree_const_iterator::difference_type	difference_type;
 		typedef typename tree_const_iterator::reference			reference;
 		typedef typename tree_const_iterator::pointer			pointer;
-	private:
+	protected:
 		iterator	_nc_ite;
 	public:
 		map_const_iterator(): _nc_ite() {}
@@ -118,7 +120,7 @@ public:
 		tree_const_iterator get_tree_ite() const { return(_nc_ite.get_tree_ite()); }
 		map_const_iterator& operator=(const map_const_iterator& other) { _nc_ite = other._nc_ite; return(*this); }
 		reference operator*() const { return((_nc_ite.get_tree_ite()).get_base_ptr()->value); }
-		pointer operator->() const { return(std::addressof(*_nc_ite)); }
+		pointer operator->() const { return(&(*_nc_ite)); }
 		map_const_iterator& operator++() { ++_nc_ite; return (*this); }
 		map_const_iterator& operator--() { --_nc_ite; return (*this); }
 		map_const_iterator operator++(int) { iterator old = _nc_ite; ++_nc_ite; return(map_const_iterator(old)); }
@@ -131,7 +133,9 @@ public:
 
 // ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
 
-	typedef map_const_iterator	const_iterator;
+public:
+
+	typedef map_const_iterator								const_iterator;
 
 	typedef typename ft::reverse_iterator<iterator>			reverse_iterator;
 	typedef typename ft::reverse_iterator<const_iterator>	const_reverse_iterator;
@@ -140,16 +144,20 @@ public:
 // attributes - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 private:
-	value_compare _compare;
-	allocator_type _allocator;
-	tree_type _tree;
+
+	value_compare	_compare;
+	allocator_type	_allocator;
+	tree_type		_tree;
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
-	public:
-	void print() const { _tree.print_tree(); } // DEBUGGING
+public:
+// private:
+	void print() const { _tree.print_tree(); } // DEBUGGING - REMOVE
 
 // publilc member functions - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+public:
 
 	map() {}
 
@@ -158,19 +166,15 @@ private:
 
 	template< class InputIt >
 	map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())
-		: _compare(comp), _allocator(alloc)
-		{ insert(first, last); }
+		: _compare(comp), _allocator(alloc) { insert(first, last); }
 
-	map(const map& other): _compare(other._compare), _allocator(other._allocator), _tree(other._tree) { }
+	map(const map& other): _compare(other._compare), _allocator(other._allocator), _tree(other._tree) {}
 
 	~map() {}
 
 // ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
 
-	map& operator=( const map& other ) {
-		_tree = other._tree;
-		return (*this);
-	}
+	map& operator=( const map& other ) { _tree = other._tree; return (*this); }
 
 // accessors - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -191,7 +195,7 @@ private:
 	T& operator[](const Key& key) {
 		iterator x = find(key);
 		if (x == end())
-			return (insert( ft::pair<Key, T>(key, T() ) )).first->second; // really ? okay...
+			return (insert( ft::pair<Key, T>(key, T() ) )).first->second;
 		return (x->second);
 	}
 
@@ -230,8 +234,7 @@ private:
 		if (x != end())
 			return(x);
 		return (iterator(_tree.insert(value)));
-	// todo properly
-	(void)hint;
+		(void)hint;
 	}
 
 	// Inserts elements from range [first, last). If multiple elements in the range
@@ -245,12 +248,13 @@ private:
 		}
 	}
 
+// ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
+
 	void clear() { if (!empty()) { _tree.clear(); } }
 
 	// Removes the element at pos.
 	void erase( iterator pos ) {
-		// std::cout << "MAP delete pos" << std::endl;
-		if (pos != end() && pos.get_tree_ite().get_base_ptr() != _tree._NIL)
+		if (pos != end())
 			_tree.erase(pos.get_tree_ite());
 	}
 
@@ -263,7 +267,7 @@ private:
 	// Returns the number of elements removed (0 or 1).
 	size_type erase( const Key& key ) {
 		iterator x = find(key);
-		if (x != end() && x.get_tree_ite().get_base_ptr() != _tree._NIL) {
+		if (x != end()) {
 			_tree.erase(x.get_tree_ite());
 			return (1);
 		}
@@ -286,10 +290,10 @@ private:
 
 	// Finds an element with key equivalent to key.
 	// If no such element is found, or map is empty, end() is returned.
-	iterator find( const Key& key ) {
+	iterator find( const Key& key ) { //can be optimiedby not using it++ but recursive inorder-tree-walk
 		if (!empty())
 			for (iterator x = begin(); x != end(); x++) {
-				if (x->first == key)//&& x != iterator(tree_iterator(_tree.NIL())))
+				if (x->first == key)
 					return (x) ;
 			}
 		return (end());
@@ -298,11 +302,13 @@ private:
 	const_iterator find( const Key& key ) const {
 		if (!empty())
 			for (const_iterator x = begin(); x != end(); x++) {
-				if (x->first == key)//&& x != iterator(tree_iterator(_tree.NIL())))
+				if (x->first == key)
 					return (x) ;
 			}
 		return (end());
 	}
+
+// ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
 
 	// Returns a range containing all elements with the given key in the container.
 	// The range is defined by two iterators, one pointing to the first element
@@ -370,15 +376,9 @@ private:
 /* - NON MEMBER FUNCTIONS ------------------------------------------------------------------------ */
 /* operator==,!=,<,<=,>,>=,<=> */
 
-
-// template<class ValueType>
-// bool map_pred(const ValueType &a, const ValueType &b)
-// 	{ return ((a.first == b.first) && (a.second == b.second)); }
-
 template< class Key, class T, class Compare, class Alloc >
 bool operator==(const ft::map<Key,T,Compare,Alloc>& lhs,
 	const ft::map<Key,T,Compare,Alloc>& rhs)
-	// { return ((lhs.size() == rhs.size()) && std::equal(lhs.begin(), lhs.end(), rhs.begin())); }
 	{ return ((lhs.size() == rhs.size()) && ft::equal(lhs.begin(), lhs.end(), rhs.begin())); }
 
 template< class Key, class T, class Compare, class Alloc >
@@ -389,8 +389,7 @@ bool operator!=(const ft::map<Key,T,Compare,Alloc>& lhs,
 template< class Key, class T, class Compare, class Alloc >
 bool operator<(const ft::map<Key,T,Compare,Alloc>& lhs,
 	const ft::map<Key,T,Compare,Alloc>& rhs)
-	// { return (std::lexicographical_compare (lhs.begin(), lhs.end(), rhs.begin(), rhs.end())); }
-	{ return (ft::lexicographical_compare (lhs.begin(), lhs.end(), rhs.begin(), rhs.end())); }
+	{ return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())); }
 
 template< class Key, class T, class Compare, class Alloc >
 bool operator<=(const ft::map<Key,T,Compare,Alloc>& lhs,

@@ -8,6 +8,7 @@
 #if (!STD)
 # include "../rb_tree.hpp"
 # include "../map.hpp"
+# include "../set.hpp"
 #endif
 
 //TEST ONLY
@@ -222,11 +223,11 @@ void tree_build() {
 	std::cout << "-----------------------" << std::endl;
 
 
-	std::cout << " !!! CLEAR !!! " << std::endl;
-	std::cout << "end_node() before: " << T.end_node() << std::endl;
+	// std::cout << " !!! CLEAR !!! " << std::endl;
+	// std::cout << "end_node() before: " << T.end_node() << std::endl;
 	T.clear();
-	std::cout << "size: " << T.size() << std::endl;
-	std::cout << "end_node() after: " << T.end_node() << std::endl;
+	// std::cout << "size: " << T.size() << std::endl;
+	// std::cout << "end_node() after: " << T.end_node() << std::endl;
 
 	std::cout << "-----------------------" << std::endl;
 	T.insert(_TestType1__(99));
@@ -414,7 +415,6 @@ template <typename T1, typename T2>
 void	printReverse(TESTED_NAMESPACE::map<T1, T2> &mp)
 {
 	typename TESTED_NAMESPACE::map<T1, T2>::iterator it = mp.end(), ite = mp.begin();
-
 	std::cout << "printReverse:" << std::endl;
 	while (it != ite) {
 		it--;
@@ -488,5 +488,13 @@ void		map_erase(void)
 	std::cout << "\n now erase 7" << std::endl;
 	ft_erase(mp, mp.begin(), mp.end());
 	mp.print();
+
+	ft::set<Tt1> set;
+	(void)set;
+	#include <set>
+	
+	std::set<Tt1> set1;
+	(void)set1;
 }
+
 #undef __PAIR__
