@@ -47,7 +47,7 @@ public:
 
 private:
 
-	typedef ft::rb_tree<value_type, value_compare, allocator_type>	tree_type;
+	typedef ft::rb_tree<const value_type, value_compare, allocator_type>	tree_type;
 	typedef typename tree_type::iterator							tree_iterator;
 	typedef typename tree_type::const_iterator						tree_const_iterator;
 
@@ -55,9 +55,9 @@ private:
 
 public:
 
-	typedef tree_iterator									iterator;
+	typedef tree_const_iterator									iterator;
 	typedef tree_const_iterator								const_iterator;
-	typedef typename ft::reverse_iterator<iterator>			reverse_iterator;
+	typedef typename ft::reverse_iterator<const_iterator>			reverse_iterator;
 	typedef typename ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -152,12 +152,14 @@ public:
 	// Removes the element at pos.
 	void erase( iterator pos ) {
 		if (pos != end())
-			_tree.erase(pos);
+			_tree.erase(pos.get_base_ptr());
 	}
 
 	// Removes the elements in the range [first; last), which must be a valid range in *this
 	void erase(iterator first, iterator last) {
-		_tree.erase(first, last);
+		// _tree.erase(first, last);
+		for (; first != last; )
+			erase(first++);
 	}
 
 	// Removes the element (if one exists) with the key equivalent to key.
@@ -165,7 +167,7 @@ public:
 	size_type erase(const Key& key) {
 		iterator x = find(key);
 		if (x != end()) {
-			_tree.erase(x);
+			_tree.erase(x.get_base_ptr());
 			return (1);
 		}
 		return (0);

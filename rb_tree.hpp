@@ -92,6 +92,7 @@ public:
 		rb_iterator(const node_pointer& x): _base_ptr(x) {}
 		rb_iterator(const rb_iterator& other): _base_ptr(other._base_ptr) {}
 		node_pointer get_base_ptr() const { return(_base_ptr); }
+		// value_type operator*() { return(_base_ptr->value); }
 		reference operator*() const { return(_base_ptr->value); }
 		pointer operator->() const { return (&(operator*())); }
 
