@@ -51,10 +51,10 @@ void map_erase();
 // CALL ALL
 void test_map() {
 	std::cout << MAGENTA_B "----\t MAP \t----" << NC << std::endl;
-	tree_build(); std::cout << std::endl;
+	// tree_build(); std::cout << std::endl;
 
-	map_build(); std::cout << std::endl;
-	map_empty(); std::cout << std::endl;
+	// map_build(); std::cout << std::endl;
+	// map_empty(); std::cout << std::endl;
 	map_erase(); std::cout << std::endl;
 }
 
@@ -451,7 +451,8 @@ void		map_erase(void)
 		lst.push_back(Tt3(i, std::string((lst_size - i), i + 65)));
 	TESTED_NAMESPACE::map<Tt1, Tt2> mp(lst.begin(), lst.end());
 	printSize(mp);
-
+	std::cout << "\n ##### FIND #####" << std::endl;
+	mp.find(8);
 	std::cout << "\nERASE 1" << std::endl;
 	ft_erase(mp, ++mp.begin());
 
@@ -489,12 +490,14 @@ void		map_erase(void)
 	ft_erase(mp, mp.begin(), mp.end());
 	mp.print();
 
-	ft::set<Tt1> set;
-	(void)set;
-	#include <set>
+	std::cout << "\n ##### FIND #####" << std::endl;
+	mp.find(12);
+	// ft::set<Tt1> set;
+	// (void)set;
+	// #include <set>
 	
-	std::set<Tt1> set1;
-	(void)set1;
+	// std::set<Tt1> set1;
+	// (void)set1;
 }
 
 #undef __PAIR__

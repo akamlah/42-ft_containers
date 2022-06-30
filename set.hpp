@@ -191,19 +191,15 @@ public:
 	// If no such element is found, or set is empty, end() is returned.
 	iterator find( const Key& key ) {
 		if (!empty())
-			for (iterator x = begin(); x != end(); x++) {
-				if (*x == key)
-					return (x) ;
-			}
+			// return (iterator((_tree.search(key, _compare, _compare))));
+			return (iterator((_tree.search(key))));
 		return (end());
 	}
 
 	const_iterator find( const Key& key ) const {
 		if (!empty())
-			for (const_iterator x = begin(); x != end(); x++) {
-				if (*x == key)
-					return (x) ;
-			}
+			// return (const_iterator((_tree.search(key, _compare, _compare))));
+			return (const_iterator((_tree.search(key))));
 		return (end());
 	}
 

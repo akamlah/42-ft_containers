@@ -92,7 +92,6 @@ public:
 		rb_iterator(const node_pointer& x): _base_ptr(x) {}
 		rb_iterator(const rb_iterator& other): _base_ptr(other._base_ptr) {}
 		node_pointer get_base_ptr() const { return(_base_ptr); }
-		// value_type operator*() { return(_base_ptr->value); }
 		reference operator*() const { return(_base_ptr->value); }
 		pointer operator->() const { return (&(operator*())); }
 
@@ -246,9 +245,9 @@ public:
 
 	bool empty() const { return (_size == 0); }
 	size_type size() const { return (_size); }
-
-	node_pointer min() const { return (empty() ? NULL : rb_min(_root)); }
-	node_pointer max() const { return (empty() ? NULL : rb_max(_root)); }
+	
+	node_pointer min() const { return (empty() ? _end_node : rb_min(_root)); }
+	node_pointer max() const { return (empty() ? _end_node : rb_max(_root)); }
 
 	iterator begin() {return(empty() ? end() : iterator(min())); }
 	iterator end() { return(iterator(_end_node)); }
@@ -260,9 +259,20 @@ public:
 	const_reverse_iterator rbegin() const { return(const_reverse_iterator(end())); }
 	const_reverse_iterator rend() const { return(const_reverse_iterator(begin())); }
 
-	node_pointer search(value_type value) const { return (_search(_root, value)); }
 	node_pointer successor(value_type value) const { return (rb_successor(search(value))); }
 	node_pointer predecessor(value_type value) const { return (rb_predecessor(search(value))); }
+
+	node_pointer search(value_type value) const { return (_search(_root, value)); }
+
+	// used (in map) for find algos that base on more complex comparison paradigms, ie when value_type
+	// is a complex object and only certain members need to be compared with the node's values
+	template<class Type, class EqualityPredicate, class ComparisonPredicate >
+	iterator search(Type value, EqualityPredicate _equal, ComparisonPredicate _compares) const {
+		node_pointer x = _root;
+		while (x != _NIL && !_equal(value, x->value))
+			x = (_compares(value, x->value)) ? x->left : x->right;
+		return (x != _NIL ? iterator(x) : iterator(_end_node));
+	}
 
 // modifiers - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -309,15 +319,8 @@ public:
 
 	}
 
-	void erase(const_reference value) {
-		node_pointer z = search(value);
-		erase(z);
-	}
-
-	void erase(iterator pos) {
-		node_pointer z = pos.get_base_ptr();
-		erase(z);
-	}
+	void erase(const_reference value) { node_pointer z = search(value); erase(z); }
+	void erase(iterator pos) { node_pointer z = pos.get_base_ptr(); erase(z); }
 
 	void erase(iterator first, iterator last) {
 		iterator it = first;
@@ -396,7 +399,8 @@ private:
 			else
 				x = x->right;
 		}
-		return (x);
+		// return (x);
+		return (x != _NIL ? x : _end_node);
 	}
 
 	// (algorithms at end of file - these are member functions)

@@ -1,0 +1,338 @@
+[32m
+****************************
+*          VECTOR          *
+****************************[0m
+Process 30452: 204 nodes malloced for 120747 KB
+Process 30452: 0 leaks for 0 total leaked bytes.
+
+[33m
+vector::vector
+[0mThe contents of fifth are: 16 2 77 29
+[33m
+iterator comparison
+[0mIterator comparison works
+[33m
+vector::operator=
+[0mSize of vfoo0: 0
+Size of vbar0: 3
+[33m
+vector::begin & vector::end
+[0mmyvector contains: 1 2 3 4 5
+[33m
+vector::rbegin | vector::rend
+[0mmyvector contains: 5 4 3 2 1
+[33m
+vector::size
+[0m0. size: 0
+1. size: 10
+2. size: 20
+3. size: 19
+[33m
+vector::size | vector::capacity | vector::max_size
+[0msize: 100
+capacity: 128
+max_size: 4611686018427387903
+[0;31m
+vector::resize
+[0mmyvector contains: 1 2 3 4 5 100 100 100 0 0 0 0
+[33m
+vector::empty
+[0mtotal: 55
+[33m
+vector::reserve
+[0mmaking vfoo grow:
+capacity changed: 1
+capacity changed: 2
+capacity changed: 4
+capacity changed: 8
+capacity changed: 16
+capacity changed: 32
+capacity changed: 64
+capacity changed: 128
+making vbar grow:
+capacity changed: 100
+[33m
+vector::operator[]
+[0mmyvector6 contains: 9 8 7 6 5 4 3 2 1 0
+[33m
+vector::at
+[0mmyvector7 contains: 0 1 2 3 4 5 6 7 8 9
+[33m
+vector::front
+[0mmyvector8.front() is now 62
+[33m
+vector::back
+[0mmyvector9 contains: 10 9 8 7 6 5 4 3 2 1 0
+[33m
+vector::assign
+[0mSize of first: 7
+Size of second: 5
+Size of third: 3
+[33m
+vector::push_back
+[0mmyvector10 stores 10 numbers.
+[33m
+vector::pop_back
+[0mThe elements of myvector11 add up to 600
+[33m
+vector::insert
+[0mmyvector12 contains: 501 502 503 300 300 400 400 200 100 100 100
+[33m
+vector::erase
+[0mmyvector13 contains: 4 5 7 8 9 10
+[33m
+vector::swap
+[0mvfoo3 contains: 100 100 100
+vbar3 contains: 200 200 200 200 200
+
+vfoo3 contains: 200 200 200 200 200
+vbar3 contains: 100 100 100
+[33m
+vector::clear
+[0mmyvector14 contains: 100 200 300
+myvector14 contains: 1101 2202
+[33m
+vector::get_allocator
+[0mThe allocated array contains: 0 1 2 3 4
+[33m
+relational operators (vector)
+[0mvfoo4 and vbar4 are not equal
+vfoo4 is less than vbar4
+vfoo4 is less than or equal to vbar4
+[33m
+swap (vector)
+[0mvfoo5 contains: 100 100 100
+vbar5 contains: 200 200 200 200 200
+vfoo5 contains: 200 200 200 200 200
+vbar5 contains: 100 100 100
+[33m
+performance vector
+[0minserting and deleting lots of elements
+Vector performance test: 0.347103sec.
+[33m
+leaks vector
+[0m[32m
+***************************
+*          STACK          *
+***************************[0m
+Process 30452: 219 nodes malloced for 202423 KB
+Process 30452: 0 leaks for 0 total leaked bytes.
+
+[33m
+stack::stack
+[0msize of sfirst: 0
+size of ssecond: 3
+size of sthird: 0
+size of sfourth: 2
+[33m
+stack::empty
+[0mtotal: 55
+[33m
+stack::size
+[0m0. size: 0
+1. size: 5
+2. size: 4
+[33m
+stack::top
+[0mmystack2.top() is now 15
+[33m
+stack::push | stack::pop
+[0mPopping out elements... 4 3 2 1 0
+[33m
+relational operators (stack)
+[0mStackA contains: 1 2 3 4 5 6 7 8 9 10 
+StackB contains: 1 2 3 4 5 6 7 8 9 10 
+operator== true
+operator!= false
+operator<  false
+operator<= true
+operator>  false
+operator>= true
+[33m
+performance stack
+[0minserting and deleting lots of elements
+Stack performance test: 0.399776sec.
+[33m
+leaks stack
+[0m[32m
+***************************
+*           MAP           *
+***************************[0m
+Process 30452: 2001242 nodes malloced for 327470 KB
+Process 30452: 0 leaks for 0 total leaked bytes.
+
+[33m
+map::map
+[0ma => 10
+b => 30
+c => 50
+d => 70
+[33m
+map::operator=
+[0mSize of mfirst2: 0
+Size of msecond2: 3
+[33m
+map::begin | map::end
+[0ma => 200
+b => 100
+c => 300
+[33m
+map::rbegin | map::rend
+[0mz => 300
+y => 200
+x => 100
+[33m
+map::empty
+[0ma => 10
+b => 20
+c => 30
+[33m
+map::size
+[0mmymap4.size() is 3
+[33m
+map::max_size
+[0mThe map contains 1000 elements.
+[33m
+map::operator[]
+[0mmymap6['a'] is an element
+mymap6['b'] is another element
+mymap6['c'] is another element
+mymap6['d'] is 
+mymap6 now contains 4 elements.
+[33m
+map::insert
+[0melement 'z' already existed with a value of 200
+mymap7 contains:
+a => 100
+b => 300
+c => 400
+z => 200
+anothermap contains:
+a => 100
+b => 300
+[33m
+map::erase
+[0ma => 10
+d => 40
+[33m
+map::swap
+[0mmfoo contains:
+x => 100
+y => 200
+mbar contains:
+a => 11
+b => 22
+c => 33
+
+swapping
+
+mfoo contains:
+a => 11
+b => 22
+c => 33
+mbar contains:
+x => 100
+y => 200
+[33m
+map::clear
+[0mmymap9 contains:
+x => 100
+y => 200
+z => 300
+mymap9 contains:
+a => 1101
+b => 2202
+[33m
+map::key_comp
+[0mmymap10 contains:
+a => 100
+b => 200
+c => 300
+
+[33m
+map::value_comp
+[0mmymap11 contains:
+x => 1001
+y => 2002
+z => 3003
+[33m
+map::find
+[0melements in mymap12:
+a => 50
+c => 150
+d => 200
+[33m
+map::count
+[0ma is an element of mymap13.
+b is not an element of mymap13.
+c is an element of mymap13.
+d is not an element of mymap13.
+e is not an element of mymap13.
+f is an element of mymap13.
+g is not an element of mymap13.
+[33m
+map::lower_bound | map::upper_bound
+[0ma => 20
+e => 100
+[33m
+map::equal_range
+[0mlower bound points to: b => 20
+upper bound points to: c => 30
+[33m
+map::get_allocator
+[0mThe allocated array has a size of 40 bytes.
+[33m
+relational operators (map)
+[0mmalice == mbob returns false
+malice != mbob returns true
+malice <  mbob returns true
+malice <= mbob returns true
+malice >  mbob returns false
+malice >= mbob returns false
+
+malice == meve returns true
+malice != meve returns false
+malice <  meve returns false
+malice <= meve returns true
+malice >  meve returns false
+malice >= meve returns true
+[33m
+swap (map)
+[0mmalice2:
+1 => a
+2 => b
+3 => c
+
+mbob2:
+7 => Z
+8 => Y
+9 => X
+10 => W
+
+-- SWAP
+
+malice2:
+7 => Z
+8 => Y
+9 => X
+10 => W
+
+mbob2:
+1 => a
+2 => b
+3 => c
+[33m
+performance map
+[0minserting and deleting lots of elements
+Map performance test: 9.1717sec.
+[33m
+leaks map
+[0m[34m
+--------------------------------------------------------
+[0m[36mTime taken by program for FT_VECTOR is 3.541369000 sec
+[0m[36mTime taken by program for FT_STACK  is 1.484372000 sec
+[0m[36mTime taken by program for FT_MAP    is 17.338049000 sec
+[0m[34m--------------------------------------------------------
+FT_TOTAL                               22.363790000 sec
+
+[0m
