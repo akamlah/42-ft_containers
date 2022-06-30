@@ -259,6 +259,8 @@ public:
 	const_reverse_iterator rbegin() const { return(const_reverse_iterator(end())); }
 	const_reverse_iterator rend() const { return(const_reverse_iterator(begin())); }
 
+// ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~  
+
 	node_pointer successor(value_type value) const { return (rb_successor(search(value))); }
 	node_pointer predecessor(value_type value) const { return (rb_predecessor(search(value))); }
 
@@ -319,9 +321,6 @@ public:
 
 	}
 
-	void erase(const_reference value) { node_pointer z = search(value); erase(z); }
-	void erase(iterator pos) { node_pointer z = pos.get_base_ptr(); erase(z); }
-
 	void erase(iterator first, iterator last) {
 		iterator it = first;
 		while (it != last) {
@@ -334,6 +333,10 @@ public:
 			tmp->__destroy();
 		}
 	}
+
+	void erase(const_reference value) { node_pointer z = search(value); erase(z); }
+
+	void erase(iterator pos) { node_pointer z = pos.get_base_ptr(); erase(z); }
 
 // lookup - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

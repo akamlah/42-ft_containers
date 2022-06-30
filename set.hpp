@@ -157,7 +157,6 @@ public:
 
 	// Removes the elements in the range [first; last), which must be a valid range in *this
 	void erase(iterator first, iterator last) {
-		// _tree.erase(first, last);
 		for (; first != last; )
 			erase(first++);
 	}
@@ -191,28 +190,24 @@ public:
 	// If no such element is found, or set is empty, end() is returned.
 	iterator find( const Key& key ) {
 		if (!empty())
-			// return (iterator((_tree.search(key, _compare, _compare))));
-			return (iterator((_tree.search(key))));
+			return (_tree.search(key));
 		return (end());
 	}
 
 	const_iterator find( const Key& key ) const {
 		if (!empty())
-			// return (const_iterator((_tree.search(key, _compare, _compare))));
-			return (const_iterator((_tree.search(key))));
+			return (_tree.search(key));
 		return (end());
 	}
 
 	// Returns a range containing all elements with the given key in the container.
 	// The range is defined by two iterators, one pointing to the first element
 	// that is not less than key and another pointing to the first element greater than key.
-	ft::pair<iterator,iterator> equal_range( const Key& key ) {
-		return (ft::pair<iterator, iterator>(lower_bound(key), upper_bound(key)));
-	}
+	ft::pair<iterator,iterator> equal_range( const Key& key )
+		{ return (ft::pair<iterator, iterator>(lower_bound(key), upper_bound(key))); }
 
-	ft::pair<const_iterator,const_iterator> equal_range( const Key& key ) const {
-		return (ft::pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key)));
-	}
+	ft::pair<const_iterator,const_iterator> equal_range( const Key& key ) const
+		{ return (ft::pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key))); }
 
 	iterator lower_bound( const Key& key ) {
 		iterator x = find(key);

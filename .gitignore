@@ -1,6 +1,5 @@
 tester1/
 containers_test/
-archieves/
 .vscode
 test_ft_containers
 std_compare/*.out

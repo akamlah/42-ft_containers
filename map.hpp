@@ -297,12 +297,12 @@ private:
 
 	// predicates: allow comparison between a key and a whole pair without having to write
 	// custom functions in the tree
-	struct key_pair_equal_predicate {
+	struct key_to_pair_equal {
 		bool operator()( const Key& key, const value_type& node_value ) const {
 			return ((key == node_value.first));
 		}
 	};
-	struct key_pair_compare_predicate {
+	struct key_to_pair_comp {
 		bool operator()( const Key& key, const value_type& node_value ) const {
 			return (key_compare()(key, node_value.first));
 		}
@@ -314,15 +314,13 @@ public:
 	// If no such element is found, or map is empty, end() is returned.
 	iterator find( const Key& key ) {
 		if (!empty())
-			return iterator(tree_iterator
-				(_tree.search(key, key_pair_equal_predicate(), key_pair_compare_predicate())));
+			return (_tree.search(key, key_to_pair_equal(), key_to_pair_comp()));
 		return (end());
 	}
 
 	const_iterator find( const Key& key ) const {
 		if (!empty())
-			return const_iterator(tree_const_iterator
-				(_tree.search(key, key_pair_equal_predicate(), key_pair_compare_predicate())));
+			return (tree_const_iterator(_tree.search(key, key_to_pair_equal(), key_to_pair_comp())));
 		return (end());
 	}
 
