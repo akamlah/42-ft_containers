@@ -1,6 +1,0 @@
-1122,1123c1122,1123
-< Process 68690: 156 nodes malloced for 12 KB
-< Process 68690: 0 leaks for 0 total leaked bytes.
----
-> Process 68768: 158 nodes malloced for 12 KB
-> Process 68768: 0 leaks for 0 total leaked bytes.

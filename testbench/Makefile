@@ -77,7 +77,7 @@ clean:
 fclean: clean
 	@ rm -f $(EXECUTABLE_NAME)
 	@ rm -rf *.dSYM
-	@ rm -rf std_container ft_container endboss.std endboss.ft
+	@ rm -rf std_container ft_container ./std_compare/*.out
 
 
 re: fclean all
@@ -103,9 +103,16 @@ sani_std: $(SOURCES) $(HEADER_DEPS)
 comp:
 	./std_compare/compare.sh
 
-endboss:
-	clang++ julians_main.cpp -o ft_container
-	clang++ julians_main.cpp -o std_container -DSTD
-	./ft_container > endboss.ft
-	./std_container > endboss.std
-	diff endboss.ft endboss.std
+main1:
+	clang++ main1.cpp -o ft_container
+	clang++ main1.cpp -o std_container -DSTD
+	./ft_container > ./std_compare/main1_ft.out
+	./std_container > ./std_compare/main1_std.out
+	diff ./std_compare/main1_ft.out ./std_compare/main1_std.out
+
+main2:
+	clang++ main2.cpp -o ft_container
+	clang++ main2.cpp -o std_container -DSTD
+	./ft_container > ./std_compare/main2_ft.out
+	./std_container > ./std_compare/main2_std.out
+	diff ./std_compare/main2_ft.out ./std_compare/main2_std.out
