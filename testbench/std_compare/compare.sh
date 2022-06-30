@@ -2,7 +2,7 @@
 
 make std
 ./test_ft_containers > ./std_compare/std.out
-make
+make re
 ./test_ft_containers > ./std_compare/ft.out
 
 DIFF="$(diff ./std_compare/std.out ./std_compare/ft.out | wc -l)"

@@ -71,11 +71,6 @@ template< class T1, class T2 >
 bool operator>=( const ft::pair<T1,T2>& lhs, const ft::pair<T1,T2>& rhs )
 	{ return (!(lhs < rhs)); }
 
-// DEBUGGING / print map function
-template<class T1, class T2>
-std::ostream& operator<<(std::ostream& o, const typename ft::pair< T1, T2 >& pair)
-	{ o << "[" << pair.first << ", " << pair.second << "]"; return o; }
-
 /* ft::pair ---------------------------------------------------------------- */
 
 /* make pair */

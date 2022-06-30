@@ -197,8 +197,8 @@ public:
 
 /* ------------------------ iterators: ------------------------------------ */
 
-	iterator begin() { return (_begin); }
-	const_iterator begin() const { return (_begin); }
+	iterator begin() { return iterator(_begin); }
+	const_iterator begin() const { return const_iterator(_begin); }
 	iterator end() {return (_end_size); }
 	const_iterator end() const { return (_end_size); }
 	reverse_iterator rbegin() {return (reverse_iterator(end())); }

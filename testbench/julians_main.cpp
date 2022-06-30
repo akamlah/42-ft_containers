@@ -62,7 +62,7 @@ struct classcomp2
 };
 
 int main()
-{
+{ 
 	struct timespec startVector, endVector;
 	struct timespec startStack, endStack;
 	struct timespec startMap, endMap;

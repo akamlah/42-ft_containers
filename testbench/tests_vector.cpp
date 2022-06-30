@@ -58,14 +58,16 @@ in the header "testing.hpp"
 
 template<typename T>
 void info(const _NS__::vector<T>& v) {
-	std::cout << "*begin: " << *v.begin() << ", ";
-	std::cout << "*end - 1: " << *(v.end() - 1) << ", ";
-	std::cout << "size: " << v.size() << ", ";
-	// std::cout << "capacity: " << v.capacity() << ", ";
-	// std::cout << "max size: " << v.max_size() << ", ";
-	std::cout << "front: " << v.front() << ", ";
-	std::cout << "back: " << v.back() << ", ";
 	std::cout << "empty?: " << v.empty() << ", ";
+	if (!v.empty()) {
+		std::cout << "*begin: " << *v.begin() << ", ";
+		std::cout << "*end - 1: " << *(v.end() - 1) << ", ";
+		std::cout << "size: " << v.size() << ", ";
+		// std::cout << "capacity: " << v.capacity() << ", ";
+		// std::cout << "max size: " << v.max_size() << ", ";
+		std::cout << "front: " << v.front() << ", ";
+		std::cout << "back: " << v.back() << ", ";
+	}
 	std::cout << std::endl;
 }
 
@@ -74,10 +76,8 @@ void info(const _NS__::vector<T>& v) {
 // CALL ALL
 void test_vector() {
 	std::cout << MAGENTA_B "----\t VECTOR \t----" << NC << std::endl;
-
 	/* ------------------ */
 	// building tests
-
 	vector_push_pop(); std::cout << std::endl;
 	vector_resize_reserve(); std::cout << std::endl;
 	vector_resize2(); std::cout << std::endl;
@@ -94,17 +94,14 @@ void test_vector() {
 	vector_rev_iter2(); std::cout << std::endl;
 	vector_rev_iter3(); std::cout << std::endl;
 	vector_bidirect(); std::cout << std::endl;
-
 	/* ------------------ */
 	// performance tests
-
 	// nb of elements in vector for stress tests. should not be smaller than 22
 	#ifndef _nb_elements__
 	#define _nb_elements__ 500000
 	#endif
-
 	vector_performance(); std::cout << std::endl;
-
+	/* ------------------ */
 }
 
 /* ************************************************************************ */
@@ -212,7 +209,6 @@ void vector_push_pop(){
 	info(v);
 	v.pop_back();
 	info(v);
-
 	_NS__::vector<std::string> vct(8);
 	_NS__::vector<std::string> vct2;
 	_NS__::vector<std::string>::iterator it = vct.begin();
@@ -321,7 +317,6 @@ void vector_copies() {
 	// for (unsigned int i = 0; i < v3.size(); i++) {
 	// 	std::cout << v3[i] << std::endl;
 	// }
-
 }
 
 void vector_range_construct() {
