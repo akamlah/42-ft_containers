@@ -5,7 +5,7 @@
 /* ************************************************************************ */
 
 #include "testing.hpp"
-#include "../utility.hpp"
+#include "../src/utility.hpp"
 
 // in this file:
 void pair();

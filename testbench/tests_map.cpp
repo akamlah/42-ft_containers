@@ -6,9 +6,9 @@
 
 #include "testing.hpp"
 #if (!STD)
-# include "../rb_tree.hpp"
-# include "../map.hpp"
-# include "../set.hpp"
+# include "../src/rb_tree.hpp"
+# include "../src/map.hpp"
+# include "../src/set.hpp"
 #endif
 
 //TEST ONLY

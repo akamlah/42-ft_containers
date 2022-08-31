@@ -21,7 +21,7 @@ CFLAGS = \
 
 ENTRY_POINT = main.cpp
 
-FT_LIB_DIR = ../
+FT_LIB_DIR = ../src/
 
 CLASSES = \
 	TestClass
@@ -77,8 +77,9 @@ clean:
 fclean: clean
 	@ rm -f $(EXECUTABLE_NAME)
 	@ rm -rf *.dSYM
-	@ rm -rf std_container ft_container ./std_compare/*.out
 
+ffclean: fclean
+	@ rm -rf std_container ft_container ./std_compare/*.out
 
 re: fclean all
 

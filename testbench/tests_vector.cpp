@@ -6,7 +6,7 @@
 
 #include "testing.hpp"
 
-#include "../vector.hpp"
+#include "../src/vector.hpp"
 
 #include <vector>
 #include <list>

@@ -1,8 +1,8 @@
 #if (!STD)
-	#include "../vector.hpp"
-	#include "../map.hpp"
-	#include "../set.hpp"
-	#include "../stack.hpp"
+	#include "../src/vector.hpp"
+	#include "../src/map.hpp"
+	#include "../src/set.hpp"
+	#include "../src/stack.hpp"
 #else
 	#include <vector>
 	#include <map>

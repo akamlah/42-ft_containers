@@ -24,9 +24,9 @@ diff endboss.ft endboss.std
 #include <set>
 #include <map>
 
-#include "../vector.hpp"
-#include "../stack.hpp"
-#include "../map.hpp"
+#include "../src/vector.hpp"
+#include "../src/stack.hpp"
+#include "../src/map.hpp"
 
 #include <sys/time.h>
 #include <iomanip>

@@ -3,3 +3,4 @@ containers_test/
 .vscode
 test_ft_containers
 std_compare/*.out
+.DS_Store

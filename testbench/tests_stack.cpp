@@ -6,8 +6,8 @@
 
 #include "testing.hpp"
 
-#include "../vector.hpp"
-#include "../stack.hpp"
+#include "../src/vector.hpp"
+#include "../src/stack.hpp"
 
 // in this file:
 void stack_construct();
